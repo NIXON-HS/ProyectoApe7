@@ -1,0 +1,164 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+@import "tailwindcss";
+
+/* ==========================================
+   SISTEMA DE DISEÑO DEL PORTAL WEB REASONS (UTA)
+   Tipografía: Outfit (Títulos) & Inter (Cuerpo)
+   Colores: Extraídos directamente de logo.png
+   ========================================== */
+
+@theme {
+  /* Tipografía */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Paleta cromática corporativa (Branding basado en logo.png) */
+  --color-reasons-blue: #0a3246;        /* Azul corporativo / turquesa oscuro (Ingeniería) */
+  --color-reasons-navy: #00283c;        /* Azul marino profundo (Identidad de marca) */
+  --color-reasons-green: #3c9632;       /* Verde hoja vibrante (Naturaleza y Sostenibilidad) */
+  --color-reasons-grey: #a0aab4;        /* Gris metálico / acero (Operaciones/Sociedad) */
+  --color-reasons-gold: #d4af37;        /* Dorado mate (Excelencia científica) */
+  --color-reasons-bg: #f8fafc;          /* Fondo claro premium slate-50 */
+  --color-reasons-slate: #1e293b;       /* Texto gris oscuro principal slate-800 */
+}
+
+/* ==========================================
+   CONFIGURACIONES BASE Y RESETS NATIVOS
+   ========================================== */
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-reasons-bg);
+  color: var(--color-reasons-slate);
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+/* ==========================================
+   UTILIDADES PREMIUM Y EFECTOS VISUALES
+   ========================================== */
+
+/* Efecto Vidrio Esmerilado Claro (Glassmorphism) */
+.glass-card {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px 0 rgba(10, 50, 70, 0.05);
+}
+
+/* Efecto Vidrio Esmerilado Oscuro (Dark Glassmorphism) */
+.glass-dark-card {
+  background: rgba(10, 50, 70, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Degradados de Texto Dinámicos */
+.text-gradient-brand {
+  background: linear-gradient(135deg, var(--color-reasons-blue) 0%, var(--color-reasons-green) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, var(--color-reasons-gold) 0%, #ffffff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Micro-animación Hover Premium */
+.hover-premium {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hover-premium:hover {
+  transform: translateY(-6px) scale(1.015);
+  box-shadow: 0 20px 40px 0 rgba(10, 50, 70, 0.12);
+}
+
+/* ==========================================
+   ADICIONES PREMIUM PARA EL PORTAL CIENTÍFICO (UTA)
+   ========================================== */
+
+/* Barra de desplazamiento minimalist premium */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+  border: 2px solid #f1f5f9;
+  transition: background 0.2s ease;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-reasons-blue);
+}
+
+/* Patrón de Rejilla de Fondo Científico */
+.bg-grid-pattern {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(10, 50, 70, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(10, 50, 70, 0.03) 1px, transparent 1px);
+}
+
+/* Animación de Flotado Dinámico */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(0.5deg); }
+}
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}
+
+/* Brillo Reflejado Elegante sin Color (Monochromatic Glass Glare) */
+.glowing-card {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.glowing-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.35) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-25deg);
+  z-index: 10;
+  transition: none;
+}
+.glowing-card:hover::after {
+  left: 150%;
+  transition: left 0.85s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.glowing-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px 0 rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+}
+
+/* Texto Degradado Dorado de Alta Gama */
+.text-gradient-gold {
+  background: linear-gradient(135deg, #d4af37 0%, #f3e5ab 50%, #aa7c11 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+

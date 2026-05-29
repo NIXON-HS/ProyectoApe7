@@ -1,0 +1,5 @@
+<app-header *ngIf="showNavbarAndFooter()"></app-header>
+<main [class]="showNavbarAndFooter() ? 'min-h-[85vh]' : ''">
+  <router-outlet></router-outlet>
+</main>
+<app-footer *ngIf="showNavbarAndFooter()"></app-footer>

@@ -1,0 +1,59 @@
+### =================================================================
+### PRUEBAS Y VALIDACIÓN DE LA API REST: Grupo de Investigación REASONS
+### =================================================================
+
+### 1. Obtener todos los Investigadores (Orden Jerárquico: Directores -> Investigadores)
+GET http://localhost:3000/api/investigadores
+Accept: application/json
+
+###
+
+### 2. Obtener un Investigador por ID
+GET http://localhost:3000/api/investigadores/1
+Accept: application/json
+
+###
+
+### 3. Obtener todos los Proyectos de Investigación (con Investigadores y Línea asociada)
+GET http://localhost:3000/api/proyectos
+Accept: application/json
+
+###
+
+### 4. Obtener todos los Artículos Científicos / Publicaciones (con Autores y Línea asociada)
+GET http://localhost:3000/api/publicaciones
+Accept: application/json
+
+###
+
+### 5. Enviar Formulario de Contacto (Payload Válido - Retorna 201 Created)
+POST http://localhost:3000/api/contacto
+Content-Type: application/json
+Accept: application/json
+
+{
+  "nombre_completo": "Ing. Juan Fernando Pérez",
+  "correo": "juan.perez@dominio.com",
+  "asunto": "Colaboración en Optimización Metalmecánica",
+  "mensaje": "Estimado Director Naranjo, me gustaría contactar con ustedes para explorar oportunidades de colaboración en sus líneas de manufactura sostenible. Quedo atento."
+}
+
+###
+
+### 6. Enviar Formulario de Contacto (Payload Inválido - Retorna 400 Bad Request)
+POST http://localhost:3000/api/contacto
+Content-Type: application/json
+Accept: application/json
+
+{
+  "nombre_completo": "Jo",
+  "correo": "correo-no-valido",
+  "asunto": "",
+  "mensaje": "Muy corto"
+}
+
+###
+
+### 7. Consultar Mensajes de Contacto Recibidos (Endpoint Admin)
+GET http://localhost:3000/api/contacto
+Accept: application/json

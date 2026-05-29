@@ -1,0 +1,73 @@
+import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
+
+@Component({
+  selector: 'app-footer',
+  standalone: true,
+  imports: [RouterLink],
+  template: `
+    <footer class="bg-reasons-navy text-slate-300 pt-16 pb-8 border-t border-slate-800">
+      <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
+        <!-- Brand Segment -->
+        <div class="flex flex-col gap-4">
+          <div class="flex items-center">
+            <img src="/logo.svg" alt="REASONS Logo" class="h-24 w-auto object-contain brightness-0 invert" />
+          </div>
+          <p class="text-sm text-slate-400 mt-2">
+            Research in Engineering and Advanced Sustainable Operations, Nature, and Society.
+          </p>
+          <p class="text-xs text-reasons-green font-semibold uppercase tracking-wider mt-1">
+            Universidad Técnica de Ambato
+          </p>
+        </div>
+
+        <!-- Sitemap Quick Links -->
+        <div class="flex flex-col gap-4">
+          <span class="text-white font-semibold tracking-wide text-sm uppercase">Navegación</span>
+          <div class="flex flex-col gap-2.5 text-sm">
+            <a routerLink="/home" class="hover:text-reasons-green transition-colors">Inicio</a>
+            <a routerLink="/equipo" class="hover:text-reasons-green transition-colors">Nuestro Equipo</a>
+            <a routerLink="/proyectos" class="hover:text-reasons-green transition-colors">Proyectos de Investigación</a>
+            <a routerLink="/publicaciones" class="hover:text-reasons-green transition-colors">Publicaciones Científicas</a>
+            <a routerLink="/contacto" class="hover:text-reasons-green transition-colors">Contacto</a>
+            <a routerLink="/login" class="hover:text-reasons-gold transition-colors font-semibold">Acceso Interno</a>
+          </div>
+        </div>
+
+        <!-- Research lines links -->
+        <div class="flex flex-col gap-4">
+          <span class="text-white font-semibold tracking-wide text-sm uppercase">Líneas de Investigación</span>
+          <div class="flex flex-col gap-2.5 text-sm">
+            <a [routerLink]="['/home']" fragment="linea-1" class="hover:text-reasons-green transition-colors">Diseño, Materiales y Procesos</a>
+            <a [routerLink]="['/home']" fragment="linea-2" class="hover:text-reasons-green transition-colors">Software y Ciencias de Datos</a>
+            <a [routerLink]="['/home']" fragment="linea-3" class="hover:text-reasons-green transition-colors">Energía y Sostenibilidad</a>
+          </div>
+        </div>
+
+        <!-- Contact details column -->
+        <div class="flex flex-col gap-4">
+          <span class="text-white font-semibold tracking-wide text-sm uppercase">Contacto</span>
+          <p class="text-sm text-slate-400">
+            Facultad de Ingeniería en Sistemas, Electrónica e Industrial. Av. de Los Chasquis y Av. Río Payamino.
+          </p>
+          <div class="flex flex-col gap-1 text-sm text-slate-300">
+            <span>Email: <a href="mailto:reasons@uta.edu.ec" class="text-reasons-green hover:underline">reasons&#64;uta.edu.ec</a></span>
+            <span>Teléfono: (03) 240-0200</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Copyright Bottom Bar -->
+      <div class="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+        <span>&copy; {{ currentYear }} REASONS Research Group (UTA). Todos los derechos reservados.</span>
+        <div class="flex gap-6">
+          <a href="#" class="hover:text-white transition-colors">Términos de Servicio</a>
+          <a href="#" class="hover:text-white transition-colors">Política de Privacidad</a>
+        </div>
+      </div>
+    </footer>
+  `
+})
+export class FooterComponent {
+  currentYear = new Date().getFullYear();
+}
