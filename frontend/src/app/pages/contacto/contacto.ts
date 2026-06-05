@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ContactoService } from '../../core/services/contacto.service';
+import { InfoGrupoService } from '../../core/services/info-grupo.service';
+import { InfoGrupo } from '../../core/models/info-grupo.model';
 
 @Component({
   selector: 'app-contacto',
@@ -13,10 +15,10 @@ import { ContactoService } from '../../core/services/contacto.service';
         <!-- Header -->
         <div class="text-center max-w-3xl mx-auto flex flex-col gap-4 mb-20 animate-fade-in">
           <span class="text-xs font-bold text-reasons-green tracking-widest uppercase">Póngase en Contacto</span>
-          <h1 class="text-4xl font-extrabold text-reasons-navy">Contacte con Nosotros</h1>
+          <h1 class="text-4xl font-extrabold text-reasons-navy">{{ info?.contacto_titulo || 'Contacte con Nosotros' }}</h1>
           <div class="w-16 h-1 bg-reasons-green mx-auto rounded-full"></div>
           <p class="text-slate-500 font-light leading-relaxed">
-            ¿Tiene alguna consulta sobre nuestras líneas de investigación, proyectos o desea colaborar con nosotros? Complete el formulario y responderemos lo antes posible.
+            {{ info?.contacto_descripcion || '¿Tiene alguna consulta sobre nuestras líneas de investigación, proyectos o desea colaborar con nosotros? Complete el formulario y responderemos lo antes posible.' }}
           </p>
         </div>
 
@@ -40,7 +42,7 @@ import { ContactoService } from '../../core/services/contacto.service';
                     </div>
                     <div class="flex flex-col gap-1.5">
                       <span class="font-bold text-reasons-navy text-xs uppercase tracking-wider">Dirección Principal</span>
-                      <span class="leading-relaxed">Facultad de Ingeniería en Sistemas, Electrónica e Industrial. Av. de Los Chasquis y Av. Río Payamino. Universidad Técnica de Ambato. Ambato – Ecuador.</span>
+                      <span class="leading-relaxed">{{ info?.contacto_direccion || 'Facultad de Ingeniería en Sistemas, Electrónica e Industrial. Av. de Los Chasquis y Av. Río Payamino. Universidad Técnica de Ambato. Ambato – Ecuador.' }}</span>
                     </div>
                   </div>
 
@@ -53,7 +55,7 @@ import { ContactoService } from '../../core/services/contacto.service';
                     </div>
                     <div class="flex flex-col gap-1.5">
                       <span class="font-bold text-reasons-navy text-xs uppercase tracking-wider">Correo Electrónico</span>
-                      <a href="mailto:reasons@uta.edu.ec" class="text-reasons-blue hover:text-reasons-green transition-colors font-medium text-sm leading-relaxed">reasons&#64;uta.edu.ec</a>
+                      <a [href]="'mailto:' + (info?.contacto_email || 'reasons@uta.edu.ec')" class="text-reasons-blue hover:text-reasons-green transition-colors font-medium text-sm leading-relaxed">{{ info?.contacto_email || 'reasons&#64;uta.edu.ec' }}</a>
                     </div>
                   </div>
                 </div>
@@ -174,11 +176,18 @@ export class ContactoComponent implements OnInit {
   isSubmitting = false;
   feedbackMsg = '';
   isSuccess = false;
+  info: InfoGrupo | null = null;
 
-  constructor(private fb: FormBuilder, private service: ContactoService) {}
+  constructor(
+    private fb: FormBuilder,
+    private service: ContactoService,
+    private infoSvc: InfoGrupoService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
     this.initForm();
+    this.infoSvc.getInfoGrupo().subscribe({ next: (d) => { this.info = d; this.cdr.detectChanges(); }, error: () => {} });
   }
 
   initForm() {

@@ -1,23 +1,26 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { ProyectoService } from '../../core/services/proyecto.service';
 import { Proyecto } from '../../core/models/proyecto.model';
 import { BlockRendererComponent } from '../../shared/block-renderer/block-renderer';
+import { InfoGrupoService } from '../../core/services/info-grupo.service';
+import { InfoGrupo } from '../../core/models/info-grupo.model';
 
 @Component({
   selector: 'app-proyectos',
   standalone: true,
-  imports: [CommonModule, BlockRendererComponent],
+  imports: [CommonModule, RouterLink, BlockRendererComponent],
   template: `
     <div class="min-h-screen pt-32 pb-24 bg-reasons-bg bg-grid-pattern relative">
       <div class="max-w-7xl mx-auto px-6">
         <!-- Header -->
         <div class="text-center max-w-3xl mx-auto flex flex-col gap-4 mb-20 animate-fade-in">
           <span class="text-xs font-bold text-reasons-green tracking-widest uppercase">Investigación Aplicada</span>
-          <h1 class="text-4xl font-extrabold text-reasons-navy">Nuestros Proyectos de Investigación</h1>
+          <h1 class="text-4xl font-extrabold text-reasons-navy">{{ info?.proyectos_titulo || 'Nuestros Proyectos de Investigación' }}</h1>
           <div class="w-16 h-1 bg-reasons-green mx-auto rounded-full"></div>
           <p class="text-slate-500 font-light leading-relaxed">
-            Explore los proyectos científicos liderados por REASONS, desarrollados en colaboración con socios industriales e instituciones académicas nacionales.
+            {{ info?.proyectos_descripcion || 'Explore los proyectos científicos liderados por REASONS, desarrollados en colaboración con socios industriales e instituciones académicas nacionales.' }}
           </p>
         </div>
 
@@ -99,26 +102,43 @@ import { BlockRendererComponent } from '../../shared/block-renderer/block-render
               </div>
             </div>
 
-            <!-- Footer with participants and expand action -->
-            <div class="border-t border-slate-100 pt-4 flex items-center justify-between gap-4">
+            <!-- Footer with participants and actions -->
+            <div class="border-t border-slate-100 pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <!-- Collaborators avatars -->
               <div class="flex items-center gap-2.5">
                 <span class="text-xs text-slate-400 font-light">Colaboradores:</span>
                 <div class="flex -space-x-2">
-                  <div *ngFor="let author of proj.investigadores" class="w-8 h-8 rounded-full bg-gradient-to-br from-reasons-navy to-reasons-blue border-2 border-white flex items-center justify-center text-white text-[10px] font-bold shadow overflow-hidden" [title]="author.nombres">
-                    <img *ngIf="author.foto_url" [src]="obtenerFotoUrl(author.foto_url)" 
-                         (error)="author.foto_url = ''" 
-                         class="w-full h-full object-cover" alt="Avatar" />
+                  <div *ngFor="let author of proj.investigadores"
+                       class="w-8 h-8 rounded-full bg-gradient-to-br from-reasons-navy to-reasons-blue border-2 border-white flex items-center justify-center text-white text-[10px] font-bold shadow overflow-hidden"
+                       [title]="author.nombres">
+                    <img *ngIf="author.foto_url" [src]="obtenerFotoUrl(author.foto_url)"
+                         (error)="author.foto_url = ''" class="w-full h-full object-cover" alt="Avatar" />
                     <span *ngIf="!author.foto_url">{{ author.nombres.charAt(0) }}</span>
                   </div>
-                  <span *ngIf="!proj.investigadores || proj.investigadores.length === 0" class="text-slate-400 text-xs italic ml-2">Ninguno asignado</span>
+                  <span *ngIf="!proj.investigadores || proj.investigadores.length === 0"
+                        class="text-slate-400 text-xs italic ml-2">Ninguno asignado</span>
                 </div>
               </div>
-              <button (click)="toggleExpand(proj.id)" class="text-xs font-bold text-reasons-blue hover:text-reasons-green transition-all flex items-center gap-1 group/btn cursor-pointer">
-                {{ expandedProjectId === proj.id ? 'Contraer Detalle' : 'Ver Detalles' }}
-                <svg class="w-3.5 h-3.5 transition-transform duration-300" [class.rotate-90]="expandedProjectId === proj.id" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
-                </svg>
-              </button>
+
+              <!-- Action buttons -->
+              <div class="flex items-center gap-2 flex-wrap">
+                <!-- Expand/collapse preview -->
+                <button (click)="toggleExpand(proj.id)"
+                        class="text-xs font-semibold text-slate-500 hover:text-reasons-blue transition-all flex items-center gap-1 cursor-pointer border border-slate-200 rounded-full px-3 py-1.5 hover:border-reasons-blue hover:bg-reasons-blue/5">
+                  {{ expandedProjectId === proj.id ? 'Contraer' : 'Vista previa' }}
+                  <svg class="w-3 h-3 transition-transform duration-300" [class.rotate-90]="expandedProjectId === proj.id" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </button>
+                <!-- Full detail link -->
+                <a [routerLink]="['/proyectos', proj.id]"
+                   class="text-xs font-bold text-white bg-reasons-blue hover:bg-reasons-navy transition-all flex items-center gap-1.5 rounded-full px-4 py-1.5 shadow-sm hover:shadow-md">
+                  Ver proyecto completo
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -153,8 +173,13 @@ export class ProyectosComponent implements OnInit {
   isLoading = true;
   proyectos: Proyecto[] = [];
   expandedProjectId: number | null = null;
+  info: InfoGrupo | null = null;
 
-  constructor(private service: ProyectoService, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private service: ProyectoService,
+    private cdr: ChangeDetectorRef,
+    private infoSvc: InfoGrupoService
+  ) {}
 
   obtenerFotoUrl(url: string | null | undefined): string | null {
     if (!url) return null;
@@ -167,6 +192,7 @@ export class ProyectosComponent implements OnInit {
 
   ngOnInit() {
     this.fetchProyectos();
+    this.infoSvc.getInfoGrupo().subscribe({ next: (d) => { this.info = d; this.cdr.detectChanges(); }, error: () => {} });
   }
 
   fetchProyectos() {

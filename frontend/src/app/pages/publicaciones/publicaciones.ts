@@ -1,24 +1,27 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { PublicacionService } from '../../core/services/publicacion.service';
 import { Publicacion } from '../../core/models/publicacion.model';
 import { BlockRendererComponent } from '../../shared/block-renderer/block-renderer';
+import { InfoGrupoService } from '../../core/services/info-grupo.service';
+import { InfoGrupo } from '../../core/models/info-grupo.model';
 
 @Component({
   selector: 'app-publicaciones',
   standalone: true,
-  imports: [CommonModule, FormsModule, BlockRendererComponent],
+  imports: [CommonModule, FormsModule, RouterLink, BlockRendererComponent],
   template: `
     <div class="min-h-screen pt-32 pb-24 bg-reasons-bg bg-grid-pattern relative">
       <div class="max-w-7xl mx-auto px-6">
         <!-- Header -->
         <div class="text-center max-w-3xl mx-auto flex flex-col gap-4 mb-16 animate-fade-in">
           <span class="text-xs font-bold text-reasons-green tracking-widest uppercase">Producción Científica</span>
-          <h1 class="text-4xl font-extrabold text-reasons-navy">Publicaciones Científicas</h1>
+          <h1 class="text-4xl font-extrabold text-reasons-navy">{{ info?.publicaciones_titulo || 'Publicaciones Científicas' }}</h1>
           <div class="w-16 h-1 bg-reasons-green mx-auto rounded-full"></div>
           <p class="text-slate-500 font-light leading-relaxed">
-            Consulte los artículos científicos, ponencias y contribuciones de los investigadores de REASONS indexados en journals internacionales de alto impacto.
+            {{ info?.publicaciones_descripcion || 'Consulte los artículos científicos, ponencias y contribuciones de los investigadores de REASONS indexados en journals internacionales de alto impacto.' }}
           </p>
         </div>
 
@@ -128,15 +131,24 @@ import { BlockRendererComponent } from '../../shared/block-renderer/block-render
               </div>
             </div>
 
-            <!-- Actions footer (DOI Link) -->
-            <div class="px-6 md:px-8 py-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
-              <a *ngIf="pub.doi_url" [href]="pub.doi_url" target="_blank" class="px-4 py-2 bg-reasons-blue hover:bg-reasons-navy text-white text-xs font-bold rounded-full shadow hover-premium flex items-center gap-2">
+            <!-- Actions footer -->
+            <div class="px-6 md:px-8 py-4 border-t border-slate-100 bg-slate-50 flex flex-wrap items-center justify-between gap-3">
+              <a *ngIf="pub.doi_url" [href]="pub.doi_url" target="_blank"
+                 class="px-4 py-2 bg-reasons-blue hover:bg-reasons-navy text-white text-xs font-bold rounded-full shadow hover-premium flex items-center gap-2">
                 Ver Journal (DOI)
                 <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                 </svg>
               </a>
-              <span *ngIf="!pub.doi_url" class="text-xs text-slate-400 font-light italic">No indexable</span>
+              <span *ngIf="!pub.doi_url" class="text-xs text-slate-400 font-light italic">Sin DOI indexado</span>
+              <!-- Detail link -->
+              <a [routerLink]="['/publicaciones', pub.id]"
+                 class="px-4 py-2 bg-reasons-green hover:bg-[#327e2a] text-white text-xs font-bold rounded-full shadow hover-premium flex items-center gap-1.5">
+                Ver publicación completa
+                <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                </svg>
+              </a>
             </div>
         </div>
       </div>
@@ -159,10 +171,16 @@ export class PublicacionesComponent implements OnInit {
   searchQuery = '';
   expandedPubId: number | null = null;
   copyFeedbackId: number | null = null;
+  info: InfoGrupo | null = null;
 
-  constructor(private service: PublicacionService, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private service: PublicacionService,
+    private cdr: ChangeDetectorRef,
+    private infoSvc: InfoGrupoService
+  ) {}
 
   ngOnInit() {
+    this.infoSvc.getInfoGrupo().subscribe({ next: (d) => { this.info = d; this.cdr.detectChanges(); }, error: () => {} });
     this.service.getPublicaciones().subscribe({
       next: (data) => {
         this.publicaciones = data;

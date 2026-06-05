@@ -157,6 +157,17 @@ table tbody tr:hover {
   box-shadow: 0 10px 25px -5px rgba(60, 150, 50, 0.08);
 }
 
+/* SAVE BUTTON — used in info forms */
+.save-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 16px; background: var(--color-reasons-green);
+  color: white; font-size: 12px; font-weight: 700;
+  border: none; border-radius: 10px; cursor: pointer;
+  transition: background .2s, transform .15s;
+  white-space: nowrap;
+}
+.save-btn:hover { background: #327e2a; transform: translateY(-1px); }
+
 /* Animations */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }

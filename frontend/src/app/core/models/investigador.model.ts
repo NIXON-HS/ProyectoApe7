@@ -12,4 +12,6 @@ export interface Investigador {
   red_telegram?: string;
   proyectos?: any[];
   publicaciones?: any[];
+  proyecto_investigador?: { rol_proyecto?: string };
+  publicacion_investigador?: { rol_publicacion?: string };
 }

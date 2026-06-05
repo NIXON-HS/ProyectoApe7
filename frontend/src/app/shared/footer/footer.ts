@@ -1,10 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { InfoGrupoService } from '../../core/services/info-grupo.service';
+import { InfoGrupo } from '../../core/models/info-grupo.model';
 
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [RouterLink],
+  imports: [CommonModule, RouterLink],
   template: `
     <footer class="bg-reasons-navy text-slate-300 pt-16 pb-8 border-t border-slate-800">
       <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
@@ -48,11 +51,11 @@ import { RouterLink } from '@angular/router';
         <div class="flex flex-col gap-4">
           <span class="text-white font-semibold tracking-wide text-sm uppercase">Contacto</span>
           <p class="text-sm text-slate-400">
-            Facultad de Ingeniería en Sistemas, Electrónica e Industrial. Av. de Los Chasquis y Av. Río Payamino.
+            {{ info?.contacto_direccion || 'Facultad de Ingeniería en Sistemas, Electrónica e Industrial. Av. de Los Chasquis y Av. Río Payamino.' }}
           </p>
           <div class="flex flex-col gap-1 text-sm text-slate-300">
-            <span>Email: <a href="mailto:reasons@uta.edu.ec" class="text-reasons-green hover:underline">reasons&#64;uta.edu.ec</a></span>
-            <span>Teléfono: (03) 240-0200</span>
+            <span>Email: <a [href]="'mailto:' + (info?.contacto_email || 'reasons@uta.edu.ec')" class="text-reasons-green hover:underline">{{ info?.contacto_email || 'reasons&#64;uta.edu.ec' }}</a></span>
+            <span *ngIf="info?.contacto_telefono || true">Teléfono: {{ info?.contacto_telefono || '(03) 240-0200' }}</span>
           </div>
         </div>
       </div>
@@ -68,6 +71,13 @@ import { RouterLink } from '@angular/router';
     </footer>
   `
 })
-export class FooterComponent {
+export class FooterComponent implements OnInit {
   currentYear = new Date().getFullYear();
+  info: InfoGrupo | null = null;
+
+  constructor(private infoSvc: InfoGrupoService) {}
+
+  ngOnInit() {
+    this.infoSvc.getInfoGrupo().subscribe({ next: (d) => { this.info = d; }, error: () => {} });
+  }
 }

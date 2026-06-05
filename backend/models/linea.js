@@ -19,6 +19,14 @@ const LineaInvestigacion = sequelize.define('lineas_investigacion', {
     type: DataTypes.STRING(50),
     allowNull: false,
   },
+  descripcion_larga: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
+  descripcion_larga_json: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
 }, {
   tableName: 'lineas_investigacion',
 });

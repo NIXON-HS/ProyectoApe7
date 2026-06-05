@@ -1,8 +1,10 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { BlockEditorComponent, Block } from '../../shared/block-editor/block-editor';
+import { InfoGrupoService } from '../../core/services/info-grupo.service';
+import { InfoGrupo, LineaInvestigacion } from '../../core/models/info-grupo.model';
 
 // Services
 import { AuthService } from '../../core/services/auth.service';
@@ -29,7 +31,7 @@ export class LoginComponent implements OnInit {
   // Session & UI Navigation State
   isLoggedIn = false;
   usuario: any = null;
-  activeTab: 'resumen' | 'investigadores' | 'proyectos' | 'publicaciones' | 'mensajes' | 'perfil' = 'resumen';
+  activeTab: 'resumen' | 'investigadores' | 'proyectos' | 'publicaciones' | 'mensajes' | 'perfil' | 'info' | 'lineas' = 'resumen';
   showPassword = false; // Toggler de visibilidad de contraseña
 
   // Forms
@@ -67,6 +69,37 @@ export class LoginComponent implements OnInit {
   // Block editor state – publicacion
   pubResumenBlocks: Block[] = [];
 
+  // Mode toggles: false = simple textarea, true = block editor
+  proyectoModoFlexible = false;
+  pubModoFlexible = false;
+
+  // ── Info del Grupo ────────────────────────────────────────────────────────
+  infoGrupo: InfoGrupo = {};
+  lineasAdmin: LineaInvestigacion[] = [];
+
+  // Block state for info grupo fields
+  infoDescBlocks:  Block[] = [];
+  infoMisionBlocks: Block[] = [];
+  infoObjGenBlocks: Block[] = [];
+  infoObjEspBlocks: Block[] = [];
+
+  // Controls whether block editors are rendered (true only after data is loaded)
+  infoLoaded = false;
+
+  // Mode toggles for info fields
+  infoDescModo   = false;
+  infoMisionModo = false;
+  infoObjGenModo = false;
+  infoObjEspModo = false;
+
+  // Línea form
+  lineaEditando: LineaInvestigacion | null = null;
+  lineaForm!: FormGroup;
+  lineaModoFlexible = false;
+  lineaDescBlocks: Block[] = [];
+  showLineaForm = false;
+  lineaPendienteEliminar: LineaInvestigacion | null = null; // for inline confirm UI
+
   // ViewChild refs for block editors (accessed after form is shown)
   @ViewChild('editorDesc')    editorDesc?:    BlockEditorComponent;
   @ViewChild('editorObj')     editorObj?:     BlockEditorComponent;
@@ -88,7 +121,10 @@ export class LoginComponent implements OnInit {
     private publicacionService: PublicacionService,
     private contactoService: ContactoService,
     private toastService: ToastService,
-    private router: Router
+    private router: Router,
+    private infoGrupoSvc: InfoGrupoService,
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone
   ) {}
 
   ngOnInit() {
@@ -104,22 +140,19 @@ export class LoginComponent implements OnInit {
     const storedUser = this.authService.getUsuarioActual();
 
     if (token && storedUser) {
-      // Mostrar el dashboard inmediatamente con el usuario de localStorage
       this.usuario = storedUser;
       this.isLoggedIn = true;
-      // Cargar datos de inmediato (en paralelo)
+      this.cdr.detectChanges();
       this.cargarTodo();
-      // Verificar el token en background — si expiró, desloguear silenciosamente
       this.authService.verifyToken().subscribe(res => {
         if (!res) {
-          // Token inválido: desloguear
           this.isLoggedIn = false;
           this.usuario = null;
           this.toastService.show('Tu sesión expiró. Por favor inicia sesión de nuevo.', 'warning');
         } else {
-          // Actualizar usuario con datos frescos del token
           this.usuario = res.data?.usuario ?? this.usuario;
         }
+        this.cdr.detectChanges();
       });
     } else if (token && !storedUser) {
       // Token sin usuario: limpiar
@@ -170,11 +203,12 @@ export class LoginComponent implements OnInit {
     this.authService.login(correo, password).subscribe({
       next: (res) => {
         this.usuario = res.data.usuario;
-        this.isLoggedIn = true;       // Show dashboard immediately
-        this.isSubmitting = false;    // Stop spinner
-        window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top to show dashboard
+        this.isLoggedIn = true;
+        this.isSubmitting = false;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         this.toastService.show(`¡Bienvenido, ${res.data.usuario?.nombres || 'Usuario'}!`, 'success');
-        this.cargarTodo();            // Load data in background (non-blocking)
+        this.cdr.detectChanges();
+        this.cargarTodo();
       },
       error: (err) => {
         this.isSubmitting = false;
@@ -269,16 +303,20 @@ export class LoginComponent implements OnInit {
       pendientes--;
       if (pendientes <= 0) {
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     };
 
-    // Safety timeout: if any request hangs, force-stop loading after 10s
-    const safetyTimer = setTimeout(() => {
-      if (this.isLoading) {
-        this.isLoading = false;
-        console.warn('cargarTodo: timeout de seguridad alcanzado, forzando fin de carga.');
-      }
-    }, 10000);
+    // Safety timeout — wrapped in NgZone so change detection fires
+    setTimeout(() => {
+      this.ngZone.run(() => {
+        if (this.isLoading) {
+          this.isLoading = false;
+          this.cdr.detectChanges();
+          console.warn('cargarTodo: timeout de seguridad alcanzado.');
+        }
+      });
+    }, 8000);
 
     // 1. Investigadores
     this.investigadorService.getInvestigadores().subscribe({
@@ -323,21 +361,256 @@ export class LoginComponent implements OnInit {
     // Clear safety timer once all loaded
     const originalFinalizar = finalizarUna;
     // Timer auto-clears via the timeout itself; no additional cleanup needed
-    void safetyTimer; // suppress unused warning
   }
 
   // ==========================================
   // TAB NAVIGATION
   // ==========================================
-  switchTab(tab: 'resumen' | 'investigadores' | 'proyectos' | 'publicaciones' | 'mensajes' | 'perfil') {
+  switchTab(tab: 'resumen' | 'investigadores' | 'proyectos' | 'publicaciones' | 'mensajes' | 'perfil' | 'info' | 'lineas') {
     this.activeTab = tab;
     this.searchQuery = '';
     this.cancelForm();
-    
-    if (tab === 'perfil') {
-      // Iniciar el perfil en vista previa
-      this.showForm = false;
+    if (tab === 'perfil') this.showForm = false;
+    if (tab === 'info')   this.cargarInfoGrupo();
+    if (tab === 'lineas') this.cargarLineas();
+  }
+
+  cargarLineas() {
+    this.infoGrupoSvc.getLineas().subscribe({
+      next: (data) => { this.lineasAdmin = data; this.cdr.detectChanges(); },
+      error: () => {}
+    });
+  }
+
+  // ==========================================
+  // INFO DEL GRUPO
+  // ==========================================
+  // ── Fallback defaults (same as home.ts constants) ────────────────────────
+  private readonly DEFAULTS = {
+    logo_url:              '/logo.svg',
+    descripcion:           'Impulsamos la excelencia en investigación multidisciplinaria uniendo la optimización de procesos industriales, el desarrollo tecnológico computacional, la armonía con la naturaleza y el beneficio de la sociedad.',
+    mision:                'Generar, promover y difundir conocimiento científico y tecnológico de vanguardia e impacto multidisciplinario, articulando la ingeniería avanzada con procesos de sostenibilidad industrial y ambiental, para aportar con soluciones innovadoras a las problemáticas actuales de la naturaleza y el beneficio de la sociedad andina y global.',
+    objetivo_general:      'Consolidarse como un grupo de investigación multidisciplinario líder y de referencia nacional e internacional en la optimización de sistemas productivos, desarrollo tecnológico sustentable y ciencia de datos, aportando soluciones eficientes y amigables con el medio ambiente aplicables a las dinámicas del sector industrial y social del país.',
+    objetivos_especificos: 'Publicar artículos científicos de alta calidad en revistas indexadas internacionalmente (Scopus, WoS).\nDesarrollar proyectos piloto conjuntos con industrias metalmecánicas, textiles y ambientales de la región.\nFormar investigadores jóvenes de pregrado y posgrado mediante la tutoría de tesis de excelencia.\nIntegrar hardware y software inteligente (IoT, AI) aplicados al desarrollo ecológico y optimización de recursos.',
+    dominio:               'Optimización de los Sistemas Productivos, Diseño y Desarrollo Urbanístico de la Facultad de Ingeniería en Sistemas, Electrónica e Industrial de la Universidad Técnica de Ambato.',
+    proyectos_titulo:      'Nuestros Proyectos de Investigación',
+    proyectos_descripcion: 'Explore los proyectos científicos liderados por REASONS, desarrollados en colaboración con socios industriales e instituciones académicas nacionales.',
+    publicaciones_titulo:       'Publicaciones Científicas',
+    publicaciones_descripcion:  'Consulte los artículos científicos, ponencias y contribuciones de los investigadores de REASONS indexados en journals internacionales de alto impacto.',
+    contacto_titulo:       'Contacte con Nosotros',
+    contacto_descripcion:  '¿Tiene alguna consulta sobre nuestras líneas de investigación, proyectos o desea colaborar con nosotros? Complete el formulario y responderemos lo antes posible.',
+    contacto_email:        'reasons@uta.edu.ec',
+    contacto_telefono:     '(03) 240-0200',
+    contacto_direccion:    'Facultad de Ingeniería en Sistemas, Electrónica e Industrial. Av. de Los Chasquis y Av. Río Payamino. Universidad Técnica de Ambato.',
+  };
+
+  cargarInfoGrupo() {
+    this.infoLoaded = false;
+    this.cdr.detectChanges();
+    this.infoGrupoSvc.getInfoGrupo().subscribe({
+      next: (data) => {
+        // Populate with defaults for any null fields so the admin sees current content
+        const d = this.DEFAULTS;
+        this.infoGrupo = {
+          logo_url:                  data.logo_url                  || d.logo_url,
+          descripcion:               data.descripcion               || d.descripcion,
+          descripcion_json:          data.descripcion_json          ?? null,
+          mision:                    data.mision                    || d.mision,
+          mision_json:               data.mision_json               ?? null,
+          objetivo_general:          data.objetivo_general          || d.objetivo_general,
+          objetivo_general_json:     data.objetivo_general_json     ?? null,
+          objetivos_especificos:     data.objetivos_especificos     || d.objetivos_especificos,
+          objetivos_especificos_json: data.objetivos_especificos_json ?? null,
+          dominio:                   data.dominio                   || d.dominio,
+          proyectos_titulo:          data.proyectos_titulo          || d.proyectos_titulo,
+          proyectos_descripcion:     data.proyectos_descripcion     || d.proyectos_descripcion,
+          publicaciones_titulo:      data.publicaciones_titulo      || d.publicaciones_titulo,
+          publicaciones_descripcion: data.publicaciones_descripcion || d.publicaciones_descripcion,
+          contacto_titulo:           data.contacto_titulo           || d.contacto_titulo,
+          contacto_descripcion:      data.contacto_descripcion      || d.contacto_descripcion,
+          contacto_email:            data.contacto_email            || d.contacto_email,
+          contacto_telefono:         data.contacto_telefono         || d.contacto_telefono,
+          contacto_direccion:        data.contacto_direccion        || d.contacto_direccion,
+        };
+
+        this.infoDescBlocks   = this.parseBlocks(data.descripcion_json,            this.infoGrupo.descripcion || '');
+        this.infoMisionBlocks = this.parseBlocks(data.mision_json,                 this.infoGrupo.mision || '');
+        this.infoObjGenBlocks = this.parseBlocks(data.objetivo_general_json,       this.infoGrupo.objetivo_general || '');
+        this.infoObjEspBlocks = this.parseBlocks(data.objetivos_especificos_json,  this.infoGrupo.objetivos_especificos || '');
+
+        this.infoLoaded = true;
+        this.cdr.detectChanges();
+      },
+      error: () => { this.infoLoaded = true; this.cdr.detectChanges(); }
+    });
+  }
+
+  private buildField(flexible: boolean, blocks: Block[], plain: string) {
+    if (flexible) {
+      const p = this.blocksToText(blocks) || ' ';
+      return { plain: p, json: JSON.stringify(blocks) };
     }
+    return { plain: plain || ' ', json: JSON.stringify(this.textToBlocks(plain)) };
+  }
+
+  private saveInfo(payload: Partial<InfoGrupo>, label: string) {
+    this.infoGrupoSvc.actualizarInfoGrupo(payload).subscribe({
+      next: () => this.toastService.show(`${label} guardado correctamente.`, 'success'),
+      error: () => this.toastService.show('Error al guardar.', 'error')
+    });
+  }
+
+  onLogoFileSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/') && file.type !== 'image/svg+xml') {
+      this.toastService.show('Solo se permiten imágenes (JPG, PNG, SVG, WEBP).', 'warning');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      this.toastService.show('El archivo no debe superar 5 MB.', 'warning');
+      return;
+    }
+
+    this.isUploading = true;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64Data = (reader.result as string).split(',')[1];
+      this.investigadorService.subirFoto(file.name, base64Data).subscribe({
+        next: (res: any) => {
+          this.isUploading = false;
+          if (res?.success) {
+            this.infoGrupo.logo_url = res.url;
+            this.cdr.detectChanges();
+            this.toastService.show('Logo subido. Presiona "Guardar" para aplicar.', 'success');
+          }
+        },
+        error: () => {
+          this.isUploading = false;
+          this.toastService.show('Error al subir el logo.', 'error');
+        }
+      });
+    };
+    reader.readAsDataURL(file);
+  }
+
+  guardarInfoGeneral() {
+    const desc   = this.buildField(this.infoDescModo,    this.infoDescBlocks,   this.infoGrupo.descripcion || '');
+    const mision = this.buildField(this.infoMisionModo,  this.infoMisionBlocks, this.infoGrupo.mision || '');
+    const objGen = this.buildField(this.infoObjGenModo,  this.infoObjGenBlocks, this.infoGrupo.objetivo_general || '');
+    const objEsp = this.buildField(this.infoObjEspModo,  this.infoObjEspBlocks, this.infoGrupo.objetivos_especificos || '');
+
+    this.saveInfo({
+      logo_url:                   this.infoGrupo.logo_url,
+      dominio:                    this.infoGrupo.dominio,
+      descripcion:                desc.plain,  descripcion_json:           desc.json,
+      mision:                     mision.plain, mision_json:                mision.json,
+      objetivo_general:           objGen.plain, objetivo_general_json:      objGen.json,
+      objetivos_especificos:      objEsp.plain, objetivos_especificos_json: objEsp.json,
+    }, 'Información general');
+  }
+
+  guardarInfoProyectos() {
+    this.saveInfo({
+      proyectos_titulo:        this.infoGrupo.proyectos_titulo,
+      proyectos_descripcion:   this.infoGrupo.proyectos_descripcion,
+    }, 'Página Proyectos');
+  }
+
+  guardarInfoPublicaciones() {
+    this.saveInfo({
+      publicaciones_titulo:       this.infoGrupo.publicaciones_titulo,
+      publicaciones_descripcion:  this.infoGrupo.publicaciones_descripcion,
+    }, 'Página Publicaciones');
+  }
+
+  guardarInfoContacto() {
+    this.saveInfo({
+      contacto_titulo:      this.infoGrupo.contacto_titulo,
+      contacto_descripcion: this.infoGrupo.contacto_descripcion,
+      contacto_email:       this.infoGrupo.contacto_email,
+      contacto_telefono:    this.infoGrupo.contacto_telefono,
+      contacto_direccion:   this.infoGrupo.contacto_direccion,
+    }, 'Página Contacto');
+  }
+
+  // ── Líneas de investigación CRUD ─────────────────────────────────────────
+
+  nuevaLinea() {
+    this.lineaEditando = null;
+    this.lineaModoFlexible = false;
+    this.lineaDescBlocks = [];
+    this.lineaForm = this.fb.group({
+      nombre:      ['', [Validators.required]],
+      abreviatura: ['', [Validators.required]],
+      descripcion: [''],
+    });
+    this.showLineaForm = false;
+    this.ngZone.run(() => { this.showLineaForm = true; this.cdr.detectChanges(); });
+  }
+
+  editarLinea(linea: LineaInvestigacion) {
+    this.lineaEditando = linea;
+    this.lineaModoFlexible = !!(linea.descripcion_larga_json);
+    this.lineaDescBlocks = this.parseBlocks(linea.descripcion_larga_json, linea.descripcion_larga || linea.descripcion);
+    this.lineaForm = this.fb.group({
+      nombre:      [linea.nombre,      [Validators.required]],
+      abreviatura: [linea.abreviatura, [Validators.required]],
+      descripcion: [linea.descripcion],
+    });
+    this.showLineaForm = false;
+    this.ngZone.run(() => { this.showLineaForm = true; this.cdr.detectChanges(); });
+  }
+
+  guardarLinea() {
+    if (this.lineaForm.invalid) return;
+
+    let descripcion_larga: string, descripcion_larga_json: string;
+    if (this.lineaModoFlexible) {
+      descripcion_larga      = this.blocksToText(this.lineaDescBlocks) || ' ';
+      descripcion_larga_json = JSON.stringify(this.lineaDescBlocks);
+    } else {
+      descripcion_larga      = this.lineaForm.get('descripcion')?.value || ' ';
+      descripcion_larga_json = JSON.stringify(this.textToBlocks(descripcion_larga));
+    }
+
+    const payload: Partial<LineaInvestigacion> = {
+      ...this.lineaForm.value,
+      descripcion: this.lineaForm.get('descripcion')?.value || ' ',
+      descripcion_larga,
+      descripcion_larga_json,
+    };
+
+    const req$ = this.lineaEditando?.id
+      ? this.infoGrupoSvc.actualizarLinea(this.lineaEditando.id, payload)
+      : this.infoGrupoSvc.crearLinea(payload);
+
+    req$.subscribe({
+      next: () => {
+        this.toastService.show(this.lineaEditando ? 'Línea actualizada.' : 'Línea creada.', 'success');
+        this.showLineaForm = false;
+        this.cargarInfoGrupo();
+      },
+      error: () => this.toastService.show('Error al guardar la línea.', 'error')
+    });
+  }
+
+  eliminarLinea(linea: LineaInvestigacion) {
+    this.lineaPendienteEliminar = linea;
+  }
+
+  confirmarEliminarLinea() {
+    const linea = this.lineaPendienteEliminar;
+    if (!linea?.id) return;
+    this.lineaPendienteEliminar = null;
+    this.infoGrupoSvc.eliminarLinea(linea.id).subscribe({
+      next: () => { this.toastService.show('Línea eliminada.', 'info'); this.cargarLineas(); },
+      error: (err) => {
+        const msg = err?.error?.message || 'No se pudo eliminar la línea.';
+        this.toastService.show(msg, 'error');
+      }
+    });
   }
 
   // ==========================================
@@ -418,19 +691,24 @@ export class LoginComponent implements OnInit {
     const currentInvIds = data?.investigadores?.map(i => i.id) || [];
 
     this.proyectoForm = this.fb.group({
-      titulo:  [data?.titulo  || '', [Validators.required]],
-      estado:  [data?.estado  || 'Activo', [Validators.required]],
-      linea_id:[data?.linea_id || 1, [Validators.required]],
+      titulo:      [data?.titulo      || '', [Validators.required]],
+      descripcion: [data?.descripcion || ''],
+      objetivos:   [data?.objetivos   || ''],
+      resultados:  [data?.resultados  || ''],
+      estado:      [data?.estado      || 'Activo', [Validators.required]],
+      linea_id:    [data?.linea_id    || 1, [Validators.required]],
       investigadores: [currentInvIds]
     });
 
-    // Load block content — force re-creation of editors by toggling showForm
+    // Auto-detect: use flexible if project already has rich content
+    this.proyectoModoFlexible = !!(data?.descripcion_json);
+
     this.proyDescBlocks = this.parseBlocks(data?.descripcion_json, data?.descripcion);
     this.proyObjBlocks  = this.parseBlocks(data?.objetivos_json,   data?.objetivos);
     this.proyResBlocks  = this.parseBlocks(data?.resultados_json,  data?.resultados);
 
     this.showForm = false;
-    Promise.resolve().then(() => { this.showForm = true; });
+    this.ngZone.run(() => { this.showForm = true; this.cdr.detectChanges(); });
   }
 
   nuevoProyecto() {
@@ -454,6 +732,13 @@ export class LoginComponent implements OnInit {
       return [{ id: crypto.randomUUID(), type: 'paragraph', content: plainText }];
     }
     return [];
+  }
+
+  /** Converts plain text into a single paragraph block (used in simple mode) */
+  private textToBlocks(text: string): Block[] {
+    const t = (text || '').trim();
+    if (!t) return [];
+    return [{ id: crypto.randomUUID(), type: 'paragraph', content: t }];
   }
 
   /** Extract plain-text from current block editors (used as DB fallback) */
@@ -487,15 +772,30 @@ export class LoginComponent implements OnInit {
     if (this.proyectoForm.invalid) return;
     this.isSubmitting = true;
 
-    const descBlocks = this.editorDesc?.getBlocks()  ?? this.proyDescBlocks;
-    const objBlocks  = this.editorObj?.getBlocks()   ?? this.proyObjBlocks;
-    const resBlocks  = this.editorRes?.getBlocks()   ?? this.proyResBlocks;
+    let descripcion: string, objetivos: string, resultados: string;
+    let descBlocks: Block[], objBlocks: Block[], resBlocks: Block[];
+
+    if (this.proyectoModoFlexible) {
+      descBlocks  = this.editorDesc?.getBlocks()  ?? this.proyDescBlocks;
+      objBlocks   = this.editorObj?.getBlocks()   ?? this.proyObjBlocks;
+      resBlocks   = this.editorRes?.getBlocks()   ?? this.proyResBlocks;
+      descripcion = this.blocksToText(descBlocks) || ' ';
+      objetivos   = this.blocksToText(objBlocks)  || ' ';
+      resultados  = this.blocksToText(resBlocks)  || ' ';
+    } else {
+      descripcion = this.proyectoForm.get('descripcion')?.value || ' ';
+      objetivos   = this.proyectoForm.get('objetivos')?.value   || ' ';
+      resultados  = this.proyectoForm.get('resultados')?.value  || ' ';
+      descBlocks  = this.textToBlocks(descripcion);
+      objBlocks   = this.textToBlocks(objetivos);
+      resBlocks   = this.textToBlocks(resultados);
+    }
 
     const val = {
       ...this.proyectoForm.value,
-      descripcion:      this.blocksToText(descBlocks) || ' ',
-      objetivos:        this.blocksToText(objBlocks)  || ' ',
-      resultados:       this.blocksToText(resBlocks)  || ' ',
+      descripcion,
+      objetivos,
+      resultados,
       descripcion_json: JSON.stringify(descBlocks),
       objetivos_json:   JSON.stringify(objBlocks),
       resultados_json:  JSON.stringify(resBlocks),
@@ -544,6 +844,7 @@ export class LoginComponent implements OnInit {
 
     this.publicacionForm = this.fb.group({
       titulo:              [data?.titulo              || '', [Validators.required]],
+      resumen:             [data?.resumen             || ''],
       cita:                [data?.cita                || '', [Validators.required]],
       revista_portada_url: [data?.revista_portada_url || ''],
       doi_url:             [data?.doi_url             || ''],
@@ -551,10 +852,11 @@ export class LoginComponent implements OnInit {
       investigadores:      [currentInvIds]
     });
 
+    this.pubModoFlexible  = !!(data?.resumen_json);
     this.pubResumenBlocks = this.parseBlocks(data?.resumen_json, data?.resumen);
 
     this.showForm = false;
-    Promise.resolve().then(() => { this.showForm = true; });
+    this.ngZone.run(() => { this.showForm = true; this.cdr.detectChanges(); });
   }
 
   nuevaPublicacion() {
@@ -623,11 +925,19 @@ export class LoginComponent implements OnInit {
     if (this.publicacionForm.invalid) return;
     this.isSubmitting = true;
 
-    const resumenBlocks = this.editorResumen?.getBlocks() ?? this.pubResumenBlocks;
+    let resumen: string, resumenBlocks: Block[];
+
+    if (this.pubModoFlexible) {
+      resumenBlocks = this.editorResumen?.getBlocks() ?? this.pubResumenBlocks;
+      resumen       = this.blocksToText(resumenBlocks) || ' ';
+    } else {
+      resumen       = this.publicacionForm.get('resumen')?.value || ' ';
+      resumenBlocks = this.textToBlocks(resumen);
+    }
 
     const val = {
       ...this.publicacionForm.value,
-      resumen:      this.blocksToText(resumenBlocks) || ' ',
+      resumen,
       resumen_json: JSON.stringify(resumenBlocks),
     };
 

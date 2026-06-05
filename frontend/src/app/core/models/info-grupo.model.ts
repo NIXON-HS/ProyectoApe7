@@ -1,0 +1,34 @@
+export interface InfoGrupo {
+  id?: number;
+  logo_url?: string | null;
+  descripcion?: string | null;
+  descripcion_json?: string | null;
+  mision?: string | null;
+  mision_json?: string | null;
+  objetivo_general?: string | null;
+  objetivo_general_json?: string | null;
+  objetivos_especificos?: string | null;
+  objetivos_especificos_json?: string | null;
+  dominio?: string | null;
+
+  proyectos_titulo?:      string | null;
+  proyectos_descripcion?: string | null;
+
+  publicaciones_titulo?:      string | null;
+  publicaciones_descripcion?: string | null;
+
+  contacto_titulo?:      string | null;
+  contacto_descripcion?: string | null;
+  contacto_email?:       string | null;
+  contacto_telefono?:    string | null;
+  contacto_direccion?:   string | null;
+}
+
+export interface LineaInvestigacion {
+  id?: number;
+  nombre: string;
+  abreviatura: string;
+  descripcion: string;
+  descripcion_larga?: string | null;
+  descripcion_larga_json?: string | null;
+}
