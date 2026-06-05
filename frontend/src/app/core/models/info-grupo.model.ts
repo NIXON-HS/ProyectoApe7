@@ -8,6 +8,9 @@ export interface InfoGrupo {
   hero_subtitulo?: string | null;
   hero_cita?:     string | null;
 
+  hero_card_nombre?: string | null;
+  hero_card_grupo?:  string | null;
+
   descripcion?: string | null;
   descripcion_json?: string | null;
   mision?: string | null;

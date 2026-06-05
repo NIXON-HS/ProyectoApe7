@@ -78,9 +78,20 @@ const DEFAULT_DOMINIO = 'Optimización de los Sistemas Productivos, Diseño y De
             <div class="w-32 h-32 rounded-full bg-white p-4 flex items-center justify-center shadow-xl">
               <img [src]="info?.logo_url || '/logo.svg'" alt="REASONS Group Logo" class="h-24 w-auto object-contain" (error)="$any($event.target).src='/logo.svg'" />
             </div>
-            <div class="flex flex-col gap-2">
-              <h2 class="text-2xl font-bold text-white tracking-wide">REASONS</h2>
-              <span class="text-xs text-[#7dd87a] font-semibold uppercase tracking-widest">Grupo de Investigación UTA</span>
+            <div class="flex flex-col gap-2 items-center w-full">
+              <h2 *ngIf="!editMode" class="text-2xl font-bold text-white tracking-wide">
+                {{ info?.hero_card_nombre || 'REASONS' }}
+              </h2>
+              <input *ngIf="editMode" [(ngModel)]="draft.hero_card_nombre"
+                     class="hero-card-input text-center text-xl font-bold text-white tracking-wide"
+                     placeholder="Nombre (ej: REASONS)" />
+
+              <span *ngIf="!editMode" class="text-xs text-[#7dd87a] font-semibold uppercase tracking-widest">
+                {{ info?.hero_card_grupo || 'Grupo de Investigación UTA' }}
+              </span>
+              <input *ngIf="editMode" [(ngModel)]="draft.hero_card_grupo"
+                     class="hero-card-input text-center text-[10px] font-bold uppercase tracking-widest text-[#7dd87a]"
+                     placeholder="Subtítulo del card (ej: Grupo de Investigación UTA)" />
             </div>
             <div class="w-full border-t border-white/10 my-2"></div>
             <p *ngIf="!editMode" class="text-slate-300 text-sm font-light leading-relaxed">
@@ -233,6 +244,12 @@ const DEFAULT_DOMINIO = 'Optimización de los Sistemas Productivos, Diseño y De
       padding:8px 14px; outline:none; line-height:1.2; transition:border .2s;
     }
     .hero-ie-input:focus { border-color:#7dd87a; background:rgba(255,255,255,.12); }
+    .hero-card-input {
+      display:block; width:100%; background:rgba(255,255,255,.08);
+      border:1.5px dashed rgba(255,255,255,.35); border-radius:10px;
+      padding:5px 10px; outline:none; transition:border .2s; color:inherit;
+    }
+    .hero-card-input:focus { border-color:#7dd87a; background:rgba(255,255,255,.12); }
   `]
 })
 export class HomeComponent implements OnInit, OnDestroy {
@@ -293,12 +310,14 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.draft = { ...this.info };
     // Pre-fill hero fields with their on-screen fallbacks so the user
     // only needs to edit what they want to change, not retype everything.
-    if (!this.draft.hero_badge)     this.draft.hero_badge     = 'Universidad Técnica de Ambato';
-    if (!this.draft.hero_titulo)    this.draft.hero_titulo    = 'Research in Engineering and Advanced Sustainable Operations,';
-    if (!this.draft.hero_nombre)    this.draft.hero_nombre    = 'Nature, and Society';
-    if (!this.draft.hero_subtitulo) this.draft.hero_subtitulo = this.info?.descripcion
+    if (!this.draft.hero_badge)        this.draft.hero_badge        = 'Universidad Técnica de Ambato';
+    if (!this.draft.hero_titulo)       this.draft.hero_titulo       = 'Research in Engineering and Advanced Sustainable Operations,';
+    if (!this.draft.hero_nombre)       this.draft.hero_nombre       = 'Nature, and Society';
+    if (!this.draft.hero_subtitulo)    this.draft.hero_subtitulo    = this.info?.descripcion
       ?? 'Investigación innovadora desde la Facultad de Ingeniería en Sistemas, Electrónica e Industrial orientada a un futuro industrial verde y sostenible.';
-    if (!this.draft.hero_cita)      this.draft.hero_cita      = 'Investigación innovadora desde la Facultad de Ingeniería en Sistemas, Electrónica e Industrial orientada a un futuro industrial verde y sostenible.';
+    if (!this.draft.hero_cita)         this.draft.hero_cita         = 'Investigación innovadora desde la Facultad de Ingeniería en Sistemas, Electrónica e Industrial orientada a un futuro industrial verde y sostenible.';
+    if (!this.draft.hero_card_nombre)  this.draft.hero_card_nombre  = 'REASONS';
+    if (!this.draft.hero_card_grupo)   this.draft.hero_card_grupo   = 'Grupo de Investigación UTA';
     if (!this.draft.mision)              this.draft.mision              = this.info?.mision              ?? DEFAULT_MISION;
     if (!this.draft.objetivo_general)    this.draft.objetivo_general    = this.info?.objetivo_general    ?? DEFAULT_OBJETIVO;
     if (!this.draft.objetivos_especificos) this.draft.objetivos_especificos = this.info?.objetivos_especificos ?? DEFAULT_OBJETIVOS_ESP;
@@ -314,6 +333,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       hero_nombre:             this.draft.hero_nombre,
       hero_subtitulo:          this.draft.hero_subtitulo,
       hero_cita:               this.draft.hero_cita,
+      hero_card_nombre:        this.draft.hero_card_nombre,
+      hero_card_grupo:         this.draft.hero_card_grupo,
       // Misión / Objetivos / Dominio
       descripcion:             this.draft.descripcion,
       mision:                  this.draft.mision,
