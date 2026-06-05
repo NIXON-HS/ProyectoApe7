@@ -24,10 +24,11 @@ exports.actualizarInfoGrupo = async (req, res, next) => {
       'objetivo_general', 'objetivo_general_json',
       'objetivos_especificos', 'objetivos_especificos_json',
       'dominio',
-      'proyectos_titulo', 'proyectos_descripcion',
-      'publicaciones_titulo', 'publicaciones_descripcion',
-      'contacto_titulo', 'contacto_descripcion',
+      'proyectos_badge', 'proyectos_titulo', 'proyectos_descripcion',
+      'publicaciones_badge', 'publicaciones_titulo', 'publicaciones_descripcion',
+      'contacto_badge', 'contacto_titulo', 'contacto_descripcion',
       'contacto_email', 'contacto_telefono', 'contacto_direccion',
+      'equipo_badge', 'equipo_titulo', 'equipo_descripcion',
     ];
 
     const update = {};

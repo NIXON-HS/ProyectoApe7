@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { InfoGrupoService } from '../../core/services/info-grupo.service';
 import { InfoGrupo, LineaInvestigacion } from '../../core/models/info-grupo.model';
 import { BlockRendererComponent } from '../../shared/block-renderer/block-renderer';
@@ -15,9 +16,14 @@ const DEFAULT_DOMINIO = 'Optimización de los Sistemas Productivos, Diseño y De
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, BlockRendererComponent, AdminBarComponent],
+  imports: [CommonModule, FormsModule, RouterLink, BlockRendererComponent, AdminBarComponent],
   template: `
-    <app-admin-bar editTab="info"></app-admin-bar>
+    <app-admin-bar editTab="info"
+      [editMode]="editMode"
+      (editStart)="startEdit()"
+      (editSave)="saveEdit()"
+      (editCancel)="cancelEdit()">
+    </app-admin-bar>
     <!-- Hero Section -->
     <section class="relative min-h-[90vh] flex items-center justify-center pt-24 pb-16 bg-gradient-to-br from-reasons-navy via-[#0a3246] to-reasons-green overflow-hidden">
       <div class="absolute inset-0 opacity-15">
@@ -27,15 +33,35 @@ const DEFAULT_DOMINIO = 'Optimización de los Sistemas Productivos, Diseño y De
 
       <div class="relative max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         <div class="lg:col-span-7 flex flex-col gap-6 text-left">
-          <span class="inline-flex px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold uppercase tracking-wider text-[#7dd87a] w-fit">
-            Universidad Técnica de Ambato
+          <!-- Hero badge -->
+          <span *ngIf="!editMode" class="inline-flex px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold uppercase tracking-wider text-[#7dd87a] w-fit">
+            {{ info?.hero_badge || 'Universidad Técnica de Ambato' }}
           </span>
-          <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
-            Research in Engineering and Advanced Sustainable Operations, <span class="text-gradient-gold">Nature, and Society</span>
+          <input *ngIf="editMode" [(ngModel)]="draft.hero_badge"
+                 class="hero-ie-badge"
+                 placeholder="Etiqueta del hero (ej: Universidad Técnica de Ambato)" />
+
+          <!-- Hero título h1 -->
+          <h1 *ngIf="!editMode" class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
+            {{ info?.hero_titulo || 'Research in Engineering and Advanced Sustainable Operations,' }}
+            <span class="text-gradient-gold">{{ info?.hero_nombre || 'Nature, and Society' }}</span>
           </h1>
-          <p class="text-lg text-slate-200 font-light leading-relaxed max-w-2xl">
-            {{ info?.descripcion || 'Impulsamos la excelencia en investigación multidisciplinaria uniendo la optimización de procesos industriales, el desarrollo tecnológico computacional, la armonía con la naturaleza y el beneficio de la sociedad.' }}
+          <div *ngIf="editMode" class="flex flex-col gap-2 max-w-2xl">
+            <input [(ngModel)]="draft.hero_titulo"
+                   class="hero-ie-input"
+                   placeholder="Título del hero (parte 1)..." />
+            <input [(ngModel)]="draft.hero_nombre"
+                   class="hero-ie-input text-[#fbbf24]"
+                   placeholder="Título del hero (parte dorada)..." />
+          </div>
+
+          <!-- Subtítulo / descripción -->
+          <p *ngIf="!editMode" class="text-lg text-slate-200 font-light leading-relaxed max-w-2xl">
+            {{ info?.hero_subtitulo || info?.descripcion || 'Investigación innovadora desde la Facultad de Ingeniería en Sistemas, Electrónica e Industrial orientada a un futuro industrial verde y sostenible.' }}
           </p>
+          <textarea *ngIf="editMode" [(ngModel)]="draft.hero_subtitulo" rows="3"
+                    class="w-full bg-white/10 border-2 border-dashed border-white/40 rounded-2xl text-white placeholder-white/40 text-base font-light leading-relaxed p-4 outline-none resize-none max-w-2xl"
+                    placeholder="Subtítulo del hero..."></textarea>
           <div class="flex flex-wrap gap-4 mt-4">
             <a routerLink="/equipo" class="px-8 py-3.5 bg-reasons-green hover:bg-[#327e2a] text-white font-semibold rounded-full shadow-lg hover-premium transition-all">
               Conocer el Equipo
@@ -57,9 +83,12 @@ const DEFAULT_DOMINIO = 'Optimización de los Sistemas Productivos, Diseño y De
               <span class="text-xs text-[#7dd87a] font-semibold uppercase tracking-widest">Grupo de Investigación UTA</span>
             </div>
             <div class="w-full border-t border-white/10 my-2"></div>
-            <p class="text-slate-300 text-sm font-light leading-relaxed">
-              "Investigación innovadora desde la Facultad de Ingeniería en Sistemas, Electrónica e Industrial orientada a un futuro industrial verde y sostenible."
+            <p *ngIf="!editMode" class="text-slate-300 text-sm font-light leading-relaxed">
+              "{{ info?.hero_cita || 'Investigación innovadora desde la Facultad de Ingeniería en Sistemas, Electrónica e Industrial orientada a un futuro industrial verde y sostenible.' }}"
             </p>
+            <textarea *ngIf="editMode" [(ngModel)]="draft.hero_cita" rows="3"
+                      class="w-full bg-white/10 border-2 border-dashed border-white/30 rounded-xl text-slate-300 placeholder-white/30 text-sm font-light leading-relaxed p-3 outline-none resize-none"
+                      placeholder="Cita del card (sin comillas)..."></textarea>
           </div>
         </div>
       </div>
@@ -87,34 +116,31 @@ const DEFAULT_DOMINIO = 'Optimización de los Sistemas Productivos, Diseño y De
             <!-- Misión -->
             <div *ngIf="activeTab==='mision'" class="flex flex-col gap-4 animate-fade-in">
               <h3 class="text-xl font-bold text-reasons-navy flex items-center gap-3">
-                <svg class="h-6 w-6 text-reasons-green flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                </svg>
+                <svg class="h-6 w-6 text-reasons-green flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                 Comprometidos con el Desarrollo Multidisciplinario
               </h3>
-              <app-block-renderer [blocksJson]="info?.mision_json" [fallback]="info?.mision || DEFAULT_MISION"></app-block-renderer>
+              <app-block-renderer *ngIf="!editMode" [blocksJson]="info?.mision_json" [fallback]="info?.mision || DEFAULT_MISION"></app-block-renderer>
+              <textarea *ngIf="editMode" [(ngModel)]="draft.mision" rows="5" class="ie-textarea-light" placeholder="Misión del grupo...">{{ draft.mision }}</textarea>
             </div>
 
             <!-- Objetivo General -->
             <div *ngIf="activeTab==='general'" class="flex flex-col gap-4 animate-fade-in">
               <h3 class="text-xl font-bold text-reasons-navy flex items-center gap-3">
-                <svg class="h-6 w-6 text-reasons-green flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
+                <svg class="h-6 w-6 text-reasons-green flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 Liderazgo Científico y Tecnológico
               </h3>
-              <app-block-renderer [blocksJson]="info?.objetivo_general_json" [fallback]="info?.objetivo_general || DEFAULT_OBJETIVO"></app-block-renderer>
+              <app-block-renderer *ngIf="!editMode" [blocksJson]="info?.objetivo_general_json" [fallback]="info?.objetivo_general || DEFAULT_OBJETIVO"></app-block-renderer>
+              <textarea *ngIf="editMode" [(ngModel)]="draft.objetivo_general" rows="5" class="ie-textarea-light" placeholder="Objetivo general...">{{ draft.objetivo_general }}</textarea>
             </div>
 
             <!-- Objetivos Específicos -->
             <div *ngIf="activeTab==='especificos'" class="flex flex-col gap-4 animate-fade-in">
               <h3 class="text-xl font-bold text-reasons-navy flex items-center gap-3">
-                <svg class="h-6 w-6 text-reasons-green flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                </svg>
+                <svg class="h-6 w-6 text-reasons-green flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                 Acciones Estratégicas del Grupo
               </h3>
-              <app-block-renderer [blocksJson]="info?.objetivos_especificos_json" [fallback]="info?.objetivos_especificos || DEFAULT_OBJETIVOS_ESP"></app-block-renderer>
+              <app-block-renderer *ngIf="!editMode" [blocksJson]="info?.objetivos_especificos_json" [fallback]="info?.objetivos_especificos || DEFAULT_OBJETIVOS_ESP"></app-block-renderer>
+              <textarea *ngIf="editMode" [(ngModel)]="draft.objetivos_especificos" rows="6" class="ie-textarea-light" placeholder="Objetivos específicos...">{{ draft.objetivos_especificos }}</textarea>
             </div>
 
           </div>
@@ -129,9 +155,11 @@ const DEFAULT_DOMINIO = 'Optimización de los Sistemas Productivos, Diseño y De
           <span class="text-xs font-bold text-reasons-green tracking-widest uppercase">Ámbito de Acción</span>
           <h2 class="text-3xl md:text-4xl font-extrabold text-reasons-navy">Dominio y Líneas de Investigación</h2>
           <div class="w-16 h-1 bg-reasons-green mx-auto rounded-full mb-2"></div>
-          <p class="text-slate-500 font-light max-w-3xl mx-auto leading-relaxed">
+          <p *ngIf="!editMode" class="text-slate-500 font-light max-w-3xl mx-auto leading-relaxed">
             <strong class="text-reasons-blue font-semibold">{{ info?.dominio || DEFAULT_DOMINIO }}</strong>
           </p>
+          <textarea *ngIf="editMode" [(ngModel)]="draft.dominio" rows="2"
+                    class="w-full max-w-3xl mx-auto ie-textarea-light" placeholder="Dominio..."></textarea>
         </div>
 
         <!-- Líneas de investigación — dinámicas desde la BD -->
@@ -176,20 +204,43 @@ const DEFAULT_DOMINIO = 'Optimización de los Sistemas Productivos, Diseño y De
   `,
   styles: [`
     .tab-btn {
-      padding: .75rem 1.5rem; font-weight:600; color:#64748b;
-      border-bottom:2px solid transparent; transition:all .2s ease; cursor:pointer;
-      white-space:nowrap;
+      padding:.75rem 1.5rem; font-weight:600; color:#64748b;
+      border-bottom:2px solid transparent; transition:all .2s ease; cursor:pointer; white-space:nowrap;
     }
     .tab-btn:hover { color:#0a3246; }
     .active-tab { color:#3c9632!important; border-color:#3c9632!important; }
     @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
     .animate-fade-in { animation:fadeIn .35s cubic-bezier(.4,0,.2,1) forwards; }
+    .ie-textarea-light {
+      display:block; width:100%; background:rgba(10,50,70,.04);
+      border:2px dashed #94a3b8; border-radius:12px; outline:none;
+      padding:10px 14px; resize:vertical; line-height:1.6; font-size:.9rem;
+      color:#374151; transition:border .2s;
+    }
+    .ie-textarea-light:focus { border-color:#3c9632; background:rgba(60,150,50,.03); }
+    /* Hero inline-edit styles */
+    .hero-ie-badge {
+      display:inline-block; font-size:11px; font-weight:700; text-transform:uppercase;
+      letter-spacing:.1em; color:#7dd87a; background:rgba(255,255,255,.08);
+      border:1.5px dashed rgba(125,216,122,.5); border-radius:999px;
+      padding:6px 18px; outline:none; transition:border .2s;
+    }
+    .hero-ie-badge:focus { border-color:#7dd87a; background:rgba(255,255,255,.12); }
+    .hero-ie-input {
+      display:block; width:100%; font-size:2.5rem; font-weight:800;
+      color:#fff; background:rgba(255,255,255,.08);
+      border:2px dashed rgba(255,255,255,.35); border-radius:16px;
+      padding:8px 14px; outline:none; line-height:1.2; transition:border .2s;
+    }
+    .hero-ie-input:focus { border-color:#7dd87a; background:rgba(255,255,255,.12); }
   `]
 })
 export class HomeComponent implements OnInit, OnDestroy {
   info: InfoGrupo | null = null;
   lineas: LineaInvestigacion[] = [];
   activeTab: 'mision' | 'general' | 'especificos' = 'mision';
+  editMode = false;
+  draft: InfoGrupo = {};
 
   // Expose defaults to template
   DEFAULT_MISION     = DEFAULT_MISION;
@@ -236,6 +287,40 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.activeTab = tab;
     this.cdr.detectChanges();
     this.startRotation();
+  }
+
+  startEdit() {
+    this.draft = { ...this.info };
+    // Pre-fill hero fields with their on-screen fallbacks so the user
+    // only needs to edit what they want to change, not retype everything.
+    if (!this.draft.hero_badge)     this.draft.hero_badge     = 'Universidad Técnica de Ambato';
+    if (!this.draft.hero_titulo)    this.draft.hero_titulo    = 'Research in Engineering and Advanced Sustainable Operations,';
+    if (!this.draft.hero_nombre)    this.draft.hero_nombre    = 'Nature, and Society';
+    if (!this.draft.hero_subtitulo) this.draft.hero_subtitulo = this.info?.descripcion
+      ?? 'Investigación innovadora desde la Facultad de Ingeniería en Sistemas, Electrónica e Industrial orientada a un futuro industrial verde y sostenible.';
+    if (!this.draft.hero_cita)      this.draft.hero_cita      = 'Investigación innovadora desde la Facultad de Ingeniería en Sistemas, Electrónica e Industrial orientada a un futuro industrial verde y sostenible.';
+    if (!this.draft.mision)              this.draft.mision              = this.info?.mision              ?? DEFAULT_MISION;
+    if (!this.draft.objetivo_general)    this.draft.objetivo_general    = this.info?.objetivo_general    ?? DEFAULT_OBJETIVO;
+    if (!this.draft.objetivos_especificos) this.draft.objetivos_especificos = this.info?.objetivos_especificos ?? DEFAULT_OBJETIVOS_ESP;
+    if (!this.draft.dominio)             this.draft.dominio             = this.info?.dominio             ?? DEFAULT_DOMINIO;
+    this.editMode = true;
+  }
+  cancelEdit() { this.editMode = false; this.draft = {}; }
+  saveEdit() {
+    this.infoSvc.actualizarInfoGrupo({
+      // Hero
+      hero_badge:              this.draft.hero_badge,
+      hero_titulo:             this.draft.hero_titulo,
+      hero_nombre:             this.draft.hero_nombre,
+      hero_subtitulo:          this.draft.hero_subtitulo,
+      hero_cita:               this.draft.hero_cita,
+      // Misión / Objetivos / Dominio
+      descripcion:             this.draft.descripcion,
+      mision:                  this.draft.mision,
+      objetivo_general:        this.draft.objetivo_general,
+      objetivos_especificos:   this.draft.objetivos_especificos,
+      dominio:                 this.draft.dominio,
+    }).subscribe({ next: () => { this.editMode = false; this.infoSvc.notifyUpdate(); this.cargarInfo(); } });
   }
 
   lineaIconBg(i: number): string {

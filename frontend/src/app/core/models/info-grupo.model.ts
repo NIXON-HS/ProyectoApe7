@@ -1,6 +1,13 @@
 export interface InfoGrupo {
   id?: number;
   logo_url?: string | null;
+
+  hero_badge?:    string | null;
+  hero_titulo?:   string | null;
+  hero_nombre?:   string | null;
+  hero_subtitulo?: string | null;
+  hero_cita?:     string | null;
+
   descripcion?: string | null;
   descripcion_json?: string | null;
   mision?: string | null;

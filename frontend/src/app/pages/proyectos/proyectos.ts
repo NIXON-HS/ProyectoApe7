@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ProyectoService } from '../../core/services/proyecto.service';
 import { Proyecto } from '../../core/models/proyecto.model';
@@ -11,19 +12,48 @@ import { AdminBarComponent } from '../../shared/admin-bar/admin-bar';
 @Component({
   selector: 'app-proyectos',
   standalone: true,
-  imports: [CommonModule, RouterLink, BlockRendererComponent, AdminBarComponent],
+  imports: [CommonModule, FormsModule, RouterLink, BlockRendererComponent, AdminBarComponent],
   template: `
-    <app-admin-bar editTab="proyectos"></app-admin-bar>
+    <app-admin-bar editTab="proyectos"
+      [editMode]="editMode"
+      (editStart)="startEdit()"
+      (editSave)="saveEdit()"
+      (editCancel)="cancelEdit()">
+    </app-admin-bar>
+
     <div class="min-h-screen pt-32 pb-24 bg-reasons-bg bg-grid-pattern relative">
       <div class="max-w-7xl mx-auto px-6">
+
+        <!-- ── Edit mode highlight frame ─────────────────────────────── -->
+        <div *ngIf="editMode" class="mb-4 px-4 py-2 bg-reasons-green/10 border border-reasons-green/30 rounded-2xl text-xs text-reasons-green font-semibold text-center animate-fade-in">
+          ✏ Modo edición activo — modifica los textos directamente y presiona "Guardar cambios"
+        </div>
+
         <!-- Header -->
         <div class="text-center max-w-3xl mx-auto flex flex-col gap-4 mb-20 animate-fade-in">
-          <span class="text-xs font-bold text-reasons-green tracking-widest uppercase">{{ info?.proyectos_badge || 'Investigación Aplicada' }}</span>
-          <h1 class="text-4xl font-extrabold text-reasons-navy">{{ info?.proyectos_titulo || 'Nuestros Proyectos de Investigación' }}</h1>
+
+          <!-- Badge -->
+          <span *ngIf="!editMode" class="text-xs font-bold text-reasons-green tracking-widest uppercase">
+            {{ info?.proyectos_badge || 'Investigación Aplicada' }}
+          </span>
+          <input *ngIf="editMode" [(ngModel)]="draft.proyectos_badge"
+                 class="ie-badge ie-badge-green" placeholder="Etiqueta..."/>
+
+          <!-- Title -->
+          <h1 *ngIf="!editMode" class="text-4xl font-extrabold text-reasons-navy">
+            {{ info?.proyectos_titulo || 'Nuestros Proyectos de Investigación' }}
+          </h1>
+          <input *ngIf="editMode" [(ngModel)]="draft.proyectos_titulo"
+                 class="ie-title" placeholder="Título..."/>
+
           <div class="w-16 h-1 bg-reasons-green mx-auto rounded-full"></div>
-          <p class="text-slate-500 font-light leading-relaxed">
-            {{ info?.proyectos_descripcion || 'Explore los proyectos científicos liderados por REASONS, desarrollados en colaboración con socios industriales e instituciones académicas nacionales.' }}
+
+          <!-- Description -->
+          <p *ngIf="!editMode" class="text-slate-500 font-light leading-relaxed">
+            {{ info?.proyectos_descripcion || 'Explore los proyectos científicos liderados por REASONS en distintas áreas del conocimiento.' }}
           </p>
+          <textarea *ngIf="editMode" [(ngModel)]="draft.proyectos_descripcion" rows="3"
+                    class="ie-desc" placeholder="Descripción..."></textarea>
         </div>
 
         <!-- Spinner loader -->
@@ -166,9 +196,22 @@ import { AdminBarComponent } from '../../shared/admin-bar/admin-bar';
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
     }
-    .animate-spin {
-      animation: spin 1s linear infinite;
-    }
+    .animate-spin { animation: spin 1s linear infinite; }
+    /* ── Inline edit styles ────────────────────────────────── */
+    .ie-badge { display:block; width:100%; font-size:10px; font-weight:700;
+      text-transform:uppercase; letter-spacing:.1em; color:#3c9632;
+      background:transparent; border:none; border-bottom:2px dashed #3c9632;
+      text-align:center; outline:none; padding:2px 4px; }
+    .ie-badge-green::placeholder { color:#a7f3d0; }
+    .ie-title { display:block; width:100%; font-size:2.25rem; font-weight:800;
+      color:#00283c; background:rgba(10,50,70,.04); border:2px dashed #0a3246;
+      border-radius:12px; text-align:center; outline:none; padding:8px 12px; }
+    .ie-desc { display:block; width:100%; font-weight:300; color:#64748b;
+      background:rgba(0,0,0,.02); border:2px dashed #cbd5e1;
+      border-radius:10px; outline:none; padding:8px 12px; resize:vertical;
+      line-height:1.6; text-align:center; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+    .animate-fade-in { animation:fadeIn .35s cubic-bezier(.4,0,.2,1) forwards; }
   `]
 })
 export class ProyectosComponent implements OnInit {
@@ -176,6 +219,8 @@ export class ProyectosComponent implements OnInit {
   proyectos: Proyecto[] = [];
   expandedProjectId: number | null = null;
   info: InfoGrupo | null = null;
+  editMode = false;
+  draft: InfoGrupo = {};
 
   constructor(
     private service: ProyectoService,
@@ -200,6 +245,32 @@ export class ProyectosComponent implements OnInit {
 
   loadInfo() {
     this.infoSvc.getInfoGrupo().subscribe({ next: (d) => { this.info = d; this.cdr.detectChanges(); }, error: () => {} });
+  }
+
+  startEdit() {
+    this.draft = { ...this.info };
+    if (!this.draft.proyectos_badge)        this.draft.proyectos_badge        = 'Investigación Aplicada';
+    if (!this.draft.proyectos_titulo)       this.draft.proyectos_titulo       = 'Nuestros Proyectos de Investigación';
+    if (!this.draft.proyectos_descripcion)  this.draft.proyectos_descripcion  = 'Explore los proyectos científicos liderados por REASONS en distintas áreas del conocimiento.';
+    this.editMode = true;
+    this.cdr.detectChanges();
+  }
+
+  cancelEdit() { this.editMode = false; this.draft = {}; }
+
+  saveEdit() {
+    this.infoSvc.actualizarInfoGrupo({
+      proyectos_badge:        this.draft.proyectos_badge,
+      proyectos_titulo:       this.draft.proyectos_titulo,
+      proyectos_descripcion:  this.draft.proyectos_descripcion,
+    }).subscribe({
+      next: () => {
+        this.editMode = false;
+        this.infoSvc.notifyUpdate();
+        this.loadInfo();
+      },
+      error: () => {}
+    });
   }
 
   fetchProyectos() {

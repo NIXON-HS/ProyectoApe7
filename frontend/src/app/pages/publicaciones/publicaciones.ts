@@ -14,17 +14,24 @@ import { AdminBarComponent } from '../../shared/admin-bar/admin-bar';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, BlockRendererComponent, AdminBarComponent],
   template: `
-    <app-admin-bar editTab="publicaciones"></app-admin-bar>
+    <app-admin-bar editTab="publicaciones"
+      [editMode]="editMode"
+      (editStart)="startEdit()"
+      (editSave)="saveEdit()"
+      (editCancel)="cancelEdit()">
+    </app-admin-bar>
     <div class="min-h-screen pt-32 pb-24 bg-reasons-bg bg-grid-pattern relative">
       <div class="max-w-7xl mx-auto px-6">
         <!-- Header -->
         <div class="text-center max-w-3xl mx-auto flex flex-col gap-4 mb-16 animate-fade-in">
-          <span class="text-xs font-bold text-reasons-green tracking-widest uppercase">{{ info?.publicaciones_badge || 'Producción Científica' }}</span>
-          <h1 class="text-4xl font-extrabold text-reasons-navy">{{ info?.publicaciones_titulo || 'Publicaciones Científicas' }}</h1>
+          <div *ngIf="editMode" class="px-4 py-2 bg-reasons-green/10 border border-reasons-green/30 rounded-2xl text-xs text-reasons-green font-semibold text-center mb-2">✏ Modo edición activo</div>
+          <span *ngIf="!editMode" class="text-xs font-bold text-reasons-green tracking-widest uppercase">{{ info?.publicaciones_badge || 'Producción Científica' }}</span>
+          <input *ngIf="editMode" [(ngModel)]="draft.publicaciones_badge" class="ie-badge ie-badge-green" placeholder="Etiqueta..."/>
+          <h1 *ngIf="!editMode" class="text-4xl font-extrabold text-reasons-navy">{{ info?.publicaciones_titulo || 'Publicaciones Científicas' }}</h1>
+          <input *ngIf="editMode" [(ngModel)]="draft.publicaciones_titulo" class="ie-title" placeholder="Título..."/>
           <div class="w-16 h-1 bg-reasons-green mx-auto rounded-full"></div>
-          <p class="text-slate-500 font-light leading-relaxed">
-            {{ info?.publicaciones_descripcion || 'Consulte los artículos científicos, ponencias y contribuciones de los investigadores de REASONS indexados en journals internacionales de alto impacto.' }}
-          </p>
+          <p *ngIf="!editMode" class="text-slate-500 font-light leading-relaxed">{{ info?.publicaciones_descripcion || 'Consulte los artículos científicos publicados por los investigadores de REASONS en revistas indexadas.' }}</p>
+          <textarea *ngIf="editMode" [(ngModel)]="draft.publicaciones_descripcion" rows="3" class="ie-desc" placeholder="Descripción..."></textarea>
         </div>
 
         <!-- Buscador por palabras clave o autor -->
@@ -161,9 +168,11 @@ import { AdminBarComponent } from '../../shared/admin-bar/admin-bar';
       from { opacity: 0; }
       to { opacity: 1; }
     }
-    .animate-fade-in {
-      animation: fadeIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    }
+    .animate-fade-in { animation: fadeIn 0.35s cubic-bezier(0.4,0,.2,1) forwards; }
+    .ie-badge { display:block;width:100%;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#3c9632;background:transparent;border:none;border-bottom:2px dashed #3c9632;text-align:center;outline:none;padding:2px 4px; }
+    .ie-badge-green::placeholder { color:#a7f3d0; }
+    .ie-title { display:block;width:100%;font-size:2.25rem;font-weight:800;color:#00283c;background:rgba(10,50,70,.04);border:2px dashed #0a3246;border-radius:12px;text-align:center;outline:none;padding:8px 12px; }
+    .ie-desc { display:block;width:100%;font-weight:300;color:#64748b;background:rgba(0,0,0,.02);border:2px dashed #cbd5e1;border-radius:10px;outline:none;padding:8px 12px;resize:vertical;line-height:1.6;text-align:center; }
   `]
 })
 export class PublicacionesComponent implements OnInit {
@@ -172,6 +181,8 @@ export class PublicacionesComponent implements OnInit {
   filteredPublicaciones: Publicacion[] = [];
   searchQuery = '';
   expandedPubId: number | null = null;
+  editMode = false;
+  draft: InfoGrupo = {};
   copyFeedbackId: number | null = null;
   info: InfoGrupo | null = null;
 
@@ -183,6 +194,22 @@ export class PublicacionesComponent implements OnInit {
 
   loadInfo() {
     this.infoSvc.getInfoGrupo().subscribe({ next: (d) => { this.info = d; this.cdr.detectChanges(); }, error: () => {} });
+  }
+
+  startEdit() {
+    this.draft = { ...this.info };
+    if (!this.draft.publicaciones_badge)        this.draft.publicaciones_badge        = 'Producción Científica';
+    if (!this.draft.publicaciones_titulo)       this.draft.publicaciones_titulo       = 'Publicaciones Científicas';
+    if (!this.draft.publicaciones_descripcion)  this.draft.publicaciones_descripcion  = 'Consulte los artículos científicos publicados por los investigadores de REASONS en revistas indexadas.';
+    this.editMode = true;
+  }
+  cancelEdit() { this.editMode = false; this.draft = {}; }
+  saveEdit() {
+    this.infoSvc.actualizarInfoGrupo({
+      publicaciones_badge:       this.draft.publicaciones_badge,
+      publicaciones_titulo:      this.draft.publicaciones_titulo,
+      publicaciones_descripcion: this.draft.publicaciones_descripcion,
+    }).subscribe({ next: () => { this.editMode = false; this.infoSvc.notifyUpdate(); this.loadInfo(); } });
   }
 
   ngOnInit() {
