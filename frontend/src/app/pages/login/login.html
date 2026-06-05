@@ -183,11 +183,11 @@
   </div>
 
   <!-- Left Navigation Sidebar -->
-  <aside class="fixed lg:fixed top-0 left-0 h-full w-72 bg-reasons-navy text-white flex flex-col justify-between p-6 z-50 lg:z-40 border-r border-white/5 shadow-2xl transition-transform duration-300 ease-in-out"
+  <aside class="fixed lg:fixed top-0 left-0 h-full w-72 bg-reasons-navy text-white flex flex-col justify-between p-5 lg:p-6 z-50 lg:z-40 border-r border-white/5 shadow-2xl transition-transform duration-300 ease-in-out overflow-y-auto"
          [class.translate-x-0]="isMobileSidebarOpen"
          [class.-translate-x-full]="!isMobileSidebarOpen"
          [class.lg:translate-x-0]="true">
-    <div class="flex flex-col gap-6 lg:gap-8">
+    <div class="flex flex-col gap-4 lg:gap-8">
       <!-- Close button on Mobile Sidebar -->
       <div class="flex justify-between items-center lg:hidden border-b border-white/10 pb-4 mb-2">
         <span class="text-xs font-bold text-reasons-green uppercase tracking-widest">Navegación</span>
@@ -1638,13 +1638,13 @@
           <!-- Misión -->
           <div class="flex flex-col gap-2 pt-2 border-t border-slate-100">
             <div class="flex items-center justify-between flex-wrap gap-2">
-              <label class="form-label mb-0">Misión del Grupo</label>
+              <label class="form-label mb-0">Descripción del Grupo (Misión)</label>
               <div class="flex gap-1 p-0.5 bg-slate-100 rounded-lg">
                 <button type="button" (click)="infoMisionModo=false" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all" [class]="!infoMisionModo?'bg-white shadow text-reasons-navy':'text-slate-400'">Simple</button>
                 <button type="button" (click)="infoMisionModo=true"  class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all" [class]="infoMisionModo?'bg-white shadow text-reasons-blue':'text-slate-400'">✦ Flexible</button>
               </div>
             </div>
-            <textarea *ngIf="!infoMisionModo" [(ngModel)]="infoGrupo.mision" rows="3" class="form-input" placeholder="Misión del grupo..."></textarea>
+            <textarea *ngIf="!infoMisionModo" [(ngModel)]="infoGrupo.mision" rows="3" class="form-input" placeholder="Descripción o Misión del grupo..."></textarea>
             <app-block-editor *ngIf="infoMisionModo" [initialBlocks]="infoMisionBlocks" (blocksChange)="infoMisionBlocks=$event"></app-block-editor>
           </div>
 

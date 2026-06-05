@@ -12,7 +12,7 @@ import { AuthService } from '../../core/services/auth.service';
          class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50
                 flex items-center gap-2 sm:gap-3 px-3 py-2 sm:px-5 sm:py-2.5
                 backdrop-blur-md border rounded-full shadow-2xl
-                text-[10px] sm:text-xs font-semibold select-none animate-slide-up transition-all duration-300"
+                max-w-[92vw] text-[10px] sm:text-xs font-semibold select-none animate-slide-up transition-all duration-300"
          [class]="editMode
            ? 'bg-reasons-green/95 border-white/20 text-white'
            : 'bg-reasons-navy/95 border-white/10 text-white'">

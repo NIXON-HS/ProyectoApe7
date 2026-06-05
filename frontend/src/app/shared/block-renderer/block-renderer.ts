@@ -83,7 +83,7 @@ import { environment } from '../../../environments/environment';
 
       <!-- Fallback: plain text when no blocks -->
       <p *ngIf="blocks.length === 0 && fallback"
-         class="text-slate-600 leading-relaxed font-light text-sm break-words">{{ fallback }}</p>
+         class="text-slate-600 leading-relaxed font-light text-sm break-words whitespace-pre-line">{{ fallback }}</p>
     </div>
   `,
 })

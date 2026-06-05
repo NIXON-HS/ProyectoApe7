@@ -110,14 +110,14 @@ const DEFAULT_DOMINIO = 'Optimización de los Sistemas Productivos, Diseño y De
       <div class="max-w-7xl mx-auto px-6">
         <div class="text-center max-w-3xl mx-auto flex flex-col gap-4 mb-16">
           <span class="text-xs font-bold text-reasons-green tracking-widest uppercase">Nuestros Propósitos</span>
-          <h2 class="text-3xl md:text-4xl font-extrabold text-reasons-navy">Misión y Objetivos de Excelencia</h2>
+          <h2 class="text-3xl md:text-4xl font-extrabold text-reasons-navy">Descripción y Objetivos de Excelencia</h2>
           <div class="w-16 h-1 bg-reasons-green mx-auto rounded-full"></div>
         </div>
 
         <div class="max-w-5xl mx-auto">
           <!-- Tab headers -->
           <div class="flex border-b border-slate-100 justify-center mb-8 overflow-x-auto">
-            <button (click)="selectTab('mision')"     [class]="activeTab==='mision'     ? 'tab-btn active-tab' : 'tab-btn'">Nuestra Misión</button>
+            <button (click)="selectTab('mision')"     [class]="activeTab==='mision'     ? 'tab-btn active-tab' : 'tab-btn'">Descripción del Grupo</button>
             <button (click)="selectTab('general')"    [class]="activeTab==='general'    ? 'tab-btn active-tab' : 'tab-btn'">Objetivo General</button>
             <button (click)="selectTab('especificos')" [class]="activeTab==='especificos' ? 'tab-btn active-tab' : 'tab-btn'">Objetivos Específicos</button>
           </div>
