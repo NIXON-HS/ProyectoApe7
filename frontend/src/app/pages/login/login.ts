@@ -157,6 +157,7 @@ export class LoginComponent implements OnInit {
         this.usuario = res.data.usuario;
         this.isLoggedIn = true;       // Show dashboard immediately
         this.isSubmitting = false;    // Stop spinner
+        window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top to show dashboard
         this.toastService.show(`¡Bienvenido, ${res.data.usuario?.nombres || 'Usuario'}!`, 'success');
         this.cargarTodo();            // Load data in background (non-blocking)
       },
