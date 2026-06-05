@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { BlockEditorComponent, Block } from '../../shared/block-editor/block-editor';
+import { BlockRendererComponent } from '../../shared/block-renderer/block-renderer';
 import { InfoGrupoService } from '../../core/services/info-grupo.service';
 import { InfoGrupo, LineaInvestigacion } from '../../core/models/info-grupo.model';
 
@@ -23,7 +24,7 @@ import { Contacto } from '../../core/models/contacto.model';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink, BlockEditorComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink, BlockEditorComponent, BlockRendererComponent],
   templateUrl: './login.html',
   styleUrls: ['./login.css']
 })
@@ -72,6 +73,10 @@ export class LoginComponent implements OnInit {
   // Mode toggles: false = simple textarea, true = block editor
   proyectoModoFlexible = false;
   pubModoFlexible = false;
+
+  // Preview toggles for project/publication forms
+  proyVistaPrevia = false;
+  pubVistaPrevia  = false;
 
   // ── Info del Grupo ────────────────────────────────────────────────────────
   infoGrupo: InfoGrupo = {};
@@ -393,15 +398,21 @@ export class LoginComponent implements OnInit {
     objetivo_general:      'Consolidarse como un grupo de investigación multidisciplinario líder y de referencia nacional e internacional en la optimización de sistemas productivos, desarrollo tecnológico sustentable y ciencia de datos, aportando soluciones eficientes y amigables con el medio ambiente aplicables a las dinámicas del sector industrial y social del país.',
     objetivos_especificos: 'Publicar artículos científicos de alta calidad en revistas indexadas internacionalmente (Scopus, WoS).\nDesarrollar proyectos piloto conjuntos con industrias metalmecánicas, textiles y ambientales de la región.\nFormar investigadores jóvenes de pregrado y posgrado mediante la tutoría de tesis de excelencia.\nIntegrar hardware y software inteligente (IoT, AI) aplicados al desarrollo ecológico y optimización de recursos.',
     dominio:               'Optimización de los Sistemas Productivos, Diseño y Desarrollo Urbanístico de la Facultad de Ingeniería en Sistemas, Electrónica e Industrial de la Universidad Técnica de Ambato.',
+    proyectos_badge:       'Investigación Aplicada',
     proyectos_titulo:      'Nuestros Proyectos de Investigación',
     proyectos_descripcion: 'Explore los proyectos científicos liderados por REASONS, desarrollados en colaboración con socios industriales e instituciones académicas nacionales.',
+    publicaciones_badge:        'Producción Científica',
     publicaciones_titulo:       'Publicaciones Científicas',
     publicaciones_descripcion:  'Consulte los artículos científicos, ponencias y contribuciones de los investigadores de REASONS indexados en journals internacionales de alto impacto.',
+    contacto_badge:        'Póngase en Contacto',
     contacto_titulo:       'Contacte con Nosotros',
     contacto_descripcion:  '¿Tiene alguna consulta sobre nuestras líneas de investigación, proyectos o desea colaborar con nosotros? Complete el formulario y responderemos lo antes posible.',
     contacto_email:        'reasons@uta.edu.ec',
     contacto_telefono:     '(03) 240-0200',
     contacto_direccion:    'Facultad de Ingeniería en Sistemas, Electrónica e Industrial. Av. de Los Chasquis y Av. Río Payamino. Universidad Técnica de Ambato.',
+    equipo_badge:         'Talento Humano',
+    equipo_titulo:        'Nuestro Equipo de Investigación',
+    equipo_descripcion:   'Conoce a los científicos, ingenieros y expertos multidisciplinares que lideran el desarrollo sostenible y la innovación tecnológica avanzada en REASONS.',
   };
 
   cargarInfoGrupo() {
@@ -422,15 +433,21 @@ export class LoginComponent implements OnInit {
           objetivos_especificos:     data.objetivos_especificos     || d.objetivos_especificos,
           objetivos_especificos_json: data.objetivos_especificos_json ?? null,
           dominio:                   data.dominio                   || d.dominio,
+          proyectos_badge:           data.proyectos_badge           || d.proyectos_badge,
           proyectos_titulo:          data.proyectos_titulo          || d.proyectos_titulo,
           proyectos_descripcion:     data.proyectos_descripcion     || d.proyectos_descripcion,
+          publicaciones_badge:       data.publicaciones_badge       || d.publicaciones_badge,
           publicaciones_titulo:      data.publicaciones_titulo      || d.publicaciones_titulo,
           publicaciones_descripcion: data.publicaciones_descripcion || d.publicaciones_descripcion,
+          contacto_badge:            data.contacto_badge            || d.contacto_badge,
           contacto_titulo:           data.contacto_titulo           || d.contacto_titulo,
           contacto_descripcion:      data.contacto_descripcion      || d.contacto_descripcion,
           contacto_email:            data.contacto_email            || d.contacto_email,
           contacto_telefono:         data.contacto_telefono         || d.contacto_telefono,
           contacto_direccion:        data.contacto_direccion        || d.contacto_direccion,
+          equipo_badge:              data.equipo_badge              || d.equipo_badge,
+          equipo_titulo:             data.equipo_titulo             || d.equipo_titulo,
+          equipo_descripcion:        data.equipo_descripcion        || d.equipo_descripcion,
         };
 
         this.infoDescBlocks   = this.parseBlocks(data.descripcion_json,            this.infoGrupo.descripcion || '');
@@ -513,6 +530,7 @@ export class LoginComponent implements OnInit {
 
   guardarInfoProyectos() {
     this.saveInfo({
+      proyectos_badge:         this.infoGrupo.proyectos_badge,
       proyectos_titulo:        this.infoGrupo.proyectos_titulo,
       proyectos_descripcion:   this.infoGrupo.proyectos_descripcion,
     }, 'Página Proyectos');
@@ -520,6 +538,7 @@ export class LoginComponent implements OnInit {
 
   guardarInfoPublicaciones() {
     this.saveInfo({
+      publicaciones_badge:        this.infoGrupo.publicaciones_badge,
       publicaciones_titulo:       this.infoGrupo.publicaciones_titulo,
       publicaciones_descripcion:  this.infoGrupo.publicaciones_descripcion,
     }, 'Página Publicaciones');
@@ -527,12 +546,21 @@ export class LoginComponent implements OnInit {
 
   guardarInfoContacto() {
     this.saveInfo({
+      contacto_badge:       this.infoGrupo.contacto_badge,
       contacto_titulo:      this.infoGrupo.contacto_titulo,
       contacto_descripcion: this.infoGrupo.contacto_descripcion,
       contacto_email:       this.infoGrupo.contacto_email,
       contacto_telefono:    this.infoGrupo.contacto_telefono,
       contacto_direccion:   this.infoGrupo.contacto_direccion,
     }, 'Página Contacto');
+  }
+
+  guardarInfoEquipo() {
+    this.saveInfo({
+      equipo_badge:        this.infoGrupo.equipo_badge,
+      equipo_titulo:       this.infoGrupo.equipo_titulo,
+      equipo_descripcion:  this.infoGrupo.equipo_descripcion,
+    }, 'Página Equipo');
   }
 
   // ── Líneas de investigación CRUD ─────────────────────────────────────────
@@ -733,6 +761,15 @@ export class LoginComponent implements OnInit {
     }
     return [];
   }
+
+  /** Public wrapper for blocksToText used in templates */
+  blocksToTextPublic(blocks: Block[]): string { return this.blocksToText(blocks); }
+
+  /** Serialize block arrays to JSON string for BlockRenderer preview */
+  get proyDescJSON()   { return JSON.stringify(this.proyDescBlocks);    }
+  get proyObjJSON()    { return JSON.stringify(this.proyObjBlocks);     }
+  get proyResJSON()    { return JSON.stringify(this.proyResBlocks);     }
+  get pubResumenJSON() { return JSON.stringify(this.pubResumenBlocks);  }
 
   /** Converts plain text into a single paragraph block (used in simple mode) */
   private textToBlocks(text: string): Block[] {
@@ -1007,6 +1044,8 @@ export class LoginComponent implements OnInit {
     this.showForm = false;
     this.editMode = false;
     this.activeRecordId = null;
+    this.proyVistaPrevia = false;
+    this.pubVistaPrevia  = false;
   }
 
   onFileSelected(event: any) {

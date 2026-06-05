@@ -1,13 +1,15 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { InvestigadorService } from '../../core/services/investigador.service';
+import { AdminBarComponent } from '../../shared/admin-bar/admin-bar';
 import { Investigador } from '../../core/models/investigador.model';
 
 @Component({
   selector: 'app-equipo',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AdminBarComponent],
   template: `
+    <app-admin-bar editTab="investigadores"></app-admin-bar>
     <div class="min-h-screen pt-32 pb-24 bg-reasons-bg bg-grid-pattern relative">
       <div class="max-w-7xl mx-auto px-6">
         <!-- Header -->

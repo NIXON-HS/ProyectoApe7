@@ -4,17 +4,19 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { ContactoService } from '../../core/services/contacto.service';
 import { InfoGrupoService } from '../../core/services/info-grupo.service';
 import { InfoGrupo } from '../../core/models/info-grupo.model';
+import { AdminBarComponent } from '../../shared/admin-bar/admin-bar';
 
 @Component({
   selector: 'app-contacto',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, AdminBarComponent],
   template: `
+    <app-admin-bar editTab="info"></app-admin-bar>
     <div class="min-h-screen pt-32 pb-24 bg-reasons-bg bg-grid-pattern relative">
       <div class="max-w-7xl mx-auto px-6">
         <!-- Header -->
         <div class="text-center max-w-3xl mx-auto flex flex-col gap-4 mb-20 animate-fade-in">
-          <span class="text-xs font-bold text-reasons-green tracking-widest uppercase">Póngase en Contacto</span>
+          <span class="text-xs font-bold text-reasons-green tracking-widest uppercase">{{ info?.contacto_badge || 'Póngase en Contacto' }}</span>
           <h1 class="text-4xl font-extrabold text-reasons-navy">{{ info?.contacto_titulo || 'Contacte con Nosotros' }}</h1>
           <div class="w-16 h-1 bg-reasons-green mx-auto rounded-full"></div>
           <p class="text-slate-500 font-light leading-relaxed">
@@ -187,6 +189,11 @@ export class ContactoComponent implements OnInit {
 
   ngOnInit() {
     this.initForm();
+    this.loadInfo();
+    this.infoSvc.contentUpdated$.subscribe(() => this.loadInfo());
+  }
+
+  loadInfo() {
     this.infoSvc.getInfoGrupo().subscribe({ next: (d) => { this.info = d; this.cdr.detectChanges(); }, error: () => {} });
   }
 

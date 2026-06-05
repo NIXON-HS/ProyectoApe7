@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { InfoGrupoService } from '../../core/services/info-grupo.service';
 import { InfoGrupo, LineaInvestigacion } from '../../core/models/info-grupo.model';
 import { BlockRendererComponent } from '../../shared/block-renderer/block-renderer';
+import { AdminBarComponent } from '../../shared/admin-bar/admin-bar';
 
 // Fallback constants (used while API loads or if no data saved yet)
 const DEFAULT_MISION = 'Generar, promover y difundir conocimiento científico y tecnológico de vanguardia e impacto multidisciplinario, articulando la ingeniería avanzada con procesos de sostenibilidad industrial y ambiental, para aportar con soluciones innovadoras a las problemáticas actuales de la naturaleza y el beneficio de la sociedad andina y global.';
@@ -14,8 +15,9 @@ const DEFAULT_DOMINIO = 'Optimización de los Sistemas Productivos, Diseño y De
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, BlockRendererComponent],
+  imports: [CommonModule, RouterLink, BlockRendererComponent, AdminBarComponent],
   template: `
+    <app-admin-bar editTab="info"></app-admin-bar>
     <!-- Hero Section -->
     <section class="relative min-h-[90vh] flex items-center justify-center pt-24 pb-16 bg-gradient-to-br from-reasons-navy via-[#0a3246] to-reasons-green overflow-hidden">
       <div class="absolute inset-0 opacity-15">
@@ -203,6 +205,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.startRotation();
     this.cargarInfo();
+    this.infoSvc.contentUpdated$.subscribe(() => this.cargarInfo());
   }
 
   ngOnDestroy() { this.stopRotation(); }
@@ -210,11 +213,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   cargarInfo() {
     this.infoSvc.getInfoGrupo().subscribe({
       next: (data) => { this.info = data; this.cdr.detectChanges(); },
-      error: () => { /* use defaults */ }
+      error: () => {}
     });
     this.infoSvc.getLineas().subscribe({
       next: (data) => { this.lineas = data; this.cdr.detectChanges(); },
-      error: () => { /* keep empty */ }
+      error: () => {}
     });
   }
 

@@ -484,7 +484,7 @@
         </div>
 
         <!-- Add / Edit Form -->
-        <div *ngIf="showForm" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-xl max-w-4xl w-full text-left">
+        <div *ngIf="showForm" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-xl w-full text-left">
           <h3 class="text-xl font-bold text-reasons-navy mb-6">{{ editMode ? 'Editar Investigador' : 'Agregar Nuevo Investigador' }}</h3>
           
           <form [formGroup]="investigadorForm" (ngSubmit)="guardarInvestigador()" class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -667,10 +667,92 @@
         </div>
 
         <!-- Add / Edit Form -->
-        <div *ngIf="showForm" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-xl max-w-4xl w-full text-left">
-          <h3 class="text-xl font-bold text-reasons-navy mb-6">{{ editMode ? 'Editar Proyecto' : 'Crear Nuevo Proyecto' }}</h3>
-          
-          <form [formGroup]="proyectoForm" (ngSubmit)="guardarProyecto()" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div *ngIf="showForm" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-xl w-full text-left">
+
+          <!-- Header con toggle Vista Previa -->
+          <div class="flex items-center justify-between gap-4 mb-6 flex-wrap">
+            <h3 class="text-xl font-bold text-reasons-navy">{{ editMode ? 'Editar Proyecto' : 'Nuevo Proyecto' }}</h3>
+            <div class="flex gap-1 p-1 bg-slate-100 rounded-xl">
+              <button type="button" (click)="proyVistaPrevia=false"
+                      class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5"
+                      [class]="!proyVistaPrevia?'bg-white shadow text-reasons-navy':'text-slate-400'">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                Formulario
+              </button>
+              <button type="button" (click)="proyVistaPrevia=true"
+                      class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5"
+                      [class]="proyVistaPrevia?'bg-white shadow text-reasons-blue':'text-slate-400'">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                Vista Previa
+              </button>
+            </div>
+          </div>
+
+          <!-- ── VISTA PREVIA — replica proyecto-detalle ── -->
+          <div *ngIf="proyVistaPrevia" class="flex flex-col gap-6 animate-fade-in">
+
+            <!-- Hero card (igual que proyecto-detalle) -->
+            <div class="glass-card rounded-3xl overflow-hidden shadow-xl">
+              <div class="h-2 bg-gradient-to-r from-reasons-navy via-reasons-blue to-reasons-green"></div>
+              <div class="p-6 sm:p-8">
+                <div class="flex flex-wrap items-center gap-2 mb-4">
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-reasons-blue/10 text-reasons-blue border border-reasons-blue/20">
+                    {{ getAbreviaturaLinea(proyectoForm.get('linea_id')?.value) }}
+                  </span>
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
+                        [class]="proyectoForm.get('estado')?.value==='Activo' ? 'bg-reasons-green/10 text-reasons-green border border-reasons-green/20' : 'bg-slate-100 text-slate-500 border border-slate-200'">
+                    <span class="w-1.5 h-1.5 rounded-full" [class]="proyectoForm.get('estado')?.value==='Activo'?'bg-reasons-green animate-pulse':'bg-slate-400'"></span>
+                    {{ proyectoForm.get('estado')?.value }}
+                  </span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-reasons-navy leading-tight">
+                  {{ proyectoForm.get('titulo')?.value || 'Sin título' }}
+                </h1>
+              </div>
+            </div>
+
+            <!-- Descripción -->
+            <div class="glass-card rounded-3xl p-6 shadow-lg">
+              <div class="flex items-center gap-2 mb-4">
+                <div class="w-7 h-7 rounded-lg bg-reasons-blue/10 text-reasons-blue flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h10M4 18h16"/></svg>
+                </div>
+                <h2 class="text-sm font-extrabold text-reasons-navy uppercase tracking-wide">Descripción</h2>
+              </div>
+              <div class="break-words overflow-hidden">
+                <app-block-renderer [blocksJson]="proyDescJSON" [fallback]="proyectoForm.get('descripcion')?.value"></app-block-renderer>
+              </div>
+            </div>
+
+            <!-- Objetivos -->
+            <div class="glass-card rounded-3xl p-6 shadow-lg">
+              <div class="flex items-center gap-2 mb-4">
+                <div class="w-7 h-7 rounded-lg bg-reasons-green/10 text-reasons-green flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><circle cx="12" cy="12" r="6" stroke-width="2"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>
+                </div>
+                <h2 class="text-sm font-extrabold text-reasons-navy uppercase tracking-wide">Objetivos</h2>
+              </div>
+              <div class="break-words overflow-hidden">
+                <app-block-renderer [blocksJson]="proyObjJSON" [fallback]="proyectoForm.get('objetivos')?.value"></app-block-renderer>
+              </div>
+            </div>
+
+            <!-- Resultados -->
+            <div class="glass-card rounded-3xl p-6 shadow-lg">
+              <div class="flex items-center gap-2 mb-4">
+                <div class="w-7 h-7 rounded-lg bg-reasons-navy/10 text-reasons-navy flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <h2 class="text-sm font-extrabold text-reasons-navy uppercase tracking-wide">Resultados Esperados</h2>
+              </div>
+              <div class="break-words overflow-hidden">
+                <app-block-renderer [blocksJson]="proyResJSON" [fallback]="proyectoForm.get('resultados')?.value"></app-block-renderer>
+              </div>
+            </div>
+
+          </div>
+
+          <form *ngIf="!proyVistaPrevia" [formGroup]="proyectoForm" (ngSubmit)="guardarProyecto()" class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Título (colspan 2) -->
             <div class="flex flex-col gap-1.5 md:col-span-2">
               <label class="form-label">Título del Proyecto</label>
@@ -810,7 +892,8 @@
               </button>
             </div>
           </form>
-        </div>
+
+        </div><!-- /showForm proyecto -->
       </div>
 
       <!-- ==========================================
@@ -878,10 +961,84 @@
         </div>
 
         <!-- Add / Edit Form -->
-        <div *ngIf="showForm" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-xl max-w-4xl w-full text-left">
-          <h3 class="text-xl font-bold text-reasons-navy mb-6">{{ editMode ? 'Editar Publicación' : 'Registrar Nueva Publicación' }}</h3>
-          
-          <form [formGroup]="publicacionForm" (ngSubmit)="guardarPublicacion()" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div *ngIf="showForm" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-xl w-full text-left">
+
+          <!-- Header con toggle Vista Previa -->
+          <div class="flex items-center justify-between gap-4 mb-6 flex-wrap">
+            <h3 class="text-xl font-bold text-reasons-navy">{{ editMode ? 'Editar Publicación' : 'Nueva Publicación' }}</h3>
+            <div class="flex gap-1 p-1 bg-slate-100 rounded-xl">
+              <button type="button" (click)="pubVistaPrevia=false"
+                      class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5"
+                      [class]="!pubVistaPrevia?'bg-white shadow text-reasons-navy':'text-slate-400'">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                Formulario
+              </button>
+              <button type="button" (click)="pubVistaPrevia=true"
+                      class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5"
+                      [class]="pubVistaPrevia?'bg-white shadow text-reasons-blue':'text-slate-400'">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                Vista Previa
+              </button>
+            </div>
+          </div>
+
+          <!-- ── VISTA PREVIA — replica publicacion-detalle ── -->
+          <div *ngIf="pubVistaPrevia" class="flex flex-col gap-6 animate-fade-in">
+
+            <!-- Cover / hero oscuro -->
+            <div class="rounded-3xl overflow-hidden shadow-xl bg-gradient-to-br from-reasons-navy via-[#0a3246] to-[#051c27] relative">
+              <div class="absolute inset-0 opacity-10">
+                <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                  <path d="M0,50 Q25,30 50,50 T100,50" fill="none" stroke="white" stroke-width="0.5"/>
+                  <path d="M0,60 Q30,80 60,40 T100,60" fill="none" stroke="#3c9632" stroke-width="0.5"/>
+                </svg>
+              </div>
+              <div class="relative z-10 p-8 sm:p-10 flex flex-col gap-4">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white/15 text-white border border-white/20 w-fit backdrop-blur-sm">
+                  {{ getAbreviaturaLinea(publicacionForm.get('linea_id')?.value) }} · Artículo Científico
+                </span>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-white leading-tight break-words">
+                  {{ publicacionForm.get('titulo')?.value || 'Sin título' }}
+                </h1>
+                <a *ngIf="publicacionForm.get('doi_url')?.value"
+                   [href]="publicacionForm.get('doi_url')?.value" target="_blank"
+                   class="inline-flex items-center gap-2 px-4 py-2 bg-white text-reasons-navy text-xs font-bold rounded-full w-fit shadow">
+                  Ver artículo (DOI) ↗
+                </a>
+              </div>
+            </div>
+
+            <!-- Resumen -->
+            <div class="glass-card rounded-3xl p-6 shadow-lg">
+              <div class="flex items-center gap-3 mb-5">
+                <div class="w-8 h-8 rounded-xl bg-reasons-blue/10 text-reasons-blue flex items-center justify-center">
+                  <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+                <h2 class="text-lg font-extrabold text-reasons-navy">Resumen / Abstract</h2>
+              </div>
+              <div class="break-words overflow-hidden">
+                <app-block-renderer [blocksJson]="pubResumenJSON" [fallback]="publicacionForm.get('resumen')?.value"></app-block-renderer>
+              </div>
+            </div>
+
+            <!-- Cita APA -->
+            <div *ngIf="publicacionForm.get('cita')?.value" class="glass-card rounded-3xl p-6 shadow-lg">
+              <div class="flex items-center justify-between gap-4 mb-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-xl bg-reasons-green/10 text-reasons-green flex items-center justify-center">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/></svg>
+                  </div>
+                  <h2 class="text-lg font-extrabold text-reasons-navy">Cita Bibliográfica (APA)</h2>
+                </div>
+              </div>
+              <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 border-l-4 border-l-reasons-green">
+                <p class="text-sm font-serif italic text-slate-600 leading-relaxed break-words">{{ publicacionForm.get('cita')?.value }}</p>
+              </div>
+            </div>
+
+          </div>
+
+          <form *ngIf="!pubVistaPrevia" [formGroup]="publicacionForm" (ngSubmit)="guardarPublicacion()" class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Título (colspan 2) -->
             <div class="flex flex-col gap-1.5 md:col-span-2">
               <label class="form-label">Título del Artículo Científico</label>
@@ -1232,7 +1389,7 @@
           </div>
 
           <!-- EDIT MODE: REUSE RESEARCHER FORM DIRECTLY -->
-          <div *ngIf="showForm" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-xl max-w-4xl w-full text-left mx-auto animate-fade-in">
+          <div *ngIf="showForm" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-xl w-full text-left mx-auto animate-fade-in">
             <h3 class="text-xl font-bold text-reasons-navy mb-6">Modificar mi Perfil Público</h3>
             
             <form [formGroup]="investigadorForm" (ngSubmit)="guardarInvestigador()" class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1497,9 +1654,15 @@
               Guardar
             </button>
           </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="form-label">Título de la página</label>
-            <input type="text" [(ngModel)]="infoGrupo.proyectos_titulo" class="form-input" placeholder="Nuestros Proyectos de Investigación" />
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="flex flex-col gap-1.5">
+              <label class="form-label">Etiqueta (badge)</label>
+              <input type="text" [(ngModel)]="infoGrupo.proyectos_badge" class="form-input" placeholder="Investigación Aplicada" />
+            </div>
+            <div class="flex flex-col gap-1.5 sm:col-span-2">
+              <label class="form-label">Título de la página</label>
+              <input type="text" [(ngModel)]="infoGrupo.proyectos_titulo" class="form-input" placeholder="Nuestros Proyectos de Investigación" />
+            </div>
           </div>
           <div class="flex flex-col gap-1.5">
             <label class="form-label">Descripción / subtítulo</label>
@@ -1523,9 +1686,15 @@
               Guardar
             </button>
           </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="form-label">Título de la página</label>
-            <input type="text" [(ngModel)]="infoGrupo.publicaciones_titulo" class="form-input" placeholder="Publicaciones Científicas" />
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="flex flex-col gap-1.5">
+              <label class="form-label">Etiqueta (badge)</label>
+              <input type="text" [(ngModel)]="infoGrupo.publicaciones_badge" class="form-input" placeholder="Producción Científica" />
+            </div>
+            <div class="flex flex-col gap-1.5 sm:col-span-2">
+              <label class="form-label">Título de la página</label>
+              <input type="text" [(ngModel)]="infoGrupo.publicaciones_titulo" class="form-input" placeholder="Publicaciones Científicas" />
+            </div>
           </div>
           <div class="flex flex-col gap-1.5">
             <label class="form-label">Descripción / subtítulo</label>
@@ -1550,6 +1719,10 @@
             </button>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex flex-col gap-1.5">
+              <label class="form-label">Etiqueta (badge)</label>
+              <input type="text" [(ngModel)]="infoGrupo.contacto_badge" class="form-input" placeholder="Póngase en Contacto" />
+            </div>
             <div class="flex flex-col gap-1.5">
               <label class="form-label">Título de la página</label>
               <input type="text" [(ngModel)]="infoGrupo.contacto_titulo" class="form-input" placeholder="Contacte con Nosotros" />

@@ -11,17 +11,24 @@ export interface InfoGrupo {
   objetivos_especificos_json?: string | null;
   dominio?: string | null;
 
+  proyectos_badge?:       string | null;
   proyectos_titulo?:      string | null;
   proyectos_descripcion?: string | null;
 
+  publicaciones_badge?:       string | null;
   publicaciones_titulo?:      string | null;
   publicaciones_descripcion?: string | null;
 
+  contacto_badge?:       string | null;
   contacto_titulo?:      string | null;
   contacto_descripcion?: string | null;
   contacto_email?:       string | null;
   contacto_telefono?:    string | null;
   contacto_direccion?:   string | null;
+
+  equipo_badge?:        string | null;
+  equipo_titulo?:       string | null;
+  equipo_descripcion?:  string | null;
 }
 
 export interface LineaInvestigacion {

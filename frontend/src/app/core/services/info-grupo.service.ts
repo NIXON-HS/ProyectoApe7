@@ -1,14 +1,19 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { InfoGrupo, LineaInvestigacion } from '../models/info-grupo.model';
 
 @Injectable({ providedIn: 'root' })
 export class InfoGrupoService {
-  private api     = `${environment.apiUrl}/info-grupo`;
+  private api      = `${environment.apiUrl}/info-grupo`;
   private apiLinea = `${environment.apiUrl}/lineas`;
+
+  /** Emits whenever info_grupo is saved — subscribe to refresh page content */
+  private _updated$ = new Subject<void>();
+  readonly contentUpdated$ = this._updated$.asObservable();
+  notifyUpdate() { this._updated$.next(); }
 
   constructor(private http: HttpClient) {}
 
