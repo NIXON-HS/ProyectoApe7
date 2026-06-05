@@ -6,6 +6,9 @@ export interface Proyecto {
   descripcion: string;
   objetivos: string;
   resultados: string;
+  descripcion_json?: string | null;
+  objetivos_json?: string | null;
+  resultados_json?: string | null;
   estado: 'Activo' | 'Finalizado' | 'Propuesta';
   linea_id: number;
   linea?: {

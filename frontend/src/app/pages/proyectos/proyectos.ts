@@ -2,11 +2,12 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProyectoService } from '../../core/services/proyecto.service';
 import { Proyecto } from '../../core/models/proyecto.model';
+import { BlockRendererComponent } from '../../shared/block-renderer/block-renderer';
 
 @Component({
   selector: 'app-proyectos',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, BlockRendererComponent],
   template: `
     <div class="min-h-screen pt-32 pb-24 bg-reasons-bg bg-grid-pattern relative">
       <div class="max-w-7xl mx-auto px-6">
@@ -48,27 +49,53 @@ import { Proyecto } from '../../core/models/proyecto.model';
               </p>
             </div>
 
-            <!-- Collapsible detailed view inside high-end split panels -->
-            <div *ngIf="expandedProjectId === proj.id" class="border-t border-slate-100 pt-6 mt-2 grid grid-cols-1 md:grid-cols-2 gap-6 animate-slide-down">
-              <div class="flex flex-col gap-3 p-4 rounded-2xl bg-slate-55/40 backdrop-blur-sm border border-slate-100 shadow-sm">
+            <!-- Collapsible detailed view -->
+            <div *ngIf="expandedProjectId === proj.id" class="border-t border-slate-100 pt-6 mt-2 flex flex-col gap-6 animate-slide-down">
+
+              <!-- Descripción -->
+              <div class="flex flex-col gap-2 p-4 rounded-2xl bg-slate-50/60 border border-slate-100 shadow-sm">
                 <h4 class="text-xs font-bold text-reasons-navy uppercase tracking-wider flex items-center gap-2">
-                  <svg class="w-4.5 h-4.5 text-reasons-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
-                    <circle cx="12" cy="12" r="6" stroke-width="2"></circle>
-                    <circle cx="12" cy="12" r="2" fill="currentColor"></circle>
+                  <svg class="w-4 h-4 text-reasons-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h10M4 18h16"/>
                   </svg>
-                  Objetivos del Proyecto
+                  Descripción
                 </h4>
-                <p class="text-xs text-slate-650 font-light leading-relaxed whitespace-pre-line">{{ proj.objetivos }}</p>
+                <app-block-renderer
+                  [blocksJson]="proj.descripcion_json"
+                  [fallback]="proj.descripcion">
+                </app-block-renderer>
               </div>
-              <div class="flex flex-col gap-3 p-4 rounded-2xl bg-slate-55/40 backdrop-blur-sm border border-slate-100 shadow-sm">
-                <h4 class="text-xs font-bold text-reasons-navy uppercase tracking-wider flex items-center gap-2">
-                  <svg class="w-4.5 h-4.5 text-reasons-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                  Resultados Esperados
-                </h4>
-                <p class="text-xs text-slate-650 font-light leading-relaxed whitespace-pre-line">{{ proj.resultados }}</p>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Objetivos -->
+                <div class="flex flex-col gap-2 p-4 rounded-2xl bg-slate-50/60 border border-slate-100 shadow-sm">
+                  <h4 class="text-xs font-bold text-reasons-navy uppercase tracking-wider flex items-center gap-2">
+                    <svg class="w-4 h-4 text-reasons-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                      <circle cx="12" cy="12" r="6"  stroke-width="2"/>
+                      <circle cx="12" cy="12" r="2"  fill="currentColor"/>
+                    </svg>
+                    Objetivos
+                  </h4>
+                  <app-block-renderer
+                    [blocksJson]="proj.objetivos_json"
+                    [fallback]="proj.objetivos">
+                  </app-block-renderer>
+                </div>
+
+                <!-- Resultados -->
+                <div class="flex flex-col gap-2 p-4 rounded-2xl bg-slate-50/60 border border-slate-100 shadow-sm">
+                  <h4 class="text-xs font-bold text-reasons-navy uppercase tracking-wider flex items-center gap-2">
+                    <svg class="w-4 h-4 text-reasons-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Resultados Esperados
+                  </h4>
+                  <app-block-renderer
+                    [blocksJson]="proj.resultados_json"
+                    [fallback]="proj.resultados">
+                  </app-block-renderer>
+                </div>
               </div>
             </div>
 

@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PublicacionService } from '../../core/services/publicacion.service';
 import { Publicacion } from '../../core/models/publicacion.model';
+import { BlockRendererComponent } from '../../shared/block-renderer/block-renderer';
 
 @Component({
   selector: 'app-publicaciones',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, BlockRendererComponent],
   template: `
     <div class="min-h-screen pt-32 pb-24 bg-reasons-bg bg-grid-pattern relative">
       <div class="max-w-7xl mx-auto px-6">
@@ -93,10 +94,13 @@ import { Publicacion } from '../../core/models/publicacion.model';
 
               <!-- Collapsible Resumen/Abstract -->
               <div class="flex flex-col gap-2">
-                <p class="text-xs text-slate-500 font-light leading-relaxed" 
-                   [class.line-clamp-3]="expandedPubId !== pub.id">
-                  {{ pub.resumen }}
-                </p>
+                <div [class.line-clamp-3]="expandedPubId !== pub.id"
+                     [class.overflow-hidden]="expandedPubId !== pub.id">
+                  <app-block-renderer
+                    [blocksJson]="pub.resumen_json"
+                    [fallback]="pub.resumen">
+                  </app-block-renderer>
+                </div>
                 <button (click)="toggleAbstract(pub.id)" class="text-[10px] font-bold text-reasons-blue hover:text-reasons-green w-fit flex items-center gap-1 transition-all">
                   {{ expandedPubId === pub.id ? 'Leer menos' : 'Leer abstract' }}
                   <svg class="w-3 h-3 transition-transform duration-300" [class.rotate-180]="expandedPubId === pub.id" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { BlockEditorComponent, Block } from '../../shared/block-editor/block-editor';
 
 // Services
 import { AuthService } from '../../core/services/auth.service';
@@ -20,7 +21,7 @@ import { Contacto } from '../../core/models/contacto.model';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink, BlockEditorComponent],
   templateUrl: './login.html',
   styleUrls: ['./login.css']
 })
@@ -57,6 +58,20 @@ export class LoginComponent implements OnInit {
   editMode = false;
   activeRecordId: number | null = null;
   showForm = false; // Toggles forms within tabs
+
+  // Block editor state – proyecto
+  proyDescBlocks: Block[] = [];
+  proyObjBlocks:  Block[] = [];
+  proyResBlocks:  Block[] = [];
+
+  // Block editor state – publicacion
+  pubResumenBlocks: Block[] = [];
+
+  // ViewChild refs for block editors (accessed after form is shown)
+  @ViewChild('editorDesc')    editorDesc?:    BlockEditorComponent;
+  @ViewChild('editorObj')     editorObj?:     BlockEditorComponent;
+  @ViewChild('editorRes')     editorRes?:     BlockEditorComponent;
+  @ViewChild('editorResumen') editorResumen?: BlockEditorComponent;
 
   // Research lines hardcoded to match the database and schema
   lineasDeInvestigacion = [
@@ -400,19 +415,22 @@ export class LoginComponent implements OnInit {
   // FORMULARIO DE PROYECTOS
   // ==========================================
   initProyectoForm(data?: Proyecto) {
-    // Array of selected researcher IDs
     const currentInvIds = data?.investigadores?.map(i => i.id) || [];
-    
+
     this.proyectoForm = this.fb.group({
-      titulo: [data?.titulo || '', [Validators.required]],
-      descripcion: [data?.descripcion || '', [Validators.required]],
-      objetivos: [data?.objetivos || '', [Validators.required]],
-      resultados: [data?.resultados || '', [Validators.required]],
-      estado: [data?.estado || 'Activo', [Validators.required]],
-      linea_id: [data?.linea_id || 1, [Validators.required]],
-      investigadores: [currentInvIds] // Array values
+      titulo:  [data?.titulo  || '', [Validators.required]],
+      estado:  [data?.estado  || 'Activo', [Validators.required]],
+      linea_id:[data?.linea_id || 1, [Validators.required]],
+      investigadores: [currentInvIds]
     });
-    this.showForm = true;
+
+    // Load block content — force re-creation of editors by toggling showForm
+    this.proyDescBlocks = this.parseBlocks(data?.descripcion_json, data?.descripcion);
+    this.proyObjBlocks  = this.parseBlocks(data?.objetivos_json,   data?.objetivos);
+    this.proyResBlocks  = this.parseBlocks(data?.resultados_json,  data?.resultados);
+
+    this.showForm = false;
+    Promise.resolve().then(() => { this.showForm = true; });
   }
 
   nuevoProyecto() {
@@ -425,6 +443,25 @@ export class LoginComponent implements OnInit {
     this.editMode = true;
     this.activeRecordId = proj.id;
     this.initProyectoForm(proj);
+  }
+
+  /** Convert a blocks JSON string (or plain text) into a Block array */
+  parseBlocks(jsonStr?: string | null, plainText?: string): Block[] {
+    if (jsonStr) {
+      try { return JSON.parse(jsonStr); } catch { /* fall through */ }
+    }
+    if (plainText) {
+      return [{ id: crypto.randomUUID(), type: 'paragraph', content: plainText }];
+    }
+    return [];
+  }
+
+  /** Extract plain-text from current block editors (used as DB fallback) */
+  private blocksToText(blocks: Block[]): string {
+    return blocks
+      .filter(b => b.content)
+      .map(b => { const d = document.createElement('div'); d.innerHTML = b.content!; return d.textContent || ''; })
+      .join('\n');
   }
 
   // Toggle selection in multi-select array helper
@@ -449,7 +486,20 @@ export class LoginComponent implements OnInit {
   guardarProyecto() {
     if (this.proyectoForm.invalid) return;
     this.isSubmitting = true;
-    const val = this.proyectoForm.value;
+
+    const descBlocks = this.editorDesc?.getBlocks()  ?? this.proyDescBlocks;
+    const objBlocks  = this.editorObj?.getBlocks()   ?? this.proyObjBlocks;
+    const resBlocks  = this.editorRes?.getBlocks()   ?? this.proyResBlocks;
+
+    const val = {
+      ...this.proyectoForm.value,
+      descripcion:      this.blocksToText(descBlocks) || ' ',
+      objetivos:        this.blocksToText(objBlocks)  || ' ',
+      resultados:       this.blocksToText(resBlocks)  || ' ',
+      descripcion_json: JSON.stringify(descBlocks),
+      objetivos_json:   JSON.stringify(objBlocks),
+      resultados_json:  JSON.stringify(resBlocks),
+    };
 
     if (this.editMode && this.activeRecordId) {
       this.proyectoService.actualizarProyecto(this.activeRecordId, val).subscribe({
@@ -493,15 +543,18 @@ export class LoginComponent implements OnInit {
     const currentInvIds = data?.investigadores?.map(i => i.id) || [];
 
     this.publicacionForm = this.fb.group({
-      titulo: [data?.titulo || '', [Validators.required]],
-      resumen: [data?.resumen || '', [Validators.required]],
-      cita: [data?.cita || '', [Validators.required]],
+      titulo:              [data?.titulo              || '', [Validators.required]],
+      cita:                [data?.cita                || '', [Validators.required]],
       revista_portada_url: [data?.revista_portada_url || ''],
-      doi_url: [data?.doi_url || ''],
-      linea_id: [data?.linea_id || 1, [Validators.required]],
-      investigadores: [currentInvIds]
+      doi_url:             [data?.doi_url             || ''],
+      linea_id:            [data?.linea_id            || 1,  [Validators.required]],
+      investigadores:      [currentInvIds]
     });
-    this.showForm = true;
+
+    this.pubResumenBlocks = this.parseBlocks(data?.resumen_json, data?.resumen);
+
+    this.showForm = false;
+    Promise.resolve().then(() => { this.showForm = true; });
   }
 
   nuevaPublicacion() {
@@ -569,7 +622,14 @@ export class LoginComponent implements OnInit {
   guardarPublicacion() {
     if (this.publicacionForm.invalid) return;
     this.isSubmitting = true;
-    const val = this.publicacionForm.value;
+
+    const resumenBlocks = this.editorResumen?.getBlocks() ?? this.pubResumenBlocks;
+
+    const val = {
+      ...this.publicacionForm.value,
+      resumen:      this.blocksToText(resumenBlocks) || ' ',
+      resumen_json: JSON.stringify(resumenBlocks),
+    };
 
     if (this.editMode && this.activeRecordId) {
       this.publicacionService.actualizarPublicacion(this.activeRecordId, val).subscribe({

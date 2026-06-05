@@ -687,22 +687,42 @@
               </select>
             </div>
 
-            <!-- Descripción (Fullwidth) -->
+            <!-- Descripción (block editor) -->
             <div class="flex flex-col gap-1.5 md:col-span-2">
-              <label class="form-label">Descripción General del Proyecto</label>
-              <textarea formControlName="descripcion" rows="4" class="form-input" placeholder="Resumen detallado de la investigación..."></textarea>
+              <label class="form-label font-bold text-reasons-navy">
+                Descripción General
+                <span class="text-slate-400 font-normal normal-case tracking-normal ml-1">— usa los bloques para agregar texto, imágenes, PDFs y más</span>
+              </label>
+              <app-block-editor
+                #editorDesc
+                [initialBlocks]="proyDescBlocks"
+                (blocksChange)="proyDescBlocks = $event">
+              </app-block-editor>
             </div>
 
-            <!-- Objetivos (Fullwidth) -->
+            <!-- Objetivos (block editor) -->
             <div class="flex flex-col gap-1.5 md:col-span-2">
-              <label class="form-label">Objetivos (Generales y Específicos)</label>
-              <textarea formControlName="objetivos" rows="4" class="form-input" placeholder="1. Evaluar eco-eficiencia...&#10;2. Diseñar algoritmo..."></textarea>
+              <label class="form-label font-bold text-reasons-navy">
+                Objetivos
+                <span class="text-slate-400 font-normal normal-case tracking-normal ml-1">— generales y específicos</span>
+              </label>
+              <app-block-editor
+                #editorObj
+                [initialBlocks]="proyObjBlocks"
+                (blocksChange)="proyObjBlocks = $event">
+              </app-block-editor>
             </div>
 
-            <!-- Resultados (Fullwidth) -->
+            <!-- Resultados (block editor) -->
             <div class="flex flex-col gap-1.5 md:col-span-2">
-              <label class="form-label">Resultados y Entregables del Proyecto</label>
-              <textarea formControlName="resultados" rows="3" class="form-input" placeholder="ej. Publicación de artículo, guía metodológica..."></textarea>
+              <label class="form-label font-bold text-reasons-navy">
+                Resultados y Entregables
+              </label>
+              <app-block-editor
+                #editorRes
+                [initialBlocks]="proyResBlocks"
+                (blocksChange)="proyResBlocks = $event">
+              </app-block-editor>
             </div>
 
             <!-- N:M Researcher Multi-selector (Fullwidth checklist) -->
@@ -831,10 +851,17 @@
               <input type="text" formControlName="doi_url" class="form-input" placeholder="ej. https://doi.org/10.1016/j.jclepro.2025.123456" />
             </div>
 
-            <!-- Resumen (Fullwidth) -->
+            <!-- Resumen (block editor) -->
             <div class="flex flex-col gap-1.5 md:col-span-2">
-              <label class="form-label">Resumen Académico (Abstract)</label>
-              <textarea formControlName="resumen" rows="4" class="form-input" placeholder="Resumen del contenido científico o abstract oficial..."></textarea>
+              <label class="form-label font-bold text-reasons-navy">
+                Resumen Académico (Abstract)
+                <span class="text-slate-400 font-normal normal-case tracking-normal ml-1">— usa bloques para enriquecer el contenido</span>
+              </label>
+              <app-block-editor
+                #editorResumen
+                [initialBlocks]="pubResumenBlocks"
+                (blocksChange)="pubResumenBlocks = $event">
+              </app-block-editor>
             </div>
 
             <!-- Autores Checklist (Fullwidth) -->
