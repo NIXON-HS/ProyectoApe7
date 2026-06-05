@@ -70,7 +70,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .text-gradient-gold {
-  background: linear-gradient(135deg, var(--color-reasons-gold) 0%, #ffffff 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #7dd87a 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -155,9 +155,9 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 20px 40px 0 rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.6) inset;
 }
 
-/* Texto Degradado Dorado de Alta Gama */
+/* Texto Degradado Verde Luminoso */
 .text-gradient-gold {
-  background: linear-gradient(135deg, #d4af37 0%, #f3e5ab 50%, #aa7c11 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #7dd87a 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

@@ -18,7 +18,7 @@ import { CommonModule } from '@angular/common';
       <div class="relative max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         <!-- Text details -->
         <div class="lg:col-span-7 flex flex-col gap-6 text-left">
-          <span class="inline-flex px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold uppercase tracking-wider text-reasons-gold w-fit">
+          <span class="inline-flex px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold uppercase tracking-wider text-[#7dd87a] w-fit">
             Universidad Técnica de Ambato
           </span>
           <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
@@ -45,7 +45,7 @@ import { CommonModule } from '@angular/common';
             </div>
             <div class="flex flex-col gap-2">
               <h2 class="text-2xl font-bold text-white tracking-wide">REASONS</h2>
-              <span class="text-xs text-reasons-gold font-semibold uppercase tracking-widest">Grupo de Investigación UTA</span>
+              <span class="text-xs text-[#7dd87a] font-semibold uppercase tracking-widest">Grupo de Investigación UTA</span>
             </div>
             <div class="w-full border-t border-white/10 my-2"></div>
             <p class="text-slate-300 text-sm font-light leading-relaxed">
@@ -192,13 +192,13 @@ import { CommonModule } from '@angular/common';
 
           <!-- Line 3 -->
           <div id="linea-3" class="glass-card p-8 rounded-3xl flex flex-col gap-6 hover-premium glowing-card">
-            <div class="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500">
+            <div class="w-14 h-14 rounded-2xl bg-reasons-green/10 flex items-center justify-center text-reasons-green">
               <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path>
               </svg>
             </div>
             <div class="flex flex-col gap-2">
-              <span class="text-xs font-bold text-amber-500 tracking-widest uppercase">Línea 3 (ED-SGRN)</span>
+              <span class="text-xs font-bold text-reasons-green tracking-widest uppercase">Línea 3 (ED-SGRN)</span>
               <h3 class="text-xl font-bold text-reasons-navy">Energía, Desarrollo Sostenible y Recursos</h3>
             </div>
             <p class="text-slate-500 font-light text-sm leading-relaxed">

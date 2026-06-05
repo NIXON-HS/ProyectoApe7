@@ -30,7 +30,7 @@ import { RouterLink } from '@angular/router';
             <a routerLink="/proyectos" class="hover:text-reasons-green transition-colors">Proyectos de Investigación</a>
             <a routerLink="/publicaciones" class="hover:text-reasons-green transition-colors">Publicaciones Científicas</a>
             <a routerLink="/contacto" class="hover:text-reasons-green transition-colors">Contacto</a>
-            <a routerLink="/login" class="hover:text-reasons-gold transition-colors font-semibold">Acceso Interno</a>
+            <a routerLink="/login" class="hover:text-reasons-green transition-colors font-semibold">Acceso Interno</a>
           </div>
         </div>
 

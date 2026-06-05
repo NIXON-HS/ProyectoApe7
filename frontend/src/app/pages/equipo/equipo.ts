@@ -36,7 +36,7 @@ import { Investigador } from '../../core/models/investigador.model';
             <div class="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-4xl mx-auto w-full">
               <div *ngFor="let member of directiva" class="glowing-card glass-card p-8 rounded-3xl flex flex-col sm:flex-row gap-6 items-center sm:items-start text-center sm:text-left relative">
                 <!-- Ribbon decoration -->
-                <div class="absolute top-0 right-0 px-4 py-1.5 bg-reasons-navy/90 backdrop-blur-md text-reasons-gold border-l border-b border-reasons-gold/15 shadow-sm font-bold text-[10px] uppercase tracking-wider rounded-bl-2xl">
+                <div class="absolute top-0 right-0 px-4 py-1.5 bg-reasons-navy/90 backdrop-blur-md text-white border-l border-b border-white/15 shadow-sm font-bold text-[10px] uppercase tracking-wider rounded-bl-2xl">
                   {{ member.posicion }}
                 </div>
 
@@ -233,7 +233,7 @@ import { Investigador } from '../../core/models/investigador.model';
             <!-- Publications -->
             <div class="flex flex-col gap-4">
               <h4 class="text-xs font-bold text-reasons-navy uppercase tracking-wider flex items-center gap-2">
-                <span class="w-1.5 h-3.5 rounded-full bg-reasons-gold shadow-[0_0_8px_rgba(212,175,55,0.3)]"></span>
+                <span class="w-1.5 h-3.5 rounded-full bg-reasons-blue shadow-[0_0_8px_rgba(10,50,70,0.3)]"></span>
                 Publicaciones Científicas
               </h4>
               <div *ngIf="!selectedMember.publicaciones?.length" class="text-xs text-slate-400 font-light italic">

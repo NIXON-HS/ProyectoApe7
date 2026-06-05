@@ -15,7 +15,7 @@
   position: absolute;
   inset: -6px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-reasons-green), var(--color-reasons-gold));
+  background: linear-gradient(135deg, var(--color-reasons-green), var(--color-reasons-blue));
   opacity: 0.7;
   filter: blur(8px);
   animation: logoGlow 4s ease-in-out infinite alternate;
@@ -107,9 +107,9 @@ table tbody tr:hover {
 
 /* BADGES DE CARGO Y ESTADO */
 .badge-gold {
-  background: linear-gradient(135deg, rgba(234, 179, 8, 0.1) 0%, rgba(202, 138, 4, 0.12) 100%);
-  color: #c29304;
-  border: 1px solid rgba(234, 179, 8, 0.2);
+  background: linear-gradient(135deg, rgba(10, 50, 70, 0.08) 0%, rgba(0, 40, 60, 0.12) 100%);
+  color: #0a3246;
+  border: 1px solid rgba(10, 50, 70, 0.2);
 }
 .badge-emerald {
   background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.12) 100%);
@@ -130,7 +130,7 @@ table tbody tr:hover {
 /* BANNERS PERSONALIZADOS POR ROL */
 .banner-admin {
   background: linear-gradient(135deg, var(--color-reasons-navy) 0%, #174e68 50%, #205c7a 100%);
-  border: 1px solid rgba(253, 224, 71, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 .banner-inv {
   background: linear-gradient(135deg, #093f1d 0%, #0d4a22 45%, var(--color-reasons-green) 100%);

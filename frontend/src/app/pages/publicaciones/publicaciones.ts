@@ -59,11 +59,11 @@ import { Publicacion } from '../../core/models/publicacion.model';
               <svg class="absolute inset-0 w-full h-full opacity-20 pointer-events-none transition-transform duration-700 group-hover:scale-110" viewBox="0 0 100 100" preserveAspectRatio="none">
                 <path d="M0,50 Q25,30 50,50 T100,50" fill="none" stroke="white" stroke-width="0.5"></path>
                 <path d="M0,60 Q30,80 60,40 T100,60" fill="none" stroke="var(--color-reasons-green)" stroke-width="0.5"></path>
-                <path d="M0,40 Q40,10 70,50 T100,30" fill="none" stroke="var(--color-reasons-gold)" stroke-width="0.3"></path>
+                <path d="M0,40 Q40,10 70,50 T100,30" fill="none" stroke="white" stroke-width="0.3"></path>
               </svg>
               <!-- Portada content overlay -->
               <div class="relative z-20 p-6 text-center flex flex-col gap-2.5 items-center">
-                <span class="text-[9px] font-bold text-reasons-gold uppercase tracking-widest border border-reasons-gold/30 px-3 py-1 rounded-full bg-reasons-navy/40 backdrop-blur-sm shadow-sm">
+                <span class="text-[9px] font-bold text-white uppercase tracking-widest border border-white/30 px-3 py-1 rounded-full bg-reasons-navy/40 backdrop-blur-sm shadow-sm">
                   Journal Indexado
                 </span>
                 <span class="text-white text-xs font-bold font-display max-w-[210px] line-clamp-3 leading-relaxed mt-2 text-shadow-sm">
@@ -106,7 +106,7 @@ import { Publicacion } from '../../core/models/publicacion.model';
               </div>
 
               <!-- Citation copiable element -->
-              <div class="p-4 rounded-2xl bg-slate-50 border-l-3 border-reasons-gold/45 border-t border-r border-b border-slate-100 flex flex-col gap-2 relative shadow-inner">
+              <div class="p-4 rounded-2xl bg-slate-50 border-l-3 border-reasons-blue/45 border-t border-r border-b border-slate-100 flex flex-col gap-2 relative shadow-inner">
                 <span class="text-[9px] font-bold text-slate-450 uppercase tracking-widest">Cita en Formato APA</span>
                 <p class="text-[10px] text-slate-600 font-light leading-relaxed select-all">
                   {{ pub.cita }}
