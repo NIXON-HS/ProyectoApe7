@@ -157,9 +157,46 @@
 
 <!-- LOGGED IN: PREMIUM DASHBOARD SUITE -->
 <div *ngIf="isLoggedIn" class="min-h-screen bg-reasons-bg flex flex-col lg:flex-row relative">
+  <!-- Mobile Header Bar for Admin Panel -->
+  <header class="lg:hidden w-full bg-reasons-navy text-white px-5 py-4 flex items-center justify-between shadow-md sticky top-0 z-30">
+    <a routerLink="/" class="flex items-center gap-2.5">
+      <div class="w-8 h-8 rounded-full bg-white p-0.5 flex items-center justify-center">
+        <img src="/logo.svg" alt="REASONS Logo" class="h-5 w-auto object-contain" />
+      </div>
+      <div class="flex flex-col text-left">
+        <span class="text-base font-bold tracking-tight text-white leading-none">REASONS</span>
+        <span class="text-[8px] font-bold text-reasons-green tracking-widest uppercase mt-0.5">Admin</span>
+      </div>
+    </a>
+    
+    <button (click)="isMobileSidebarOpen = true" class="flex items-center justify-center p-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 transition-colors focus:outline-none cursor-pointer">
+      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+      </svg>
+    </button>
+  </header>
+
+  <!-- Sidebar Backdrop for Mobile -->
+  <div *ngIf="isMobileSidebarOpen" 
+       (click)="isMobileSidebarOpen = false" 
+       class="fixed inset-0 z-45 bg-slate-900/60 backdrop-blur-sm lg:hidden transition-opacity duration-300 animate-fade-in">
+  </div>
+
   <!-- Left Navigation Sidebar -->
-  <aside class="w-full lg:w-72 bg-reasons-navy text-white flex flex-col justify-between p-6 lg:fixed lg:h-screen lg:top-0 lg:left-0 z-40 border-r border-white/5 shadow-2xl">
-    <div class="flex flex-col gap-8">
+  <aside class="fixed lg:fixed top-0 left-0 h-full w-72 bg-reasons-navy text-white flex flex-col justify-between p-6 z-50 lg:z-40 border-r border-white/5 shadow-2xl transition-transform duration-300 ease-in-out"
+         [class.translate-x-0]="isMobileSidebarOpen"
+         [class.-translate-x-full]="!isMobileSidebarOpen"
+         [class.lg:translate-x-0]="true">
+    <div class="flex flex-col gap-6 lg:gap-8">
+      <!-- Close button on Mobile Sidebar -->
+      <div class="flex justify-between items-center lg:hidden border-b border-white/10 pb-4 mb-2">
+        <span class="text-xs font-bold text-reasons-green uppercase tracking-widest">Navegación</span>
+        <button (click)="isMobileSidebarOpen = false" class="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white cursor-pointer transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
       <!-- Title & Branding -->
       <a routerLink="/" class="flex items-center gap-3 group">
         <div class="w-10 h-10 rounded-full bg-white p-1 flex items-center justify-center shadow-lg">

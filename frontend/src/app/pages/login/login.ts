@@ -34,6 +34,7 @@ export class LoginComponent implements OnInit {
   usuario: any = null;
   activeTab: 'resumen' | 'investigadores' | 'proyectos' | 'publicaciones' | 'mensajes' | 'perfil' | 'info' | 'lineas' = 'resumen';
   showPassword = false; // Toggler de visibilidad de contraseña
+  isMobileSidebarOpen = false; // Control de menú lateral responsive en móviles
 
   // Forms
   loginForm!: FormGroup;
@@ -377,6 +378,7 @@ export class LoginComponent implements OnInit {
     this.activeTab = tab;
     this.searchQuery = '';
     this.cancelForm();
+    this.isMobileSidebarOpen = false;
     if (tab === 'perfil') this.showForm = false;
     if (tab === 'info')   this.cargarInfoGrupo();
     if (tab === 'lineas') this.cargarLineas();
