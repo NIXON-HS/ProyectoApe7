@@ -159,18 +159,35 @@ const DEFAULT_DOMINIO = 'Optimización de los Sistemas Productivos, Diseño y De
       </div>
     </section>
 
-    <!-- Dominio y Líneas de Investigación -->
-    <section class="py-24 bg-reasons-bg bg-grid-pattern">
+    <!-- Dominio Section -->
+    <section class="py-20 bg-white relative overflow-hidden">
+      <!-- Decorative background glow -->
+      <div class="absolute -right-40 -top-40 w-96 h-96 bg-reasons-blue/5 rounded-full filter blur-3xl"></div>
+      
       <div class="max-w-7xl mx-auto px-6">
-        <div class="text-center max-w-4xl mx-auto flex flex-col gap-4 mb-16">
+        <div class="text-center max-w-4xl mx-auto flex flex-col gap-4">
           <span class="text-xs font-bold text-reasons-green tracking-widest uppercase">Ámbito de Acción</span>
-          <h2 class="text-3xl md:text-4xl font-extrabold text-reasons-navy">Dominio y Líneas de Investigación</h2>
-          <div class="w-16 h-1 bg-reasons-green mx-auto rounded-full mb-2"></div>
-          <p *ngIf="!editMode" class="text-slate-500 font-light max-w-3xl mx-auto leading-relaxed">
-            <strong class="text-reasons-blue font-semibold">{{ info?.dominio || DEFAULT_DOMINIO }}</strong>
-          </p>
-          <textarea *ngIf="editMode" [(ngModel)]="draft.dominio" rows="2"
-                    class="w-full max-w-3xl mx-auto ie-textarea-light" placeholder="Dominio..."></textarea>
+          <h2 class="text-3xl md:text-4xl font-extrabold text-reasons-navy">Dominio de Investigación</h2>
+          <div class="w-16 h-1 bg-reasons-green mx-auto rounded-full mb-4"></div>
+          
+          <div class="glass-card max-w-3xl mx-auto p-8 rounded-3xl border border-slate-100 shadow-lg relative overflow-hidden bg-cover">
+            <p *ngIf="!editMode" class="text-slate-650 font-light leading-relaxed text-base italic">
+              "{{ info?.dominio || DEFAULT_DOMINIO }}"
+            </p>
+            <textarea *ngIf="editMode" [(ngModel)]="draft.dominio" rows="3"
+                      class="w-full max-w-3xl mx-auto ie-textarea-light" placeholder="Dominio..."></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Líneas de Investigación Section -->
+    <section class="py-20 bg-reasons-bg bg-grid-pattern relative">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center max-w-3xl mx-auto flex flex-col gap-4 mb-16">
+          <span class="text-xs font-bold text-reasons-blue tracking-widest uppercase">Ejes Científicos</span>
+          <h2 class="text-3xl md:text-4xl font-extrabold text-reasons-navy">Líneas de Investigación</h2>
+          <div class="w-16 h-1 bg-reasons-blue mx-auto rounded-full"></div>
         </div>
 
         <!-- Líneas de investigación — dinámicas desde la BD -->
