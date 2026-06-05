@@ -19,6 +19,7 @@ exports.actualizarInfoGrupo = async (req, res, next) => {
   try {
     const fields = [
       'logo_url',
+      'hero_badge', 'hero_titulo', 'hero_nombre', 'hero_subtitulo', 'hero_cita', 'hero_card_nombre', 'hero_card_grupo',
       'descripcion', 'descripcion_json',
       'mision', 'mision_json',
       'objetivo_general', 'objetivo_general_json',

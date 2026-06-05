@@ -254,7 +254,7 @@
       </div>
 
       <!-- Search bar when listing items -->
-      <div *ngIf="activeTab !== 'resumen' && !showForm" class="relative w-full md:w-80">
+      <div *ngIf="activeTab !== 'resumen' && activeTab !== 'perfil' && activeTab !== 'info' && activeTab !== 'lineas' && !showForm" class="relative w-full md:w-80">
         <input type="text" [(ngModel)]="searchQuery" class="search-input" placeholder="Buscar..." />
         <svg class="absolute right-3.5 top-3.5 text-slate-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
       </div>
@@ -529,8 +529,8 @@
               <div class="flex flex-col sm:flex-row items-center gap-5 mt-1">
                 <!-- Avatar Preview -->
                 <div class="w-16 h-16 rounded-full border-2 border-slate-200 shadow-md overflow-hidden bg-white flex-shrink-0 flex items-center justify-center">
-                  <img [src]="obtenerFotoUrl(investigadorForm.get('foto_url')?.value)" 
-                       (error)="$event.target.src = defaultAvatar"
+                  <img [src]="uploadPreview || obtenerFotoUrl(investigadorForm.get('foto_url')?.value)" 
+                       (error)="$any($event.target).src = defaultAvatar"
                        class="w-full h-full object-cover" alt="Previsualización" />
                 </div>
                 
@@ -1435,8 +1435,8 @@
                 <div class="flex flex-col sm:flex-row items-center gap-5 mt-1">
                   <!-- Avatar Preview -->
                   <div class="w-16 h-16 rounded-full border-2 border-slate-200 shadow-md overflow-hidden bg-white flex-shrink-0 flex items-center justify-center">
-                    <img [src]="obtenerFotoUrl(investigadorForm.get('foto_url')?.value)" 
-                         (error)="$event.target.src = defaultAvatar"
+                    <img [src]="uploadPreview || obtenerFotoUrl(investigadorForm.get('foto_url')?.value)" 
+                         (error)="$any($event.target).src = defaultAvatar"
                          class="w-full h-full object-cover" alt="Previsualización" />
                   </div>
                   

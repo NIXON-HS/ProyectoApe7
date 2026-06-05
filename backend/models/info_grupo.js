@@ -6,11 +6,13 @@ const InfoGrupo = sequelize.define('info_grupo', {
 
   logo_url: { type: DataTypes.TEXT, allowNull: true },
 
-  hero_badge:    { type: DataTypes.TEXT, allowNull: true },
-  hero_titulo:   { type: DataTypes.TEXT, allowNull: true },
-  hero_nombre:   { type: DataTypes.TEXT, allowNull: true },
-  hero_subtitulo:{ type: DataTypes.TEXT, allowNull: true },
-  hero_cita:     { type: DataTypes.TEXT, allowNull: true },
+  hero_badge:       { type: DataTypes.TEXT, allowNull: true },
+  hero_titulo:      { type: DataTypes.TEXT, allowNull: true },
+  hero_nombre:      { type: DataTypes.TEXT, allowNull: true },
+  hero_subtitulo:   { type: DataTypes.TEXT, allowNull: true },
+  hero_cita:        { type: DataTypes.TEXT, allowNull: true },
+  hero_card_nombre: { type: DataTypes.TEXT, allowNull: true },
+  hero_card_grupo:  { type: DataTypes.TEXT, allowNull: true },
 
   descripcion:      { type: DataTypes.TEXT, allowNull: true },
   descripcion_json: { type: DataTypes.TEXT, allowNull: true },

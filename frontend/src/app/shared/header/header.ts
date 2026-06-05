@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive],
   template: `
-    <nav class="fixed top-0 left-0 w-full z-50 glass-card px-6 py-4 transition-all duration-300">
+    <nav class="fixed top-0 left-0 w-full z-50 bg-white border-b border-slate-100 shadow-sm px-6 py-4 transition-all duration-300">
       <div class="max-w-7xl mx-auto flex items-center justify-between">
         <!-- Logo -->
         <a routerLink="/" class="flex items-center gap-3 group">
@@ -38,29 +38,45 @@ import { CommonModule } from '@angular/common';
           </a>
         </div>
 
-        <!-- Mobile Menu Toggle Button -->
-        <button (click)="toggleMenu()" class="md:hidden flex items-center justify-center p-2 text-reasons-blue hover:text-reasons-green transition-colors">
-          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path *ngIf="!isMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-            <path *ngIf="isMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
+        <!-- Mobile Menu Toggle Button (Animated burger-to-X) -->
+        <button (click)="toggleMenu()" class="md:hidden relative z-50 flex items-center justify-center w-10 h-10 rounded-full bg-reasons-navy hover:bg-reasons-blue border border-white/10 shadow-lg transition-all focus:outline-none cursor-pointer">
+          <div class="relative w-5 h-3.5 flex flex-col justify-between items-center">
+            <span class="w-5 h-0.5 bg-white rounded-full transition-all duration-300 origin-left" [class.rotate-45]="isMenuOpen" [class.translate-x-0.5]="isMenuOpen" [class.translate-y-px]="isMenuOpen"></span>
+            <span class="w-5 h-0.5 bg-white rounded-full transition-all duration-300" [class.opacity-0]="isMenuOpen"></span>
+            <span class="w-5 h-0.5 bg-white rounded-full transition-all duration-300 origin-left" [class.-rotate-45]="isMenuOpen" [class.translate-x-0.5]="isMenuOpen" [class.-translate-y-px]="isMenuOpen"></span>
+          </div>
         </button>
       </div>
 
-      <!-- Mobile Dropdown Menu -->
-      <div *ngIf="isMenuOpen" class="md:hidden mt-4 pt-4 border-t border-slate-100 flex flex-col gap-3 animate-fade-in">
-        <a routerLink="/home" (click)="closeMenu()" routerLinkActive="active-link" class="nav-item py-2 px-3 rounded-lg hover:bg-slate-50">Inicio</a>
-        <a routerLink="/equipo" (click)="closeMenu()" routerLinkActive="active-link" class="nav-item py-2 px-3 rounded-lg hover:bg-slate-50">Equipo</a>
-        <a routerLink="/proyectos" (click)="closeMenu()" routerLinkActive="active-link" class="nav-item py-2 px-3 rounded-lg hover:bg-slate-50">Proyectos</a>
-        <a routerLink="/publicaciones" (click)="closeMenu()" routerLinkActive="active-link" class="nav-item py-2 px-3 rounded-lg hover:bg-slate-50">Publicaciones</a>
-        <a routerLink="/contacto" (click)="closeMenu()" routerLinkActive="active-link" class="nav-item py-2 px-3 rounded-lg hover:bg-slate-50">Contacto</a>
-        <a routerLink="/contacto" (click)="closeMenu()" class="w-full text-center py-3 bg-reasons-blue text-white rounded-xl font-semibold shadow-md mt-2">
-          Únete a nosotros
-        </a>
-        <a routerLink="/login" (click)="closeMenu()" class="w-full text-center py-3 bg-reasons-green text-white rounded-xl font-semibold shadow-md mt-1 flex items-center justify-center gap-1.5">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-          Acceso Interno
-        </a>
+      <!-- Mobile Backdrop Overlay -->
+      <div *ngIf="isMenuOpen" (click)="closeMenu()" class="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm md:hidden transition-opacity duration-300 animate-fade-in"></div>
+
+      <!-- Mobile Navigation Slide-out Drawer -->
+      <div class="fixed top-0 right-0 h-full w-80 max-w-full z-45 bg-white shadow-2xl border-l border-slate-200/80 md:hidden flex flex-col p-8 pt-24 transition-all duration-300 ease-out transform"
+           [class.translate-x-0]="isMenuOpen"
+           [class.translate-x-full]="!isMenuOpen"
+           [class.invisible]="!isMenuOpen">
+        
+        <!-- Drawer Menu Items -->
+        <div class="flex flex-col gap-6">
+          <span class="text-[10px] font-bold text-reasons-green tracking-widest uppercase mb-1">Navegación</span>
+          <a routerLink="/home" (click)="closeMenu()" routerLinkActive="active-link" class="mobile-nav-item">Inicio</a>
+          <a routerLink="/equipo" (click)="closeMenu()" routerLinkActive="active-link" class="mobile-nav-item">Equipo</a>
+          <a routerLink="/proyectos" (click)="closeMenu()" routerLinkActive="active-link" class="mobile-nav-item">Proyectos</a>
+          <a routerLink="/publicaciones" (click)="closeMenu()" routerLinkActive="active-link" class="mobile-nav-item">Publicaciones</a>
+          <a routerLink="/contacto" (click)="closeMenu()" routerLinkActive="active-link" class="mobile-nav-item">Contacto</a>
+        </div>
+
+        <!-- Drawer CTA Buttons -->
+        <div class="mt-auto flex flex-col gap-4 border-t border-slate-100 pt-6">
+          <a routerLink="/contacto" (click)="closeMenu()" class="w-full text-center py-3 bg-reasons-blue hover:bg-reasons-navy text-white rounded-2xl font-semibold shadow-md transition-colors flex items-center justify-center gap-1.5">
+            Únete a nosotros
+          </a>
+          <a routerLink="/login" (click)="closeMenu()" class="w-full text-center py-3 bg-reasons-green hover:bg-[#327e2a] text-white rounded-2xl font-semibold shadow-md flex items-center justify-center gap-1.5 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+            Acceso Interno
+          </a>
+        </div>
       </div>
     </nav>
   `,
@@ -89,12 +105,31 @@ import { CommonModule } from '@angular/common';
       background-color: #3c9632;
       border-radius: 9999px;
     }
+    .mobile-nav-item {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #0f172a;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #f1f5f9;
+      transition: all 0.25s ease;
+      display: block;
+    }
+    .mobile-nav-item:hover {
+      color: #3c9632;
+      padding-left: 0.5rem;
+      border-bottom-color: #e2e8f0;
+    }
+    .mobile-nav-item.active-link {
+      color: #3c9632 !important;
+      border-bottom-color: #3c9632;
+      padding-left: 0.5rem;
+    }
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
     .animate-fade-in {
-      animation: fadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      animation: fadeIn 0.3s ease-out forwards;
     }
   `]
 })

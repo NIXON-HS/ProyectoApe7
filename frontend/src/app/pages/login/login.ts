@@ -54,6 +54,8 @@ export class LoginComponent implements OnInit {
   isLoading = false;
   isSubmitting = false;
   isUploading = false;
+  /** Base64 data-URL shown in preview immediately on file select (before server confirms) */
+  uploadPreview: string | null = null;
   defaultAvatar = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="%23e2e8f0"/><path d="M50 50 A 15 15 0 1 0 50 20 A 15 15 0 1 0 50 50 Z M50 60 C 30 60 20 75 20 90 L 80 90 C 80 75 70 60 50 60 Z" fill="%2394a3b8"/></svg>';
   selectedMessage: Contacto | null = null;
   
@@ -645,6 +647,7 @@ export class LoginComponent implements OnInit {
   // FORMULARIO DE INVESTIGADORES
   // ==========================================
   initInvestigadorForm(data?: Investigador) {
+    this.uploadPreview = null;
     this.investigadorForm = this.fb.group({
       nombres: [data?.nombres || '', [Validators.required, Validators.minLength(3)]],
       orcid: [data?.orcid || ''],
@@ -1046,6 +1049,7 @@ export class LoginComponent implements OnInit {
     this.activeRecordId = null;
     this.proyVistaPrevia = false;
     this.pubVistaPrevia  = false;
+    this.uploadPreview   = null;
   }
 
   onFileSelected(event: any) {
@@ -1060,19 +1064,24 @@ export class LoginComponent implements OnInit {
     this.isUploading = true;
     const reader = new FileReader();
     reader.onload = (e: any) => {
-      const base64Data = e.target.result.split(',')[1];
+      // ── 1. Mostrar preview base64 de inmediato ──
+      this.uploadPreview = e.target.result as string;
+      this.cdr.detectChanges();
+
+      const base64Data = (e.target.result as string).split(',')[1];
       this.investigadorService.subirFoto(file.name, base64Data).subscribe({
         next: (res) => {
           this.isUploading = false;
           if (res && res.success) {
-            this.investigadorForm.patchValue({
-              foto_url: res.url
-            });
+            // ── 2. URL del servidor lista: actualizar form (dejamos el base64 activo para visualización) ──
+            this.investigadorForm.patchValue({ foto_url: res.url });
+            this.cdr.detectChanges();
             this.toastService.show('¡Imagen de perfil subida y vinculada exitosamente!', 'success');
           }
         },
         error: (err) => {
           this.isUploading = false;
+          this.cdr.detectChanges();
           console.error('Error al subir imagen:', err);
           this.toastService.show('Error al subir la imagen al servidor.', 'error');
         }
