@@ -45,6 +45,9 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 // Servir de manera estática y en vivo las imágenes de equipo escritas en el frontend
 app.use('/assets/images/team', express.static(path.join(__dirname, '..', 'frontend', 'src', 'assets', 'images', 'team')));
 
+// Servir archivos del editor de bloques (imágenes y PDFs subidos)
+app.use('/assets/uploads/media', express.static(path.join(__dirname, '..', 'frontend', 'src', 'assets', 'uploads', 'media')));
+
 // 4. Integración del enrutador maestro bajo el prefijo /api/
 app.use('/api', routes);
 
