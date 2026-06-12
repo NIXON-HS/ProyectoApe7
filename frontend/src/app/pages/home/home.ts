@@ -247,7 +247,7 @@ const DEFAULT_DOMINIO = 'Optimización de los Sistemas Productivos, Diseño y De
 
         <div class="relative max-w-4xl mx-auto">
           <!-- Card container -->
-          <div class="overflow-hidden rounded-3xl shadow-xl relative min-h-[380px] bg-slate-50 border border-slate-150 transition-all duration-500 hover:shadow-2xl">
+          <div class="group/card overflow-hidden rounded-3xl shadow-xl relative min-h-[380px] bg-slate-50 border border-slate-150 transition-all duration-500 hover:shadow-2xl">
             <!-- Sliding Item -->
             <div *ngFor="let noticia of noticias; let idx = index"
                  [class]="idx === currentNewsIndex ? 'flex flex-col md:flex-row opacity-100 scale-100 translate-x-0 relative z-10' : 'absolute inset-0 flex flex-col md:flex-row opacity-0 scale-95 pointer-events-none z-0 translate-x-4'"
@@ -256,7 +256,7 @@ const DEFAULT_DOMINIO = 'Optimización de los Sistemas Productivos, Diseño y De
               <!-- Image side -->
               <div class="md:w-1/2 relative bg-gradient-to-br from-[#00283c] to-[#043d1a] overflow-hidden min-h-[220px] md:min-h-0 flex-shrink-0 flex items-center justify-center">
                 <img *ngIf="noticia.imagen_url" [src]="resolveUrl(noticia.imagen_url)" 
-                     class="absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out" 
+                     class="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-out group-hover/card:scale-110 group-hover/card:brightness-110 group-hover/card:saturate-110" 
                      [class]="idx === currentNewsIndex ? 'scale-100 opacity-100' : 'scale-110 opacity-0'" alt="News Image" />
                 <div *ngIf="!noticia.imagen_url" class="absolute inset-0 flex flex-col items-center justify-center text-white/20 p-8 transition-all duration-700"
                      [class]="idx === currentNewsIndex ? 'opacity-100 scale-100' : 'opacity-0 scale-95'">
