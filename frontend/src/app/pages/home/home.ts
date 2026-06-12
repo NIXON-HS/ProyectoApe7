@@ -250,18 +250,21 @@ const DEFAULT_DOMINIO = 'Optimización de los Sistemas Productivos, Diseño y De
           <div class="overflow-hidden rounded-3xl shadow-xl relative min-h-[380px] bg-slate-50 border border-slate-150 transition-all duration-500 hover:shadow-2xl">
             <!-- Sliding Item -->
             <div *ngFor="let noticia of noticias; let idx = index"
-                 [class]="idx === currentNewsIndex ? 'flex flex-col md:flex-row opacity-100 scale-100' : 'hidden opacity-0 scale-95'"
-                 class="transition-all duration-700 ease-in-out h-full min-h-[380px] text-left">
+                 [class]="idx === currentNewsIndex ? 'flex flex-col md:flex-row opacity-100 scale-100 translate-x-0 relative z-10' : 'absolute inset-0 flex flex-col md:flex-row opacity-0 scale-95 pointer-events-none z-0 translate-x-4'"
+                 class="transition-all duration-750 cubic-bezier(0.16, 1, 0.3, 1) h-full min-h-[380px] text-left bg-white w-full">
               
               <!-- Image side -->
               <div class="md:w-1/2 relative bg-gradient-to-br from-[#00283c] to-[#043d1a] overflow-hidden min-h-[220px] md:min-h-0 flex-shrink-0 flex items-center justify-center">
                 <img *ngIf="noticia.imagen_url" [src]="resolveUrl(noticia.imagen_url)" 
-                     class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-105" alt="News Image" />
-                <div *ngIf="!noticia.imagen_url" class="absolute inset-0 flex flex-col items-center justify-center text-white/20 p-8">
+                     class="absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out" 
+                     [class]="idx === currentNewsIndex ? 'scale-100 opacity-100' : 'scale-110 opacity-0'" alt="News Image" />
+                <div *ngIf="!noticia.imagen_url" class="absolute inset-0 flex flex-col items-center justify-center text-white/20 p-8 transition-all duration-700"
+                     [class]="idx === currentNewsIndex ? 'opacity-100 scale-100' : 'opacity-0 scale-95'">
                   <svg class="w-16 h-16 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15M9 11l3 3m0 0l3-3m-3 3V8"/></svg>
                   <span class="text-[10px] uppercase tracking-widest font-bold mt-2 text-white/40">REASONS News</span>
                 </div>
-                <span class="absolute top-4 left-4 inline-flex px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-white bg-reasons-green/80 backdrop-blur-md border border-white/20 shadow-md">
+                <span class="absolute top-4 left-4 inline-flex px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-white bg-reasons-green/80 backdrop-blur-md border border-white/20 shadow-md transition-all duration-700 delay-300 transform"
+                      [class]="idx === currentNewsIndex ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0'">
                   {{ noticia.categoria }}
                 </span>
               </div>
@@ -269,20 +272,26 @@ const DEFAULT_DOMINIO = 'Optimización de los Sistemas Productivos, Diseño y De
               <!-- Content side -->
               <div class="md:w-1/2 p-8 md:p-12 flex flex-col justify-between bg-white text-left gap-6">
                 <div class="flex flex-col gap-4">
-                  <span class="text-xs font-bold text-slate-400 uppercase tracking-wide flex items-center gap-1.5">
+                  <span class="text-xs font-bold text-slate-400 uppercase tracking-wide flex items-center gap-1.5 transition-all duration-700 delay-75 transform"
+                        [class]="idx === currentNewsIndex ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'">
                     <svg class="w-4 h-4 text-reasons-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                     {{ noticia.fecha | date:'longDate' }}
                   </span>
-                  <h3 class="text-xl md:text-2xl font-black text-reasons-navy leading-tight hover:text-reasons-green transition-colors cursor-pointer" (click)="verNoticia(noticia)">
+                  <h3 class="text-xl md:text-2xl font-black text-reasons-navy leading-tight hover:text-reasons-green transition-all duration-700 delay-150 transform cursor-pointer" 
+                      [class]="idx === currentNewsIndex ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'"
+                      (click)="verNoticia(noticia)">
                     {{ noticia.titulo }}
                   </h3>
-                  <p class="text-sm text-slate-500 font-light leading-relaxed">
+                  <p class="text-sm text-slate-500 font-light leading-relaxed transition-all duration-700 delay-300 transform"
+                     [class]="idx === currentNewsIndex ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'">
                     {{ noticia.resumen }}
                   </p>
                 </div>
-                <button (click)="verNoticia(noticia)" class="w-fit px-6 py-2.5 bg-reasons-navy hover:bg-reasons-green text-white text-xs font-bold rounded-full shadow hover-premium transition-all flex items-center gap-1.5 cursor-pointer">
+                <button (click)="verNoticia(noticia)" 
+                        class="group w-fit px-6 py-2.5 bg-reasons-navy hover:bg-reasons-green text-white text-xs font-bold rounded-full shadow hover-premium transition-all duration-700 delay-500 transform cursor-pointer flex items-center gap-1.5"
+                        [class]="idx === currentNewsIndex ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'">
                   Leer más
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                  <svg class="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                 </button>
               </div>
 
@@ -290,19 +299,19 @@ const DEFAULT_DOMINIO = 'Optimización de los Sistemas Productivos, Diseño y De
           </div>
 
           <!-- Controls -->
-          <button (click)="prevNews()" class="absolute left-[-20px] md:left-[-28px] top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white hover:bg-reasons-green hover:text-white text-reasons-navy border border-slate-200/80 shadow-lg flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer z-10">
-            <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+          <button (click)="prevNews()" class="group absolute left-[-20px] md:left-[-28px] top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white hover:bg-reasons-green hover:text-white text-reasons-navy border border-slate-200/80 shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer z-10 hover:shadow-reasons-green/20 hover:shadow-2xl">
+            <svg class="w-5 h-5 md:w-6 md:h-6 transition-transform duration-300 group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
           </button>
-          <button (click)="nextNews()" class="absolute right-[-20px] md:right-[-28px] top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white hover:bg-reasons-green hover:text-white text-reasons-navy border border-slate-200/80 shadow-lg flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer z-10">
-            <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+          <button (click)="nextNews()" class="group absolute right-[-20px] md:right-[-28px] top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white hover:bg-reasons-green hover:text-white text-reasons-navy border border-slate-200/80 shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer z-10 hover:shadow-reasons-green/20 hover:shadow-2xl">
+            <svg class="w-5 h-5 md:w-6 md:h-6 transition-transform duration-300 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
           </button>
 
           <!-- Dots -->
           <div class="flex justify-center gap-2 mt-8">
             <button *ngFor="let noticia of noticias; let idx = index"
                     (click)="selectNews(idx)"
-                    [class]="idx === currentNewsIndex ? 'w-6 bg-reasons-green' : 'w-2 bg-slate-300 hover:bg-slate-400'"
-                    class="h-2 rounded-full transition-all duration-300 cursor-pointer"></button>
+                    [class]="idx === currentNewsIndex ? 'w-6 bg-reasons-green' : 'w-2 bg-slate-300 hover:bg-slate-400 hover:scale-125'"
+                    class="h-2 rounded-full transition-all duration-500 cubic-bezier(0.25, 1, 0.5, 1) cursor-pointer"></button>
           </div>
         </div>
 
@@ -312,15 +321,15 @@ const DEFAULT_DOMINIO = 'Optimización de los Sistemas Productivos, Diseño y De
     <!-- News Details Backdrop Modal -->
     <div *ngIf="selectedNoticia" 
          (click)="cerrarNoticia()"
-         class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 animate-fade-in">
+         class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 animate-backdrop">
       <div (click)="$event.stopPropagation()"
-           class="bg-white rounded-3xl max-w-3xl w-full max-h-[85vh] overflow-y-auto shadow-2xl border border-slate-100 flex flex-col text-left scale-up-animation">
+           class="bg-white rounded-3xl max-w-3xl w-full max-h-[85vh] overflow-y-auto shadow-2xl border border-slate-100 flex flex-col text-left animate-modal-spring">
         
         <!-- Modal Cover -->
         <div class="relative bg-gradient-to-br from-[#00283c] to-[#043d1a] min-h-[220px] sm:min-h-[280px] flex items-center justify-center text-center overflow-hidden flex-shrink-0">
           <img *ngIf="selectedNoticia.imagen_url" [src]="resolveUrl(selectedNoticia.imagen_url)" class="w-full h-full object-cover" />
           <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
-          <button (click)="cerrarNoticia()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-colors cursor-pointer">
+          <button (click)="cerrarNoticia()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-all hover:rotate-90 duration-300 cursor-pointer">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
           
@@ -401,6 +410,23 @@ const DEFAULT_DOMINIO = 'Optimización de los Sistemas Productivos, Diseño y De
     .hero-card-input:focus { border-color:#7dd87a; background:rgba(255,255,255,.12); }
     @keyframes scaleUp { from{opacity:0;transform:scale(.95)} to{opacity:1;transform:scale(1)} }
     .scale-up-animation { animation:scaleUp .3s cubic-bezier(.16,1,.3,1) forwards; }
+    
+    /* Premium News Animations */
+    @keyframes backdropFade {
+      from { opacity: 0; backdrop-filter: blur(0px); background-color: rgba(15, 23, 42, 0); }
+      to { opacity: 1; backdrop-filter: blur(4px); background-color: rgba(15, 23, 42, 0.6); }
+    }
+    .animate-backdrop {
+      animation: backdropFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    
+    @keyframes modalSpring {
+      0% { opacity: 0; transform: scale(0.92) translateY(30px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .animate-modal-spring {
+      animation: modalSpring 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
   `]
 })
 export class HomeComponent implements OnInit, OnDestroy {
