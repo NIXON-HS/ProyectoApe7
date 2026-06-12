@@ -224,10 +224,10 @@
 
     <div class="relative max-w-4xl mx-auto">
       <!-- Card container -->
-      <div class="group/card overflow-hidden rounded-3xl shadow-xl relative min-h-[380px] bg-slate-50 border border-slate-150 transition-all duration-500 hover:shadow-2xl">
+      <div class="group/card news-premium-card relative min-h-[380px] rounded-3xl">
         <!-- Sliding Item -->
         <div *ngFor="let noticia of noticias; let idx = index"
-             [class]="idx === currentNewsIndex ? 'flex flex-col md:flex-row opacity-100 scale-100 translate-x-0 relative z-10' : 'absolute inset-0 flex flex-col md:flex-row opacity-0 scale-95 pointer-events-none z-0 translate-x-4'"
+             [class]="idx === currentNewsIndex ? 'flex flex-col md:flex-row opacity-100 scale-100 translate-x-0 relative z-10 slide-active' : 'absolute inset-0 flex flex-col md:flex-row opacity-0 scale-95 pointer-events-none z-0 translate-x-4'"
              class="transition-all duration-750 cubic-bezier(0.16, 1, 0.3, 1) h-full min-h-[380px] text-left bg-white w-full">
           
           <!-- Image side -->
@@ -276,10 +276,10 @@
       </div>
 
       <!-- Controls -->
-      <button (click)="prevNews()" class="group absolute left-[-20px] md:left-[-28px] top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white hover:bg-reasons-green hover:text-white text-reasons-navy border border-slate-200/80 shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer z-10 hover:shadow-reasons-green/20 hover:shadow-2xl">
+      <button (click)="prevNews()" class="premium-control-btn absolute left-[-20px] md:left-[-28px] top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full shadow-lg flex items-center justify-center cursor-pointer z-10">
         <svg class="w-5 h-5 md:w-6 md:h-6 transition-transform duration-300 group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
       </button>
-      <button (click)="nextNews()" class="group absolute right-[-20px] md:right-[-28px] top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white hover:bg-reasons-green hover:text-white text-reasons-navy border border-slate-200/80 shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer z-10 hover:shadow-reasons-green/20 hover:shadow-2xl">
+      <button (click)="nextNews()" class="premium-control-btn absolute right-[-20px] md:right-[-28px] top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full shadow-lg flex items-center justify-center cursor-pointer z-10">
         <svg class="w-5 h-5 md:w-6 md:h-6 transition-transform duration-300 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
       </button>
 
@@ -287,8 +287,8 @@
       <div class="flex justify-center gap-2 mt-8">
         <button *ngFor="let noticia of noticias; let idx = index"
                 (click)="selectNews(idx)"
-                [class]="idx === currentNewsIndex ? 'w-6 bg-reasons-green' : 'w-2 bg-slate-300 hover:bg-slate-400 hover:scale-125'"
-                class="h-2 rounded-full transition-all duration-500 cubic-bezier(0.25, 1, 0.5, 1) cursor-pointer"></button>
+                [class.carousel-dot-active]="idx === currentNewsIndex"
+                class="h-2 w-2 bg-slate-350 rounded-full cursor-pointer carousel-dot"></button>
       </div>
     </div>
 
