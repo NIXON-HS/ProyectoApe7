@@ -1,0 +1,174 @@
+<div class="animate-fade-in flex flex-col gap-6">
+  
+  <!-- Table List -->
+  <div *ngIf="!showForm" class="flex flex-col gap-4">
+    <div class="flex justify-between items-center">
+      <h3 class="text-xl font-bold text-reasons-navy text-left">Lista del Equipo</h3>
+      <button (click)="nuevoInvestigador()" class="px-5 py-2.5 bg-reasons-green hover:bg-[#327e2a] text-white text-xs font-bold rounded-xl shadow hover-premium flex items-center gap-1.5 cursor-pointer">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+        Nuevo Investigador
+      </button>
+    </div>
+
+    <div class="glass-card rounded-3xl overflow-hidden shadow-lg border border-slate-100">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-150 text-slate-500 font-bold uppercase">
+              <th class="p-4">Foto</th>
+              <th class="p-4">Nombres</th>
+              <th class="p-4">Posición</th>
+              <th class="p-4">Correo</th>
+              <th class="p-4">ORCID</th>
+              <th class="p-4 text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-slate-600 font-light">
+            <tr *ngFor="let inv of filtrarLista(investigadores)" class="hover:bg-slate-50/50 transition-colors">
+              <td class="p-4">
+                <img [src]="obtenerFotoUrl(inv.foto_url)" 
+                     (error)="inv.foto_url = defaultAvatar" 
+                     class="w-10 h-10 rounded-full object-cover border border-slate-200" alt="Foto" />
+              </td>
+              <td class="p-4 font-bold text-reasons-navy">{{ inv.nombres }}</td>
+              <td class="p-4">
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                      [class]="inv.posicion === 'Director' ? 'badge-gold' : (inv.posicion === 'Subdirector' ? 'badge-sky' : 'badge-slate')">
+                  {{ inv.posicion }}
+                </span>
+              </td>
+              <td class="p-4">{{ inv.correo_institucional }}</td>
+              <td class="p-4 font-mono">{{ inv.orcid || 'N/A' }}</td>
+              <td class="p-4 text-center flex items-center justify-center gap-2">
+                <button (click)="editarInvestigador(inv)" class="p-2 bg-reasons-blue/10 text-reasons-blue rounded-lg hover:bg-reasons-blue/20 transition-colors cursor-pointer" title="Editar">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                </button>
+                <button (click)="eliminarInvestigador(inv.id, inv.nombres)" class="p-2 bg-rose-500/10 text-rose-500 rounded-lg hover:bg-rose-500/20 transition-colors cursor-pointer" title="Eliminar">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="filtrarLista(investigadores).length === 0">
+              <td colspan="6" class="p-8 text-center text-slate-400 font-semibold">No se encontraron investigadores.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add / Edit Form -->
+  <div *ngIf="showForm" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-xl w-full text-left">
+    <h3 class="text-xl font-bold text-reasons-navy mb-6">{{ editMode ? 'Editar Investigador' : 'Agregar Nuevo Investigador' }}</h3>
+    
+    <form [formGroup]="investigadorForm" (ngSubmit)="guardarInvestigador()" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Nombres -->
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">Nombres Completos</label>
+        <input type="text" formControlName="nombres" class="form-input" placeholder="ej. John Reyes" />
+      </div>
+
+      <!-- Correo -->
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">Correo Institucional</label>
+        <input type="email" formControlName="correo_institucional" class="form-input" placeholder="ej. john.reyes@uta.edu.ec" />
+      </div>
+
+      <!-- ORCID -->
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">Código ORCID</label>
+        <input type="text" formControlName="orcid" class="form-input" placeholder="ej. 0000-0001-9284-7561" />
+      </div>
+
+      <!-- Posición -->
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">Cargo / Posición</label>
+        <select formControlName="posicion" class="form-input">
+          <option value="Director">Director</option>
+          <option value="Subdirector">Subdirector</option>
+          <option value="Investigador">Investigador</option>
+        </select>
+      </div>
+
+      <!-- Biografía (Textarea fullwidth) -->
+      <div class="flex flex-col gap-1.5 md:col-span-2">
+        <label class="form-label">Trayectoria / Biografía Académica</label>
+        <textarea formControlName="biografia" rows="4" class="form-input" placeholder="Trayectoria, estudios y áreas de interés científico..."></textarea>
+      </div>
+
+      <!-- Foto URL con Subida Directa -->
+      <div class="flex flex-col gap-2 md:col-span-2 bg-slate-50/50 p-5 rounded-2xl border border-slate-150 text-left">
+        <label class="form-label font-bold text-reasons-navy">Foto de Perfil del Investigador</label>
+        
+        <div class="flex flex-col sm:flex-row items-center gap-5 mt-1">
+          <!-- Avatar Preview -->
+          <div class="w-16 h-16 rounded-full border-2 border-slate-200 shadow-md overflow-hidden bg-white flex-shrink-0 flex items-center justify-center">
+            <img [src]="uploadPreview || obtenerFotoUrl(investigadorForm.get('foto_url')?.value)" 
+                 (error)="$any($event.target).src = defaultAvatar"
+                 class="w-full h-full object-cover" alt="Previsualización" />
+          </div>
+          
+          <!-- File Upload Trigger & URL input -->
+          <div class="flex-1 flex flex-col gap-2.5 w-full">
+            <div class="flex flex-col sm:flex-row gap-3">
+              <!-- File Input hidden, triggered by button -->
+              <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" class="hidden" />
+              
+              <button type="button" (click)="fileInput.click()" [disabled]="isUploading" class="px-4 py-2.5 bg-reasons-blue hover:bg-reasons-navy text-white text-xs font-bold rounded-xl shadow-sm cursor-pointer transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50">
+                <span *ngIf="isUploading" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                <svg *ngIf="!isUploading" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                {{ isUploading ? 'Subiendo Imagen...' : 'Subir Nueva Foto' }}
+              </button>
+              
+              <span class="text-[10px] text-slate-400 self-center">Formatos admitidos: JPG, PNG. Tamaño recomendado: 300x300px.</span>
+            </div>
+            
+            <!-- Fallback Manual Input -->
+            <div class="flex flex-col gap-1 w-full">
+              <span class="text-[9px] text-slate-400 font-semibold uppercase tracking-wider">O ingresa una ruta/URL manual:</span>
+              <input type="text" formControlName="foto_url" class="form-input text-xs" placeholder="ej. assets/images/team/nombre.jpg" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="md:col-span-2 border-t border-slate-100 my-2 pt-4">
+        <h4 class="text-sm font-bold text-reasons-navy mb-4">Redes Sociales y Enlaces Directos (Opcional)</h4>
+      </div>
+
+      <!-- Facebook -->
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">Facebook URL</label>
+        <input type="text" formControlName="red_facebook" class="form-input" placeholder="https://facebook.com/..." />
+      </div>
+
+      <!-- Linkedin -->
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">LinkedIn URL</label>
+        <input type="text" formControlName="red_linkedin" class="form-input" placeholder="https://linkedin.com/in/..." />
+      </div>
+
+      <!-- Instagram -->
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">Instagram URL</label>
+        <input type="text" formControlName="red_instagram" class="form-input" placeholder="https://instagram.com/..." />
+      </div>
+
+      <!-- Telegram -->
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">Telegram URL o Chat</label>
+        <input type="text" formControlName="red_telegram" class="form-input" placeholder="https://t.me/..." />
+      </div>
+
+      <!-- Action buttons -->
+      <div class="md:col-span-2 flex justify-end gap-3 mt-4">
+        <button type="button" (click)="cancelForm()" class="px-5 py-2.5 bg-slate-150 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-all cursor-pointer">
+          Cancelar
+        </button>
+        <button type="submit" [disabled]="investigadorForm.invalid || isSubmitting" class="px-6 py-2.5 bg-reasons-green hover:bg-[#327e2a] text-white font-bold rounded-xl text-xs shadow-md disabled:opacity-50 transition-all cursor-pointer">
+          {{ isSubmitting ? 'Guardando...' : 'Guardar Investigador' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
