@@ -14,12 +14,14 @@ import { ProyectoService } from '../../core/services/proyecto.service';
 import { PublicacionService } from '../../core/services/publicacion.service';
 import { ContactoService } from '../../core/services/contacto.service';
 import { ToastService } from '../../core/services/toast.service';
+import { NoticiaService } from '../../core/services/noticia.service';
 
 // Models
 import { Investigador } from '../../core/models/investigador.model';
 import { Proyecto } from '../../core/models/proyecto.model';
 import { Publicacion } from '../../core/models/publicacion.model';
 import { Contacto } from '../../core/models/contacto.model';
+import { Noticia } from '../../core/models/noticia.model';
 
 @Component({
   selector: 'app-login',
@@ -32,7 +34,7 @@ export class LoginComponent implements OnInit {
   // Session & UI Navigation State
   isLoggedIn = false;
   usuario: any = null;
-  activeTab: 'resumen' | 'investigadores' | 'proyectos' | 'publicaciones' | 'mensajes' | 'perfil' | 'info' | 'lineas' = 'resumen';
+  activeTab: 'resumen' | 'investigadores' | 'proyectos' | 'publicaciones' | 'mensajes' | 'perfil' | 'info' | 'lineas' | 'noticias' = 'resumen';
   showPassword = false; // Toggler de visibilidad de contraseña
   isMobileSidebarOpen = false; // Control de menú lateral responsive en móviles
 
@@ -41,12 +43,14 @@ export class LoginComponent implements OnInit {
   investigadorForm!: FormGroup;
   proyectoForm!: FormGroup;
   publicacionForm!: FormGroup;
+  noticiaForm!: FormGroup;
 
   // Data collections
   investigadores: Investigador[] = [];
   proyectos: Proyecto[] = [];
   publicaciones: Publicacion[] = [];
   mensajes: Contacto[] = [];
+  noticias: Noticia[] = [];
 
   // Search & Filter Query
   searchQuery = '';
@@ -113,6 +117,12 @@ export class LoginComponent implements OnInit {
   @ViewChild('editorObj')     editorObj?:     BlockEditorComponent;
   @ViewChild('editorRes')     editorRes?:     BlockEditorComponent;
   @ViewChild('editorResumen') editorResumen?: BlockEditorComponent;
+  @ViewChild('editorNoticia') editorNoticia?: BlockEditorComponent;
+
+  // Block editor state – noticia
+  noticiaDescBlocks: Block[] = [];
+  noticiaModoFlexible = false;
+  noticiaVistaPrevia = false;
 
   // Research lines hardcoded to match the database and schema
   lineasDeInvestigacion = [
@@ -131,6 +141,7 @@ export class LoginComponent implements OnInit {
     private toastService: ToastService,
     private router: Router,
     private infoGrupoSvc: InfoGrupoService,
+    private noticiaService: NoticiaService,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone
   ) {}
@@ -306,7 +317,7 @@ export class LoginComponent implements OnInit {
     const esAdmin = rol === 'admin';
 
     // Track each parallel load with a simple counter
-    let pendientes = esAdmin ? 4 : 3;
+    let pendientes = esAdmin ? 5 : 3;
     const finalizarUna = () => {
       pendientes--;
       if (pendientes <= 0) {
@@ -366,6 +377,14 @@ export class LoginComponent implements OnInit {
       this.mensajes = [];
     }
 
+    // 5. Noticias (solo admin)
+    if (esAdmin) {
+      this.noticiaService.getNoticias().subscribe({
+        next: (data) => { this.noticias = data; finalizarUna(); },
+        error: (err) => { console.error('Error cargando noticias:', err); finalizarUna(); }
+      });
+    }
+
     // Clear safety timer once all loaded
     const originalFinalizar = finalizarUna;
     // Timer auto-clears via the timeout itself; no additional cleanup needed
@@ -374,7 +393,7 @@ export class LoginComponent implements OnInit {
   // ==========================================
   // TAB NAVIGATION
   // ==========================================
-  switchTab(tab: 'resumen' | 'investigadores' | 'proyectos' | 'publicaciones' | 'mensajes' | 'perfil' | 'info' | 'lineas') {
+  switchTab(tab: 'resumen' | 'investigadores' | 'proyectos' | 'publicaciones' | 'mensajes' | 'perfil' | 'info' | 'lineas' | 'noticias') {
     this.activeTab = tab;
     this.searchQuery = '';
     this.cancelForm();
@@ -382,6 +401,7 @@ export class LoginComponent implements OnInit {
     if (tab === 'perfil') this.showForm = false;
     if (tab === 'info')   this.cargarInfoGrupo();
     if (tab === 'lineas') this.cargarLineas();
+    if (tab === 'noticias') this.cargarTodo();
   }
 
   cargarLineas() {
@@ -1051,6 +1071,7 @@ export class LoginComponent implements OnInit {
     this.activeRecordId = null;
     this.proyVistaPrevia = false;
     this.pubVistaPrevia  = false;
+    this.noticiaVistaPrevia = false;
     this.uploadPreview   = null;
   }
 
@@ -1098,7 +1119,11 @@ export class LoginComponent implements OnInit {
     
     return items.filter(item => {
       if (item.nombres) return item.nombres.toLowerCase().includes(q) || item.correo_institucional.toLowerCase().includes(q);
-      if (item.titulo) return item.titulo.toLowerCase().includes(q) || (item.descripcion && item.descripcion.toLowerCase().includes(q));
+      if (item.titulo) {
+        return item.titulo.toLowerCase().includes(q) || 
+               (item.descripcion && item.descripcion.toLowerCase().includes(q)) || 
+               (item.resumen && item.resumen.toLowerCase().includes(q));
+      }
       if (item.nombre_completo) return item.nombre_completo.toLowerCase().includes(q) || item.asunto.toLowerCase().includes(q) || item.mensaje.toLowerCase().includes(q);
       return false;
     });
@@ -1107,5 +1132,131 @@ export class LoginComponent implements OnInit {
   getAbreviaturaLinea(lineaId: number): string {
     const l = this.lineasDeInvestigacion.find(x => x.id === lineaId);
     return l ? l.abreviatura : 'N/A';
+  }
+
+  // ==========================================
+  // FORMULARIO DE NOTICIAS
+  // ==========================================
+  initNoticiaForm(data?: Noticia) {
+    this.uploadPreview = null;
+    this.noticiaForm = this.fb.group({
+      titulo:     [data?.titulo     || '', [Validators.required]],
+      resumen:    [data?.resumen    || '', [Validators.required]],
+      contenido:  [data?.contenido  || ''],
+      categoria:  [data?.categoria  || 'General', [Validators.required]],
+      imagen_url: [data?.imagen_url || ''],
+      activo:     [data?.activo !== undefined ? data?.activo : true],
+      fecha:      [data?.fecha ? data.fecha.substring(0, 10) : new Date().toISOString().substring(0, 10)]
+    });
+
+    this.noticiaModoFlexible = !!(data?.contenido_json);
+    this.noticiaDescBlocks   = this.parseBlocks(data?.contenido_json, data?.contenido);
+
+    this.showForm = false;
+    this.ngZone.run(() => { this.showForm = true; this.cdr.detectChanges(); });
+  }
+
+  nuevaNoticia() {
+    this.editMode = false;
+    this.activeRecordId = null;
+    this.initNoticiaForm();
+  }
+
+  editarNoticia(noticia: Noticia) {
+    this.editMode = true;
+    this.activeRecordId = noticia.id;
+    this.initNoticiaForm(noticia);
+  }
+
+  guardarNoticia() {
+    if (this.noticiaForm.invalid) return;
+    this.isSubmitting = true;
+
+    let contenido: string;
+    let descBlocks: Block[];
+
+    if (this.noticiaModoFlexible) {
+      descBlocks = this.editorNoticia?.getBlocks() ?? this.noticiaDescBlocks;
+      contenido  = this.blocksToText(descBlocks) || ' ';
+    } else {
+      contenido  = this.noticiaForm.get('contenido')?.value || ' ';
+      descBlocks = this.textToBlocks(contenido);
+    }
+
+    const val = {
+      ...this.noticiaForm.value,
+      contenido,
+      contenido_json: JSON.stringify(descBlocks),
+    };
+
+    if (this.editMode && this.activeRecordId) {
+      this.noticiaService.actualizarNoticia(this.activeRecordId, val).subscribe({
+        next: () => {
+          this.isSubmitting = false;
+          this.toastService.show('Noticia actualizada exitosamente.', 'success');
+          this.cargarTodo();
+          this.cancelForm();
+        },
+        error: () => this.isSubmitting = false
+      });
+    } else {
+      this.noticiaService.crearNoticia(val).subscribe({
+        next: () => {
+          this.isSubmitting = false;
+          this.toastService.show('Noticia registrada exitosamente.', 'success');
+          this.cargarTodo();
+          this.cancelForm();
+        },
+        error: () => this.isSubmitting = false
+      });
+    }
+  }
+
+  eliminarNoticia(id: number, titulo: string) {
+    if (confirm(`¿Está seguro de que desea eliminar la noticia "${titulo}"?`)) {
+      this.noticiaService.eliminarNoticia(id).subscribe({
+        next: () => {
+          this.toastService.show('Noticia eliminada.', 'info');
+          this.cargarTodo();
+        },
+        error: (err) => console.error(err)
+      });
+    }
+  }
+
+  onNoticiaFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      this.toastService.show('Por favor seleccione un archivo de imagen válido.', 'warning');
+      return;
+    }
+
+    this.isUploading = true;
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.uploadPreview = e.target.result as string;
+      this.cdr.detectChanges();
+
+      const base64Data = (e.target.result as string).split(',')[1];
+      this.investigadorService.subirFoto(file.name, base64Data).subscribe({
+        next: (res) => {
+          this.isUploading = false;
+          if (res && res.success) {
+            this.noticiaForm.patchValue({ imagen_url: res.url });
+            this.cdr.detectChanges();
+            this.toastService.show('¡Imagen de portada subida exitosamente!', 'success');
+          }
+        },
+        error: (err) => {
+          this.isUploading = false;
+          this.cdr.detectChanges();
+          console.error('Error al subir imagen:', err);
+          this.toastService.show('Error al subir la imagen al servidor.', 'error');
+        }
+      });
+    };
+    reader.readAsDataURL(file);
   }
 }

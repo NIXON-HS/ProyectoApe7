@@ -6,6 +6,9 @@ import { InfoGrupoService } from '../../core/services/info-grupo.service';
 import { InfoGrupo, LineaInvestigacion } from '../../core/models/info-grupo.model';
 import { BlockRendererComponent } from '../../shared/block-renderer/block-renderer';
 import { AdminBarComponent } from '../../shared/admin-bar/admin-bar';
+import { NoticiaService } from '../../core/services/noticia.service';
+import { Noticia } from '../../core/models/noticia.model';
+import { environment } from '../../../environments/environment';
 
 // Fallback constants (used while API loads or if no data saved yet)
 const DEFAULT_MISION = 'Generar, promover y difundir conocimiento científico y tecnológico de vanguardia e impacto multidisciplinario, articulando la ingeniería avanzada con procesos de sostenibilidad industrial y ambiental, para aportar con soluciones innovadoras a las problemáticas actuales de la naturaleza y el beneficio de la sociedad andina y global.';
@@ -229,6 +232,135 @@ const DEFAULT_DOMINIO = 'Optimización de los Sistemas Productivos, Diseño y De
         </div>
       </div>
     </section>
+
+    <!-- Noticias Section -->
+    <section *ngIf="noticias.length > 0" class="py-20 bg-slate-50/50 relative overflow-hidden border-t border-slate-100">
+      <div class="absolute -left-40 top-20 w-96 h-96 bg-reasons-green/5 rounded-full filter blur-3xl"></div>
+      <div class="absolute -right-40 bottom-20 w-96 h-96 bg-reasons-blue/5 rounded-full filter blur-3xl"></div>
+
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center max-w-3xl mx-auto flex flex-col gap-4 mb-16">
+          <span class="text-xs font-bold text-reasons-green tracking-widest uppercase">Actualidad</span>
+          <h2 class="text-3xl md:text-4xl font-extrabold text-reasons-navy">Noticias y Novedades del Grupo</h2>
+          <div class="w-16 h-1 bg-reasons-green mx-auto rounded-full"></div>
+        </div>
+
+        <div class="relative max-w-4xl mx-auto">
+          <!-- Card container -->
+          <div class="overflow-hidden rounded-3xl shadow-xl relative min-h-[380px] bg-slate-50 border border-slate-150 transition-all duration-500 hover:shadow-2xl">
+            <!-- Sliding Item -->
+            <div *ngFor="let noticia of noticias; let idx = index"
+                 [class]="idx === currentNewsIndex ? 'flex flex-col md:flex-row opacity-100 scale-100' : 'hidden opacity-0 scale-95'"
+                 class="transition-all duration-700 ease-in-out h-full min-h-[380px] text-left">
+              
+              <!-- Image side -->
+              <div class="md:w-1/2 relative bg-gradient-to-br from-[#00283c] to-[#043d1a] overflow-hidden min-h-[220px] md:min-h-0 flex-shrink-0 flex items-center justify-center">
+                <img *ngIf="noticia.imagen_url" [src]="resolveUrl(noticia.imagen_url)" 
+                     class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-105" alt="News Image" />
+                <div *ngIf="!noticia.imagen_url" class="absolute inset-0 flex flex-col items-center justify-center text-white/20 p-8">
+                  <svg class="w-16 h-16 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15M9 11l3 3m0 0l3-3m-3 3V8"/></svg>
+                  <span class="text-[10px] uppercase tracking-widest font-bold mt-2 text-white/40">REASONS News</span>
+                </div>
+                <span class="absolute top-4 left-4 inline-flex px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-white bg-reasons-green/80 backdrop-blur-md border border-white/20 shadow-md">
+                  {{ noticia.categoria }}
+                </span>
+              </div>
+
+              <!-- Content side -->
+              <div class="md:w-1/2 p-8 md:p-12 flex flex-col justify-between bg-white text-left gap-6">
+                <div class="flex flex-col gap-4">
+                  <span class="text-xs font-bold text-slate-400 uppercase tracking-wide flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-reasons-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    {{ noticia.fecha | date:'longDate' }}
+                  </span>
+                  <h3 class="text-xl md:text-2xl font-black text-reasons-navy leading-tight hover:text-reasons-green transition-colors cursor-pointer" (click)="verNoticia(noticia)">
+                    {{ noticia.titulo }}
+                  </h3>
+                  <p class="text-sm text-slate-500 font-light leading-relaxed">
+                    {{ noticia.resumen }}
+                  </p>
+                </div>
+                <button (click)="verNoticia(noticia)" class="w-fit px-6 py-2.5 bg-reasons-navy hover:bg-reasons-green text-white text-xs font-bold rounded-full shadow hover-premium transition-all flex items-center gap-1.5 cursor-pointer">
+                  Leer más
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Controls -->
+          <button (click)="prevNews()" class="absolute left-[-20px] md:left-[-28px] top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white hover:bg-reasons-green hover:text-white text-reasons-navy border border-slate-200/80 shadow-lg flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer z-10">
+            <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+          </button>
+          <button (click)="nextNews()" class="absolute right-[-20px] md:right-[-28px] top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white hover:bg-reasons-green hover:text-white text-reasons-navy border border-slate-200/80 shadow-lg flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer z-10">
+            <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+          </button>
+
+          <!-- Dots -->
+          <div class="flex justify-center gap-2 mt-8">
+            <button *ngFor="let noticia of noticias; let idx = index"
+                    (click)="selectNews(idx)"
+                    [class]="idx === currentNewsIndex ? 'w-6 bg-reasons-green' : 'w-2 bg-slate-300 hover:bg-slate-400'"
+                    class="h-2 rounded-full transition-all duration-300 cursor-pointer"></button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- News Details Backdrop Modal -->
+    <div *ngIf="selectedNoticia" 
+         (click)="cerrarNoticia()"
+         class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 animate-fade-in">
+      <div (click)="$event.stopPropagation()"
+           class="bg-white rounded-3xl max-w-3xl w-full max-h-[85vh] overflow-y-auto shadow-2xl border border-slate-100 flex flex-col text-left scale-up-animation">
+        
+        <!-- Modal Cover -->
+        <div class="relative bg-gradient-to-br from-[#00283c] to-[#043d1a] min-h-[220px] sm:min-h-[280px] flex items-center justify-center text-center overflow-hidden flex-shrink-0">
+          <img *ngIf="selectedNoticia.imagen_url" [src]="resolveUrl(selectedNoticia.imagen_url)" class="w-full h-full object-cover" />
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
+          <button (click)="cerrarNoticia()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-colors cursor-pointer">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+          
+          <div class="absolute bottom-6 left-6 right-6 flex flex-col gap-2.5">
+            <span class="inline-flex px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-[#7dd87a] bg-white/10 border border-white/20 w-fit backdrop-blur-md">
+              {{ selectedNoticia.categoria }}
+            </span>
+            <h3 class="text-xl sm:text-2xl md:text-3xl font-black text-white leading-tight">
+              {{ selectedNoticia.titulo }}
+            </h3>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6 sm:p-8 flex flex-col gap-6">
+          <div class="flex items-center gap-1.5 text-xs text-slate-400 font-bold uppercase tracking-wide border-b border-slate-100 pb-3">
+            <svg class="w-4 h-4 text-reasons-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            Publicado el {{ selectedNoticia.fecha | date:'longDate' }}
+          </div>
+
+          <div class="p-4 bg-slate-50 border-l-4 border-reasons-green rounded-r-2xl font-light text-slate-650 leading-relaxed text-sm italic">
+            {{ selectedNoticia.resumen }}
+          </div>
+
+          <div class="text-sm text-slate-700 font-light leading-relaxed prose max-w-none">
+            <app-block-renderer
+              [blocksJson]="selectedNoticia.contenido_json"
+              [fallback]="selectedNoticia.contenido">
+            </app-block-renderer>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="p-5 border-t border-slate-100 bg-slate-50/50 flex justify-end">
+          <button (click)="cerrarNoticia()" class="px-6 py-2 bg-reasons-navy hover:bg-reasons-green text-white text-xs font-bold rounded-full transition-colors cursor-pointer shadow-sm">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
   `,
   styles: [`
     .tab-btn {
@@ -267,6 +399,8 @@ const DEFAULT_DOMINIO = 'Optimización de los Sistemas Productivos, Diseño y De
       padding:5px 10px; outline:none; transition:border .2s; color:inherit;
     }
     .hero-card-input:focus { border-color:#7dd87a; background:rgba(255,255,255,.12); }
+    @keyframes scaleUp { from{opacity:0;transform:scale(.95)} to{opacity:1;transform:scale(1)} }
+    .scale-up-animation { animation:scaleUp .3s cubic-bezier(.16,1,.3,1) forwards; }
   `]
 })
 export class HomeComponent implements OnInit, OnDestroy {
@@ -276,6 +410,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   editMode = false;
   draft: InfoGrupo = {};
 
+  // Noticias state
+  noticias: Noticia[] = [];
+  selectedNoticia: Noticia | null = null;
+  currentNewsIndex = 0;
+
   // Expose defaults to template
   DEFAULT_MISION     = DEFAULT_MISION;
   DEFAULT_OBJETIVO   = DEFAULT_OBJETIVO;
@@ -283,17 +422,29 @@ export class HomeComponent implements OnInit, OnDestroy {
   DEFAULT_DOMINIO    = DEFAULT_DOMINIO;
 
   private intervalId: any;
+  private newsIntervalId: any;
   private tabs: ('mision' | 'general' | 'especificos')[] = ['mision', 'general', 'especificos'];
 
-  constructor(private cdr: ChangeDetectorRef, private infoSvc: InfoGrupoService) {}
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private infoSvc: InfoGrupoService,
+    private noticiaSvc: NoticiaService
+  ) {}
 
   ngOnInit() {
     this.startRotation();
     this.cargarInfo();
-    this.infoSvc.contentUpdated$.subscribe(() => this.cargarInfo());
+    this.cargarNoticias();
+    this.infoSvc.contentUpdated$.subscribe(() => {
+      this.cargarInfo();
+      this.cargarNoticias();
+    });
   }
 
-  ngOnDestroy() { this.stopRotation(); }
+  ngOnDestroy() {
+    this.stopRotation();
+    this.stopNewsRotation();
+  }
 
   cargarInfo() {
     this.infoSvc.getInfoGrupo().subscribe({
@@ -366,5 +517,67 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
   lineaIconColor(i: number): string {
     return ['text-reasons-green', 'text-reasons-blue', 'text-reasons-green'][i % 3];
+  }
+
+  cargarNoticias() {
+    this.noticiaSvc.getNoticias().subscribe({
+      next: (data) => {
+        this.noticias = data.filter(n => n.activo);
+        this.currentNewsIndex = 0;
+        this.cdr.detectChanges();
+        this.startNewsRotation();
+      },
+      error: () => {}
+    });
+  }
+
+  startNewsRotation() {
+    this.stopNewsRotation();
+    if (this.noticias.length <= 1) return;
+    this.newsIntervalId = setInterval(() => {
+      this.nextNews();
+    }, 6000);
+  }
+
+  stopNewsRotation() {
+    if (this.newsIntervalId) clearInterval(this.newsIntervalId);
+  }
+
+  prevNews() {
+    if (this.noticias.length === 0) return;
+    this.currentNewsIndex = (this.currentNewsIndex - 1 + this.noticias.length) % this.noticias.length;
+    this.cdr.detectChanges();
+    this.startNewsRotation();
+  }
+
+  nextNews() {
+    if (this.noticias.length === 0) return;
+    this.currentNewsIndex = (this.currentNewsIndex + 1) % this.noticias.length;
+    this.cdr.detectChanges();
+    this.startNewsRotation();
+  }
+
+  selectNews(index: number) {
+    this.currentNewsIndex = index;
+    this.cdr.detectChanges();
+    this.startNewsRotation();
+  }
+
+  verNoticia(noticia: Noticia) {
+    this.selectedNoticia = noticia;
+    this.stopNewsRotation();
+    this.cdr.detectChanges();
+  }
+
+  cerrarNoticia() {
+    this.selectedNoticia = null;
+    this.startNewsRotation();
+    this.cdr.detectChanges();
+  }
+
+  resolveUrl(url: string | null | undefined): string {
+    if (!url) return '';
+    if (url.startsWith('http') || url.startsWith('data:')) return url;
+    return `${environment.apiUrl.replace('/api', '')}/${url}`;
   }
 }
