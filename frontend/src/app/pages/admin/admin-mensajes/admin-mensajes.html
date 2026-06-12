@@ -1,0 +1,96 @@
+<div class="animate-fade-in flex flex-col gap-6 text-left">
+  <!-- Message list in columns or table -->
+  <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-stretch">
+    
+    <!-- Column 1: Chronological message list (width 7) -->
+    <div class="xl:col-span-7 flex flex-col gap-4 text-left">
+      <h3 class="text-xl font-bold text-reasons-navy mb-0">Bandeja de Entrada</h3>
+      
+      <div class="glass-card rounded-3xl overflow-hidden shadow-lg border border-slate-100 bg-white">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-150 text-slate-500 font-bold uppercase">
+                <th class="p-4">Remitente</th>
+                <th class="p-4">Asunto</th>
+                <th class="p-4">Fecha</th>
+                <th class="p-4 text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-600 font-light">
+              <tr *ngFor="let msg of filtrarLista(mensajes)" 
+                  (click)="verDetalleMensaje(msg)"
+                  class="hover:bg-slate-50/50 transition-all duration-200 cursor-pointer"
+                  [class.bg-reasons-blue/5]="selectedMessage?.id === msg.id">
+                <td class="p-4 font-bold text-reasons-navy">
+                  {{ msg.nombre_completo }}
+                  <span class="text-[10px] text-slate-400 block font-light font-sans truncate max-w-[150px]">{{ msg.correo }}</span>
+                </td>
+                <td class="p-4 font-medium max-w-[200px] truncate">{{ msg.asunto }}</td>
+                <td class="p-4 font-mono text-[10px] text-slate-400">
+                  {{ msg.creado_en | date:'dd/MM/yyyy HH:mm' }}
+                </td>
+                <td class="p-4 text-center flex items-center justify-center gap-2 h-full min-h-[50px]">
+                  <button (click)="$event.stopPropagation(); eliminarMensaje(msg.id!)" class="p-2 bg-rose-500/10 text-rose-500 rounded-lg hover:bg-rose-500/20 transition-colors cursor-pointer" title="Eliminar Mensaje">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="filtrarLista(mensajes).length === 0">
+                <td colspan="4" class="p-8 text-center text-slate-400 font-semibold">No hay mensajes de contacto.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Column 2: Detailed View Card (width 5) -->
+    <div class="xl:col-span-5 flex flex-col">
+      <div class="glowing-card glass-card p-6 md:p-8 rounded-3xl shadow-xl h-full flex flex-col justify-between border border-slate-100 text-left min-h-[400px] bg-white">
+        <div *ngIf="!selectedMessage" class="flex-1 flex flex-col items-center justify-center text-slate-400 gap-4">
+          <svg class="w-16 h-16 text-slate-350" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+          <span class="text-sm font-semibold text-center">Seleccione un mensaje de la bandeja para leer los detalles completos.</span>
+        </div>
+
+        <div *ngIf="selectedMessage" class="flex-1 flex flex-col justify-between h-full animate-fade-in gap-6">
+          <!-- Header details -->
+          <div class="flex flex-col gap-4">
+            <div class="flex justify-between items-start border-b border-slate-100 pb-4">
+              <div class="flex flex-col gap-1">
+                <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">De:</span>
+                <h4 class="text-lg font-bold text-reasons-navy leading-none mb-0">{{ selectedMessage.nombre_completo }}</h4>
+                <a href="mailto:{{ selectedMessage.correo }}" class="text-xs text-reasons-blue hover:text-reasons-green transition-colors mt-1 font-medium select-all">{{ selectedMessage.correo }}</a>
+              </div>
+              <span class="text-[10px] text-slate-400 font-mono font-bold bg-slate-50 p-2 rounded-xl border border-slate-150">
+                {{ selectedMessage.creado_en | date:'dd/MM HH:mm' }}
+              </span>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Asunto:</span>
+              <p class="font-bold text-sm text-reasons-navy mb-0">{{ selectedMessage.asunto }}</p>
+            </div>
+
+            <div class="flex flex-col gap-2 bg-slate-50 p-5 rounded-2xl border border-slate-100 min-h-[180px] overflow-y-auto">
+              <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Mensaje:</span>
+              <p class="text-xs text-slate-650 font-light leading-relaxed whitespace-pre-line mb-0">{{ selectedMessage.mensaje }}</p>
+            </div>
+          </div>
+
+          <!-- Footer buttons inside details -->
+          <div class="flex items-center justify-between border-t border-slate-100 pt-4 gap-3 mt-4">
+            <a href="mailto:{{ selectedMessage.correo }}?subject=RE: {{ selectedMessage.asunto }}" class="px-5 py-2.5 bg-reasons-blue hover:bg-reasons-navy text-white text-xs font-bold rounded-xl shadow-sm cursor-pointer transition-colors flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
+              Responder por Correo
+            </a>
+            <button (click)="eliminarMensaje(selectedMessage.id!)" class="px-5 py-2.5 bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold rounded-xl shadow-sm cursor-pointer transition-colors flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+              Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

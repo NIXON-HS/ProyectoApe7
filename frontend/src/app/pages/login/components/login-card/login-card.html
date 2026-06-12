@@ -1,0 +1,154 @@
+<!-- NOT LOGGED IN: PREMIUM SPLIT LOGIN SCREEN -->
+<div class="min-h-screen flex flex-col lg:flex-row bg-[#edf2f7] overflow-hidden relative">
+  <!-- Grid Overlay on Outer Container using inline styling to avoid custom CSS dependencies -->
+  <div class="absolute inset-0 opacity-5 pointer-events-none z-0" style="background-size: 40px 40px; background-image: linear-gradient(to right, rgba(10, 50, 70, 0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(10, 50, 70, 0.03) 1px, transparent 1px);"></div>
+
+  <!-- Glowing Background Blobs -->
+  <div class="absolute inset-0 opacity-15 pointer-events-none">
+    <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-[#3c9632]/25 filter blur-3xl"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-[#d4af37]/20 filter blur-3xl"></div>
+  </div>
+
+  <!-- LEFT PANEL: RICH BRANDING & STATS (Hidden on mobile) -->
+  <div class="hidden lg:flex lg:w-[45%] bg-gradient-to-br from-[#00283c] via-[#072433] to-[#043d1a] p-12 flex-col justify-between relative border-r border-slate-100 overflow-hidden">
+    <!-- Light Grid Overlay inside Dark Panel for premium high-tech scientific visual effect -->
+    <div class="absolute inset-0 opacity-10 pointer-events-none z-0" style="background-size: 40px 40px; background-image: linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-[#00283c]/90 via-transparent to-transparent z-0"></div>
+    
+    <!-- Top Branding -->
+    <div class="flex items-center gap-3 relative z-10">
+      <div class="w-10 h-10 rounded-full bg-white p-1.5 flex items-center justify-center shadow-lg">
+        <img src="/logo.svg" alt="REASONS Logo" class="h-7 w-auto object-contain" />
+      </div>
+      <div class="flex flex-col text-left">
+        <span class="text-xl font-bold tracking-tight text-white leading-none">REASONS</span>
+        <span class="text-[9px] font-bold text-[#7dd87a] tracking-widest uppercase mt-0.5">Grupo de Investigación</span>
+      </div>
+    </div>
+
+    <!-- Center Content (Slogans & Glowing Ring) -->
+    <div class="my-auto flex flex-col gap-6 text-left relative z-10 max-w-md">
+      <span class="text-xs text-[#7dd87a] font-bold uppercase tracking-widest pl-1">Universidad Técnica de Ambato</span>
+      <h2 class="text-4xl xl:text-5xl font-extrabold text-white leading-[1.1] tracking-tight">
+        Impulsando la <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-[#7dd87a] to-[#3c9632]">Sostenibilidad</span> y la Ciencia
+      </h2>
+      <p class="text-sm font-light text-slate-300 leading-relaxed">
+        Plataforma administrativa y portal de investigadores del grupo de investigación en Diseño, Materiales, Software, Energía y Desarrollo Sostenible (REASONS).
+      </p>
+
+      <!-- Cool Micro Stats -->
+      <div class="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-white/10">
+        <div class="flex flex-col">
+          <span class="text-2xl font-black text-white">3</span>
+          <span class="text-[10px] text-white/70 font-bold uppercase tracking-wider">Líneas</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-2xl font-black text-white">15+</span>
+          <span class="text-[10px] text-white/70 font-bold uppercase tracking-wider">Científicos</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-2xl font-black text-white">20+</span>
+          <span class="text-[10px] text-white/70 font-bold uppercase tracking-wider">Publicaciones</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Footer Info -->
+    <div class="relative z-10 text-left text-[11px] text-white/65 flex items-center justify-between">
+      <span>FISEI - UTA &copy; 2026</span>
+      <span class="flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 bg-[#3c9632] rounded-full animate-pulse"></span>
+        Sistemas Activos
+      </span>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL: COMPACT LOGIN CARD -->
+  <div class="flex-1 flex items-center justify-center p-4 sm:p-6 md:p-10 lg:p-16 relative z-10 bg-[#edf2f7]/80 min-h-screen lg:min-h-0">
+    <div class="w-full max-w-lg sm:max-w-xl lg:max-w-2xl relative z-10 my-6">
+      <!-- Card fully styled using pure, native Tailwind CSS classes (glass effect, transitions, shadows, borders) -->
+      <div class="p-6 sm:p-8 md:p-10 lg:p-14 rounded-2xl sm:rounded-3xl shadow-xl sm:shadow-2xl flex flex-col items-center gap-5 sm:gap-8 text-center border relative overflow-hidden bg-white/90 backdrop-blur-xl border-white/80 shadow-[0_8px_32px_0_rgba(10,50,70,0.05)] transition-all duration-300">
+        
+        <!-- Glowing logo only visible in mobile to avoid double logo on desktop - 100% Tailwind styled -->
+        <div class="relative flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 lg:hidden">
+          <div class="absolute -inset-1.5 rounded-full bg-gradient-to-br from-[#3c9632] to-[#0a3246] opacity-60 blur-md animate-pulse"></div>
+          <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white p-2 sm:p-2.5 flex items-center justify-center shadow-xl relative z-10">
+            <img src="/logo.svg" alt="REASONS Logo" class="h-12 sm:h-14 w-auto object-contain" />
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1 text-center">
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-[#00283c] tracking-wide">Acceso Administrativo</h1>
+          <span class="text-[10px] sm:text-xs text-reasons-navy font-bold uppercase tracking-widest">Grupo de Investigación REASONS</span>
+        </div>
+       
+        <div class="w-full border-t border-slate-100 my-0"></div>
+
+        <!-- Login Form -->
+        <form [formGroup]="loginForm" (submit)="$event.preventDefault()" class="w-full flex flex-col gap-4 sm:gap-5 text-left">
+          <!-- Email -->
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider pl-1">Correo Institucional</label>
+            <div class="relative w-full flex items-center">
+              <svg class="absolute left-4 text-slate-400 w-4 h-4 sm:w-5 sm:h-5 pointer-events-none transition-colors duration-300 peer-focus:text-[#3c9632]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.206"></path></svg>
+              <input type="email" formControlName="correo" class="peer w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-3.5 border border-slate-200 rounded-xl sm:rounded-2xl text-sm bg-white text-[#00283c] outline-none transition-all duration-300 focus:border-[#3c9632] focus:ring-2 focus:ring-[#3c9632]/15 placeholder:text-slate-400" placeholder="ejemplo@uta.edu.ec" (keyup.enter)="onLogin()" />
+            </div>
+            <span *ngIf="loginForm.get('correo')?.invalid && loginForm.get('correo')?.touched" class="text-[10px] text-rose-600 font-semibold pl-1.5 mt-0.5">
+              Ingrese un correo electrónico válido.
+            </span>
+          </div>
+
+          <!-- Password -->
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider pl-1">Contraseña</label>
+            <div class="relative w-full flex items-center">
+              <svg class="absolute left-4 text-slate-400 w-4 h-4 sm:w-5 sm:h-5 pointer-events-none transition-colors duration-300 peer-focus:text-[#3c9632]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+              <input [type]="showPassword ? 'text' : 'password'" formControlName="password" class="peer w-full pl-10 sm:pl-12 pr-12 py-3 sm:py-3.5 border border-slate-200 rounded-xl sm:rounded-2xl text-sm bg-white text-[#00283c] outline-none transition-all duration-300 focus:border-[#3c9632] focus:ring-2 focus:ring-[#3c9632]/15 placeholder:text-slate-400" placeholder="••••••••" (keyup.enter)="onLogin()" />
+              <div (click)="togglePasswordVisibility(); $event.preventDefault(); $event.stopPropagation()" class="absolute right-3 sm:right-4 text-slate-400 hover:text-[#00283c] cursor-pointer flex items-center justify-center p-1.5 rounded-full hover:bg-slate-100 transition-all z-10">
+                <svg *ngIf="!showPassword" class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                <svg *ngIf="showPassword" class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"></path></svg>
+              </div>
+            </div>
+            <span *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="text-[10px] text-rose-600 font-semibold pl-1.5 mt-0.5">
+              La contraseña es requerida.
+            </span>
+          </div>
+
+          <button type="button" (click)="onLogin()" [disabled]="loginForm.invalid || isSubmitting"
+            class="w-full mt-2 py-3.5 sm:py-4 bg-gradient-to-r from-[#00283c] to-[#3c9632] hover:from-[#0a3246] hover:to-[#327e2a] text-white font-bold rounded-xl sm:rounded-2xl shadow-lg transition-all duration-300 hover:-translate-y-[1.5px] hover:shadow-md disabled:from-slate-200 disabled:to-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed disabled:shadow-none cursor-pointer text-sm tracking-wide flex items-center justify-center gap-2">
+            <span *ngIf="isSubmitting" class="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block"></span>
+            {{ isSubmitting ? 'Iniciando Sesión...' : 'Ingresar al Portal' }}
+          </button>
+        </form>
+
+        <!-- Asistente de Credenciales de Demostración -->
+        <div class="w-full bg-slate-50 border border-dashed border-slate-200 rounded-2xl sm:rounded-3xl p-4 sm:p-5 backdrop-blur-md transition-all duration-300 hover:border-[#0a3246] hover:shadow-md flex flex-col gap-2.5 text-center">
+          <div class="flex flex-col gap-0.5">
+            <span class="text-[10px] sm:text-[11px] font-extrabold text-reasons-navy uppercase tracking-wider">Acceso Rápido de Demostración</span>
+            <span class="text-[10px] text-slate-505 font-medium">Un clic para autocompletar e ingresar:</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 sm:gap-3 mt-0.5">
+            <!-- Admin: 1-click fill + login -->
+            <button type="button" (click)="copyCredential('admin')" class="w-full bg-white border border-reasons-blue/20 rounded-xl sm:rounded-2xl text-slate-650 p-2.5 sm:p-3 text-xs font-semibold cursor-pointer transition-all duration-200 flex items-center justify-between gap-2 shadow-sm hover:bg-reasons-blue/5 hover:border-reasons-blue/40 hover:translate-y-[-1px] hover:shadow-md active:translate-y-0">
+              <div class="flex flex-col text-left min-w-0">
+                <span class="text-[9px] sm:text-[10px] text-reasons-blue uppercase font-bold tracking-wide">Director</span>
+                <span class="text-[8px] sm:text-[9px] font-mono text-[#00283c] font-medium truncate">admin@reasons.uta.edu.ec</span>
+              </div>
+              <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-reasons-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
+            </button>
+            <!-- Investigador: 1-click fill + login -->
+            <button type="button" (click)="copyCredential('investigador')" class="w-full bg-white border border-green-200 rounded-xl sm:rounded-2xl text-slate-650 p-2.5 sm:p-3 text-xs font-semibold cursor-pointer transition-all duration-200 flex items-center justify-between gap-2 shadow-sm hover:bg-green-50 hover:border-[#3c9632] hover:translate-y-[-1px] hover:shadow-md active:translate-y-0">
+              <div class="flex flex-col text-left min-w-0">
+                <span class="text-[9px] sm:text-[10px] text-[#3c9632] uppercase font-bold tracking-wide">Científico</span>
+                <span class="text-[8px] sm:text-[9px] font-mono text-[#00283c] font-medium truncate">investigador@reasons.uta.edu.ec</span>
+              </div>
+              <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#3c9632] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
+            </button>
+          </div>
+        </div>
+        
+        <a routerLink="/" class="text-xs text-slate-400 hover:text-[#00283c] transition-colors underline mt-0">← Volver al Sitio Público</a>
+      </div>
+    </div>
+  </div>
+</div>

@@ -13,6 +13,7 @@ DROP TABLE IF EXISTS proyectos CASCADE;
 DROP TABLE IF EXISTS lineas_investigacion CASCADE;
 DROP TABLE IF EXISTS investigadores CASCADE;
 DROP TABLE IF EXISTS usuarios CASCADE;
+DROP TABLE IF EXISTS noticias CASCADE;
 
 -- Eliminación de tipos ENUM previos si existen
 DROP TYPE IF EXISTS posicion_enum CASCADE;
@@ -100,6 +101,19 @@ CREATE TABLE usuarios (
     rol VARCHAR(50) DEFAULT 'admin' NOT NULL
 );
 
+-- Tabla: noticias (Noticias y Eventos del Grupo)
+CREATE TABLE noticias (
+    id SERIAL PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    resumen TEXT NOT NULL,
+    contenido TEXT NOT NULL,
+    contenido_json TEXT, -- JSON structure for the block editor
+    imagen_url VARCHAR(255) DEFAULT NULL,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    categoria VARCHAR(100) DEFAULT 'General' NOT NULL,
+    activo BOOLEAN DEFAULT TRUE NOT NULL
+);
+
 -- ==========================================
 -- 4. Creación de Tablas de Relación N:M
 -- ==========================================
@@ -144,6 +158,7 @@ CREATE TABLE publicacion_investigador (
 CREATE INDEX idx_investigadores_correo ON investigadores(correo_institucional);
 CREATE INDEX idx_proyectos_titulo ON proyectos(titulo);
 CREATE INDEX idx_publicaciones_titulo ON publicaciones(titulo);
+CREATE INDEX idx_noticias_fecha ON noticias(fecha);
 
 -- Índices adicionales para optimizar uniones de claves foráneas
 CREATE INDEX idx_proyectos_linea_id ON proyectos(linea_id);

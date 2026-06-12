@@ -1,0 +1,230 @@
+<div class="animate-fade-in flex flex-col gap-8 text-left">
+
+  <!-- Loading skeleton while data arrives -->
+  <div *ngIf="!infoLoaded" class="flex flex-col items-center justify-center py-20 gap-4">
+    <div class="w-10 h-10 border-4 border-reasons-green border-t-transparent rounded-full animate-spin"></div>
+    <span class="text-sm font-semibold text-reasons-blue">Cargando información del grupo...</span>
+  </div>
+
+  <ng-container *ngIf="infoLoaded">
+
+    <!-- FORMULARIO 1: INFORMACIÓN GENERAL DEL GRUPO -->
+    <div class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-6 bg-white">
+      <!-- Header -->
+      <div class="flex items-center justify-between flex-wrap gap-3 pb-4 border-b border-slate-100">
+        <h3 class="text-lg font-bold text-reasons-navy flex items-center gap-2 mb-0">
+          <svg class="w-5 h-5 text-reasons-green animate-float" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Información General del Grupo
+        </h3>
+        <button type="button" (click)="guardarInfoGeneral()" class="save-btn">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+          Guardar
+        </button>
+      </div>
+
+      <!-- Logo + Dominio -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="flex flex-col gap-3">
+          <label class="form-label">Logo del grupo</label>
+
+          <!-- Preview -->
+          <div class="flex items-center gap-4">
+            <div class="w-20 h-20 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm">
+              <ng-container *ngIf="infoGrupo.logo_url; else noLogo">
+                <img [src]="infoGrupo.logo_url"
+                     (error)="$any(infoGrupo).logo_url = ''"
+                     class="w-full h-full object-contain p-2" alt="Logo" />
+              </ng-container>
+              <ng-template #noLogo>
+                <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+              </ng-template>
+            </div>
+
+            <!-- Upload + URL -->
+            <div class="flex flex-col gap-2 flex-1 min-w-0">
+              <div class="flex gap-2">
+                <input type="file" #logoFileInput accept="image/*,image/svg+xml" class="hidden"
+                       (change)="onLogoFileSelected($event)" />
+                <button type="button" (click)="logoFileInput.click()" [disabled]="isUploading"
+                        class="px-3 py-2 bg-reasons-blue hover:bg-reasons-navy text-white text-xs font-bold rounded-xl shadow-sm cursor-pointer transition-colors flex items-center gap-1.5 disabled:opacity-50">
+                  <span *ngIf="isUploading" class="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                  <svg *ngIf="!isUploading" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                  </svg>
+                  {{ isUploading ? 'Subiendo...' : 'Subir imagen' }}
+                </button>
+              </div>
+              <div class="flex flex-col gap-1">
+                <span class="text-[9px] text-slate-400 font-semibold uppercase tracking-wider">o ingresa una URL:</span>
+                <input type="text" [(ngModel)]="infoGrupo.logo_url" class="form-input text-xs"
+                       placeholder="/logo.svg o https://..." />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="form-label">Dominio oficial del grupo</label>
+          <textarea [(ngModel)]="infoGrupo.dominio" rows="2" class="form-input" placeholder="Optimización de los Sistemas Productivos..."></textarea>
+        </div>
+      </div>
+
+      <!-- Descripción -->
+      <div class="flex flex-col gap-2 pt-2 border-t border-slate-100">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <label class="form-label mb-0">Descripción del Grupo</label>
+          <div class="flex gap-1 p-0.5 bg-slate-100 rounded-lg">
+            <button type="button" (click)="infoDescModo=false" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all cursor-pointer" [class]="!infoDescModo?'bg-white shadow text-reasons-navy':'text-slate-400'">Simple</button>
+            <button type="button" (click)="infoDescModo=true"  class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all cursor-pointer" [class]="infoDescModo?'bg-white shadow text-reasons-blue':'text-slate-400'">✦ Flexible</button>
+          </div>
+        </div>
+        <textarea *ngIf="!infoDescModo" [(ngModel)]="infoGrupo.descripcion" rows="4" class="form-input" placeholder="Descripción general del grupo..."></textarea>
+        <app-block-editor *ngIf="infoDescModo" [initialBlocks]="infoDescBlocks" (blocksChange)="infoDescBlocks=$event"></app-block-editor>
+      </div>
+
+      <!-- Misión -->
+      <div class="flex flex-col gap-2 pt-2 border-t border-slate-100">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <label class="form-label mb-0">Descripción del Grupo (Misión)</label>
+          <div class="flex gap-1 p-0.5 bg-slate-100 rounded-lg">
+            <button type="button" (click)="infoMisionModo=false" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all cursor-pointer" [class]="!infoMisionModo?'bg-white shadow text-reasons-navy':'text-slate-400'">Simple</button>
+            <button type="button" (click)="infoMisionModo=true"  class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all cursor-pointer" [class]="infoMisionModo?'bg-white shadow text-reasons-blue':'text-slate-400'">✦ Flexible</button>
+          </div>
+        </div>
+        <textarea *ngIf="!infoMisionModo" [(ngModel)]="infoGrupo.mision" rows="3" class="form-input" placeholder="Descripción o Misión del grupo..."></textarea>
+        <app-block-editor *ngIf="infoMisionModo" [initialBlocks]="infoMisionBlocks" (blocksChange)="infoMisionBlocks=$event"></app-block-editor>
+      </div>
+
+      <!-- Objetivo General -->
+      <div class="flex flex-col gap-2 pt-2 border-t border-slate-100">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <label class="form-label mb-0">Objetivo General</label>
+          <div class="flex gap-1 p-0.5 bg-slate-100 rounded-lg">
+            <button type="button" (click)="infoObjGenModo=false" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all cursor-pointer" [class]="!infoObjGenModo?'bg-white shadow text-reasons-navy':'text-slate-400'">Simple</button>
+            <button type="button" (click)="infoObjGenModo=true"  class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all cursor-pointer" [class]="infoObjGenModo?'bg-white shadow text-reasons-blue':'text-slate-400'">✦ Flexible</button>
+          </div>
+        </div>
+        <textarea *ngIf="!infoObjGenModo" [(ngModel)]="infoGrupo.objetivo_general" rows="3" class="form-input" placeholder="Objetivo general..."></textarea>
+        <app-block-editor *ngIf="infoObjGenModo" [initialBlocks]="infoObjGenBlocks" (blocksChange)="infoObjGenBlocks=$event"></app-block-editor>
+      </div>
+
+      <!-- Objetivos Específicos -->
+      <div class="flex flex-col gap-2 pt-2 border-t border-slate-100">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <label class="form-label mb-0">Objetivos Específicos</label>
+          <div class="flex gap-1 p-0.5 bg-slate-100 rounded-lg">
+            <button type="button" (click)="infoObjEspModo=false" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all cursor-pointer" [class]="!infoObjEspModo?'bg-white shadow text-reasons-navy':'text-slate-400'">Simple</button>
+            <button type="button" (click)="infoObjEspModo=true"  class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all cursor-pointer" [class]="infoObjEspModo?'bg-white shadow text-reasons-blue':'text-slate-400'">✦ Flexible</button>
+          </div>
+        </div>
+        <textarea *ngIf="!infoObjEspModo" [(ngModel)]="infoGrupo.objetivos_especificos" rows="4" class="form-input" placeholder="• Objetivo específico 1&#10;• Objetivo específico 2..."></textarea>
+        <app-block-editor *ngIf="infoObjEspModo" [initialBlocks]="infoObjEspBlocks" (blocksChange)="infoObjEspBlocks=$event"></app-block-editor>
+      </div>
+    </div>
+
+    <!-- FORMULARIO 2: PÁGINA PROYECTOS -->
+    <div class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-4 bg-white">
+      <div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-100">
+        <h3 class="text-lg font-bold text-reasons-navy flex items-center gap-2 mb-0">
+          <div class="w-7 h-7 rounded-lg bg-reasons-green/10 text-reasons-green flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          </div>
+          Página — Proyectos
+        </h3>
+        <button type="button" (click)="guardarInfoProyectos()" class="save-btn">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+          Guardar
+        </button>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="flex flex-col gap-1.5">
+          <label class="form-label">Etiqueta (badge)</label>
+          <input type="text" [(ngModel)]="infoGrupo.proyectos_badge" class="form-input" placeholder="Investigación Aplicada" />
+        </div>
+        <div class="flex flex-col gap-1.5 sm:col-span-2">
+          <label class="form-label">Título de la página</label>
+          <input type="text" [(ngModel)]="infoGrupo.proyectos_titulo" class="form-input" placeholder="Nuestros Proyectos de Investigación" />
+        </div>
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">Descripción / subtítulo</label>
+        <textarea [(ngModel)]="infoGrupo.proyectos_descripcion" rows="2" class="form-input" placeholder="Explore los proyectos científicos..."></textarea>
+      </div>
+    </div>
+
+    <!-- FORMULARIO 3: PÁGINA PUBLICACIONES -->
+    <div class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-4 bg-white">
+      <div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-100">
+        <h3 class="text-lg font-bold text-reasons-navy flex items-center gap-2 mb-0">
+          <div class="w-7 h-7 rounded-lg bg-reasons-blue/10 text-reasons-blue flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          </div>
+          Página — Publicaciones
+        </h3>
+        <button type="button" (click)="guardarInfoPublicaciones()" class="save-btn">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+          Guardar
+        </button>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="flex flex-col gap-1.5">
+          <label class="form-label">Etiqueta (badge)</label>
+          <input type="text" [(ngModel)]="infoGrupo.publicaciones_badge" class="form-input" placeholder="Producción Científica" />
+        </div>
+        <div class="flex flex-col gap-1.5 sm:col-span-2">
+          <label class="form-label">Título de la página</label>
+          <input type="text" [(ngModel)]="infoGrupo.publicaciones_titulo" class="form-input" placeholder="Publicaciones Científicas" />
+        </div>
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">Descripción / subtítulo</label>
+        <textarea [(ngModel)]="infoGrupo.publicaciones_descripcion" rows="2" class="form-input" placeholder="Consulte los artículos científicos..."></textarea>
+      </div>
+    </div>
+
+    <!-- FORMULARIO 4: PÁGINA CONTACTO -->
+    <div class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-4 bg-white">
+      <div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-100">
+        <h3 class="text-lg font-bold text-reasons-navy flex items-center gap-2 mb-0">
+          <div class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-650 flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          </div>
+          Página — Contacto
+        </h3>
+        <button type="button" (click)="guardarInfoContacto()" class="save-btn">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+          Guardar
+        </button>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="flex flex-col gap-1.5">
+          <label class="form-label">Etiqueta (badge)</label>
+          <input type="text" [(ngModel)]="infoGrupo.contacto_badge" class="form-input" placeholder="Póngase en Contacto" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="form-label">Título de la página</label>
+          <input type="text" [(ngModel)]="infoGrupo.contacto_titulo" class="form-input" placeholder="Contacte con Nosotros" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="form-label">Correo electrónico</label>
+          <input type="email" [(ngModel)]="infoGrupo.contacto_email" class="form-input" placeholder="reasons@uta.edu.ec" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="form-label">Teléfono</label>
+          <input type="text" [(ngModel)]="infoGrupo.contacto_telefono" class="form-input" placeholder="(03) 240-0200" />
+        </div>
+        <div class="flex flex-col gap-1.5 md:col-span-2">
+          <label class="form-label">Descripción / subtítulo</label>
+          <textarea [(ngModel)]="infoGrupo.contacto_descripcion" rows="2" class="form-input" placeholder="¿Tiene alguna consulta...?"></textarea>
+        </div>
+        <div class="flex flex-col gap-1.5 md:col-span-2">
+          <label class="form-label">Dirección física</label>
+          <textarea [(ngModel)]="infoGrupo.contacto_direccion" rows="2" class="form-input" placeholder="Facultad de Ingeniería..."></textarea>
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
+
+</div>

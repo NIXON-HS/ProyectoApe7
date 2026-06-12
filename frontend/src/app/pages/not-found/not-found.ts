@@ -5,24 +5,7 @@ import { RouterLink } from '@angular/router';
   selector: 'app-not-found',
   standalone: true,
   imports: [RouterLink],
-  template: `
-    <div class="min-h-screen flex flex-col items-center justify-center bg-reasons-bg px-6 py-24 text-center">
-      <div class="max-w-md flex flex-col items-center gap-6">
-        <!-- Main 404 code -->
-        <span class="text-9xl font-extrabold tracking-widest text-gradient-brand">404</span>
-        
-        <!-- Error text -->
-        <h1 class="text-3xl font-extrabold text-reasons-navy">Página no encontrada</h1>
-        <p class="text-slate-500 text-sm">
-          Lo sentimos, la página que buscas no existe o ha sido trasladada a una ubicación diferente.
-        </p>
-
-        <!-- Back home button -->
-        <a routerLink="/" class="mt-4 px-8 py-3 bg-reasons-blue hover:bg-reasons-navy text-white font-semibold rounded-full shadow-lg hover-premium transition-all">
-          Volver al Inicio
-        </a>
-      </div>
-    </div>
-  `
+  templateUrl: './not-found.html',
+  styleUrls: ['./not-found.css']
 })
 export class NotFoundComponent {}

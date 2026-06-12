@@ -1,0 +1,203 @@
+<div class="animate-fade-in flex flex-col gap-6">
+
+  <!-- Table List -->
+  <div *ngIf="!showForm" class="flex flex-col gap-4">
+    <div class="flex justify-between items-center">
+      <h3 class="text-xl font-bold text-reasons-navy text-left mb-0">Noticias y Novedades</h3>
+      <button (click)="nuevaNoticia()"
+        class="px-5 py-2.5 bg-reasons-green hover:bg-[#327e2a] text-white text-xs font-bold rounded-xl shadow hover-premium flex items-center gap-1.5 cursor-pointer">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        Nueva Noticia
+      </button>
+    </div>
+
+    <div class="glass-card rounded-3xl overflow-hidden shadow-lg border border-slate-100 text-left bg-white">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-150 text-slate-500 font-bold uppercase">
+              <th class="p-4">Portada</th>
+              <th class="p-4">Título</th>
+              <th class="p-4">Categoría</th>
+              <th class="p-4">Fecha</th>
+              <th class="p-4">Estado</th>
+              <th class="p-4 text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-slate-600 font-light">
+            <tr *ngFor="let noticia of filtrarLista(noticias)" class="hover:bg-slate-50/50 transition-colors">
+              <td class="p-4">
+                <div
+                  class="w-12 h-8 rounded bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center">
+                  <img *ngIf="noticia.imagen_url" [src]="obtenerFotoUrl(noticia.imagen_url)"
+                    class="w-full h-full object-cover" />
+                  <svg *ngIf="!noticia.imagen_url" class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              </td>
+              <td class="p-4 font-bold text-reasons-navy max-w-xs truncate">{{ noticia.titulo }}</td>
+              <td class="p-4">
+                <span
+                  class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700">
+                  {{ noticia.categoria }}
+                </span>
+              </td>
+              <td class="p-4">{{ noticia.fecha | date:'dd/MM/yyyy' }}</td>
+              <td class="p-4">
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                  [class]="noticia.activo ? 'badge-emerald' : 'badge-slate'">
+                  {{ noticia.activo ? 'Activa' : 'Borrador' }}
+                </span>
+              </td>
+              <td class="p-4 text-center flex items-center justify-center gap-2">
+                <button (click)="editarNoticia(noticia)"
+                  class="p-2 bg-reasons-blue/10 text-reasons-blue rounded-lg hover:bg-reasons-blue/20 transition-colors cursor-pointer"
+                  title="Editar">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
+                    </path>
+                  </svg>
+                </button>
+                <button (click)="eliminarNoticia(noticia.id, noticia.titulo)"
+                  class="p-2 bg-rose-500/10 text-rose-500 rounded-lg hover:bg-rose-500/20 transition-colors cursor-pointer"
+                  title="Eliminar">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                    </path>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="filtrarLista(noticias).length === 0">
+              <td colspan="6" class="p-8 text-center text-slate-400 font-semibold">No se encontraron noticias.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add / Edit Form -->
+  <div *ngIf="showForm"
+    class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-xl w-full text-left bg-white">
+    <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+      <h3 class="text-xl font-bold text-reasons-navy mb-0">{{ editMode ? 'Editar Noticia' : 'Registrar Nueva Noticia' }}
+      </h3>
+      <!-- Flexible editor / Simple editor switch -->
+      <div class="flex gap-1.5 p-1 bg-slate-100 rounded-xl">
+        <button type="button" (click)="noticiaModoFlexible=false"
+          class="px-3 py-1 text-xs font-bold rounded-lg transition-all cursor-pointer"
+          [class]="!noticiaModoFlexible?'bg-reasons-navy text-white':'text-slate-500'">Editor Simple</button>
+        <button type="button" (click)="noticiaModoFlexible=true"
+          class="px-3 py-1 text-xs font-bold rounded-lg transition-all cursor-pointer"
+          [class]="noticiaModoFlexible?'bg-reasons-blue text-white':'text-slate-500'">✦ Editor Flexible</button>
+      </div>
+    </div>
+
+    <form [formGroup]="noticiaForm" (ngSubmit)="guardarNoticia()" class="flex flex-col gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+        <!-- Title -->
+        <div class="flex flex-col gap-1.5 md:col-span-2">
+          <label class="form-label">Título de la Noticia</label>
+          <input type="text" formControlName="titulo" class="form-input"
+            placeholder="ej. Nuevo laboratorio de investigación inaugurado..." />
+        </div>
+
+        <!-- Categoria -->
+        <div class="flex flex-col gap-1.5">
+          <label class="form-label">Categoría</label>
+          <select formControlName="categoria" class="form-input">
+            <option value="General">General</option>
+            <option value="Evento">Evento</option>
+            <option value="Logro">Logro</option>
+            <option value="Investigación">Investigación</option>
+            <option value="Convocatoria">Convocatoria</option>
+          </select>
+        </div>
+
+        <!-- Fecha -->
+        <div class="flex flex-col gap-1.5">
+          <label class="form-label">Fecha de Publicación</label>
+          <input type="date" formControlName="fecha" class="form-input" />
+        </div>
+
+        <!-- Resumen -->
+        <div class="flex flex-col gap-1.5 md:col-span-2">
+          <label class="form-label">Resumen Breve (Aparece en la tarjeta del carrusel)</label>
+          <textarea formControlName="resumen" rows="2" class="form-input"
+            placeholder="Resumen corto para captar la atención del lector..."></textarea>
+        </div>
+      </div>
+
+      <!-- Cover Image upload zone -->
+      <div class="bg-slate-50 p-5 rounded-2xl border border-slate-150 text-left">
+        <label class="form-label font-bold text-reasons-navy mb-2 block">Imagen de Portada (Recomendada
+          horizontal)</label>
+        <div class="flex flex-col sm:flex-row items-center gap-5">
+          <div
+            class="w-32 h-20 rounded-xl bg-white border-2 border-slate-200 overflow-hidden flex items-center justify-center flex-shrink-0">
+            <img [src]="uploadPreview || obtenerFotoUrl(noticiaForm.get('imagen_url')?.value)"
+              (error)="$any($event.target).src = 'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2054/svg%22 width=%22100%22 height=%22100%22><rect width=%22100%22 height=%22100%22 fill=%22%23e2e8f0%22/><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%2394a3b8%22 font-size=%2210%22>Sin Imagen</text></svg>'"
+              class="w-full h-full object-cover" />
+          </div>
+          <div class="flex-1 w-full flex flex-col gap-2">
+            <input type="file" #noticiaFileInput (change)="onNoticiaFileSelected($event)" accept="image/*"
+              class="hidden" />
+            <div class="flex gap-2">
+              <button type="button" (click)="noticiaFileInput.click()" [disabled]="isUploading"
+                class="px-4 py-2 bg-reasons-blue hover:bg-reasons-navy text-white text-xs font-bold rounded-xl shadow-sm cursor-pointer transition-colors disabled:opacity-50">
+                {{ isUploading ? 'Subiendo...' : 'Subir Imagen de Portada' }}
+              </button>
+              <button type="button" *ngIf="noticiaForm.get('imagen_url')?.value"
+                (click)="noticiaForm.patchValue({imagen_url: ''}); uploadPreview=null"
+                class="px-4 py-2 border border-slate-200 text-slate-500 text-xs font-bold rounded-xl hover:bg-slate-50 transition-colors cursor-pointer">
+                Quitar
+              </button>
+            </div>
+            <span class="text-[10px] text-slate-400">Archivos recomendados: JPG, PNG o WEBP de relación 16:9.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Status Toggle -->
+      <div class="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-150 text-left">
+        <input type="checkbox" formControlName="activo" id="noticia-activo-toggle"
+          class="w-5 h-5 accent-reasons-green rounded cursor-pointer" />
+        <label for="noticia-activo-toggle" class="text-xs font-bold text-reasons-navy cursor-pointer select-none mb-0">
+          Publicar Noticia (Si está inactiva, se guardará como borrador y no aparecerá en el portal público)
+        </label>
+      </div>
+
+      <!-- News body editor -->
+      <div class="flex flex-col gap-2 text-left">
+        <label class="form-label font-bold text-reasons-navy">Cuerpo / Contenido de la Noticia</label>
+        <!-- Simple textarea -->
+        <textarea *ngIf="!noticiaModoFlexible" formControlName="contenido" rows="10" class="form-input"
+          placeholder="Redacte el cuerpo de la noticia o comunicado oficial aquí..."></textarea>
+        <!-- Rich block editor -->
+        <app-block-editor *ngIf="noticiaModoFlexible" #editorNoticia [initialBlocks]="noticiaDescBlocks"
+          (blocksChange)="noticiaDescBlocks=$event"></app-block-editor>
+      </div>
+
+      <!-- Form actions -->
+      <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-slate-100">
+        <button type="button" (click)="cancelForm()"
+          class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl text-xs transition-all cursor-pointer">
+          Cancelar
+        </button>
+        <button type="submit" [disabled]="noticiaForm.invalid || isSubmitting"
+          class="px-8 py-3 bg-reasons-green hover:bg-[#327e2a] text-white font-bold rounded-2xl text-xs shadow-lg disabled:from-slate-200 disabled:to-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed cursor-pointer transition-all">
+          {{ editMode ? 'Guardar Cambios' : 'Publicar Noticia' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+</div>

@@ -1,0 +1,250 @@
+<app-admin-bar editTab="investigadores"
+  [editMode]="editMode"
+  (editStart)="startEdit()"
+  (editSave)="saveEdit()"
+  (editCancel)="cancelEdit()">
+</app-admin-bar>
+<div class="min-h-screen pt-32 pb-24 bg-reasons-bg bg-grid-pattern relative">
+  <div class="max-w-7xl mx-auto px-6">
+    <!-- Header -->
+    <div class="text-center max-w-3xl mx-auto flex flex-col gap-4 mb-20 animate-fade-in">
+      <div *ngIf="editMode" class="px-4 py-2 bg-reasons-green/10 border border-reasons-green/30 rounded-2xl text-xs text-reasons-green font-semibold text-center mb-2">✏ Modo edición activo</div>
+      <span *ngIf="!editMode" class="text-xs font-bold text-reasons-green tracking-widest uppercase">{{ info?.equipo_badge || 'Talento Humano' }}</span>
+      <input *ngIf="editMode" [(ngModel)]="draft.equipo_badge" class="ie-badge ie-badge-green" placeholder="Etiqueta..."/>
+      <h1 *ngIf="!editMode" class="text-4xl md:text-5xl font-extrabold text-reasons-navy">{{ info?.equipo_titulo || 'Nuestro Equipo de Investigación' }}</h1>
+      <input *ngIf="editMode" [(ngModel)]="draft.equipo_titulo" class="ie-title" placeholder="Título..."/>
+      <div class="w-16 h-1 bg-reasons-green mx-auto rounded-full"></div>
+      <p *ngIf="!editMode" class="text-slate-505 font-light leading-relaxed">{{ info?.equipo_descripcion || 'Conoce a los científicos, ingenieros y expertos multidisciplinares que forman parte de REASONS.' }}</p>
+      <textarea *ngIf="editMode" [(ngModel)]="draft.equipo_descripcion" rows="3" class="ie-desc" placeholder="Descripción..."></textarea>
+    </div>
+
+    <!-- Spinner Loading Indicator -->
+    <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-20 gap-4">
+      <div class="w-12 h-12 border-4 border-reasons-green border-t-transparent rounded-full animate-spin"></div>
+      <span class="text-sm font-semibold text-reasons-blue">Cargando investigadores...</span>
+    </div>
+
+    <div *ngIf="!isLoading" class="flex flex-col gap-24 animate-fade-in">
+      <!-- 1. Sección Directiva (Director & Subdirector) -->
+      <div class="flex flex-col gap-10">
+        <h2 class="text-2xl font-bold text-reasons-navy flex items-center gap-3">
+          <span class="w-2.5 h-6 rounded bg-reasons-green"></span>
+          Directiva del Grupo
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-4xl mx-auto w-full">
+          <div *ngFor="let member of directiva" class="glowing-card glass-card p-8 rounded-3xl flex flex-col sm:flex-row gap-6 items-center sm:items-start text-center sm:text-left relative">
+            <!-- Ribbon decoration -->
+            <div class="absolute top-0 right-0 px-4 py-1.5 bg-reasons-navy/90 backdrop-blur-md text-white border-l border-b border-white/15 shadow-sm font-bold text-[10px] uppercase tracking-wider rounded-bl-2xl">
+              {{ member.posicion }}
+            </div>
+
+            <!-- Profile avatar/image with double-layered gradient ring -->
+            <div class="w-32 h-32 rounded-full bg-gradient-to-br from-reasons-blue via-reasons-navy to-reasons-green p-1 flex-shrink-0 flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-105">
+              <div class="w-full h-full rounded-full bg-[#f8fafc] p-0.5 flex items-center justify-center overflow-hidden">
+                <img *ngIf="member.foto_url" [src]="obtenerFotoUrl(member.foto_url)" 
+                     (error)="member.foto_url = ''" 
+                     class="w-full h-full object-cover rounded-full" alt="Foto" />
+                <div *ngIf="!member.foto_url" class="w-full h-full rounded-full bg-gradient-to-br from-[#0f3a52] to-[#051c27] flex items-center justify-center text-white text-3xl font-extrabold shadow-inner font-display">
+                  {{ getInitials(member.nombres) }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Details -->
+            <div class="flex flex-col gap-3 justify-between h-full w-full">
+              <div>
+                <h3 class="text-xl font-bold text-reasons-navy">{{ member.nombres }}</h3>
+                <span class="text-xs text-reasons-green font-semibold tracking-wider uppercase">{{ member.posicion }} de REASONS</span>
+                <p class="text-xs text-slate-505 font-light mt-3 line-clamp-3 leading-relaxed">
+                  {{ member.biografia }}
+                </p>
+              </div>
+
+              <!-- Social Icons and Actions -->
+              <div class="flex items-center justify-between mt-4 border-t border-slate-100 pt-3">
+                <div class="flex gap-3 items-center">
+                  <!-- ORCID SVG Icon -->
+                  <a *ngIf="member.orcid" [href]="'https://orcid.org/' + member.orcid" target="_blank" class="w-8 h-8 rounded-full bg-slate-50 hover:bg-[#a6ce39]/10 border border-slate-100 hover:border-[#a6ce39]/30 flex items-center justify-center transition-all group/social" title="Perfil ORCID">
+                    <svg class="w-4.5 h-4.5 text-[#a6ce39] transition-transform duration-300 group-hover/social:scale-110" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zM7.369 4.378c.541 0 .98.439.98.98s-.439.98-.98.98-.98-.439-.98-.98.439-.98.98-.98zm-.016 3.125c.341 0 .618.277.618.618v9.502c0 .341-.277.618-.618.618H6.115c-.341 0-.618-.277-.618-.618V8.121c0-.341.277-.618.618-.618h1.238zm6.541.378c2.903 0 4.354 1.637 4.354 4.379 0 2.871-1.464 4.341-4.385 4.341h-2.9v-8.72h2.931zm-.914 1.84h-1.071v5.04h1.071c1.63 0 2.445-.884 2.445-2.52 0-1.645-.815-2.52-2.445-2.52z"/>
+                    </svg>
+                  </a>
+                  <!-- LinkedIn SVG Icon -->
+                  <a *ngIf="member.red_linkedin" [href]="member.red_linkedin" target="_blank" class="w-8 h-8 rounded-full bg-slate-50 hover:bg-[#0077b5]/10 border border-slate-100 hover:border-[#0077b5]/30 flex items-center justify-center transition-all group/social" title="Perfil LinkedIn">
+                    <svg class="w-4.5 h-4.5 text-[#0077b5] transition-transform duration-300 group-hover/social:scale-110" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                    </svg>
+                  </a>
+                </div>
+                <button (click)="openDetail(member)" class="text-xs font-bold text-reasons-blue hover:text-reasons-green transition-colors flex items-center gap-1 group/btn">
+                  Ver Biografía 
+                  <svg class="w-3.5 h-3.5 transition-transform duration-300 group-hover/btn:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Sección Investigadores -->
+      <div class="flex flex-col gap-10">
+        <h2 class="text-2xl font-bold text-reasons-navy flex items-center gap-3">
+          <span class="w-2.5 h-6 rounded bg-reasons-green"></span>
+          Investigadores Asociados
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div *ngFor="let member of investigadoresList" class="glowing-card glass-card p-6 rounded-3xl flex flex-col justify-between relative">
+            <div>
+              <!-- Profile image wrapper -->
+              <div class="flex justify-between items-start mb-6">
+                <div class="w-20 h-20 rounded-full bg-gradient-to-br from-reasons-blue to-reasons-green p-0.5 flex-shrink-0 flex items-center justify-center shadow-md">
+                  <div class="w-full h-full rounded-full bg-[#f8fafc] p-0.5 flex items-center justify-center overflow-hidden">
+                    <img *ngIf="member.foto_url" [src]="obtenerFotoUrl(member.foto_url)" 
+                         (error)="member.foto_url = ''" 
+                         class="w-full h-full object-cover rounded-full" alt="Foto" />
+                    <div *ngIf="!member.foto_url" class="w-full h-full rounded-full bg-slate-100 text-[#0a3246] flex items-center justify-center text-xl font-bold font-display shadow-inner">
+                      {{ getInitials(member.nombres) }}
+                    </div>
+                  </div>
+                </div>
+                <span class="text-[10px] font-bold px-3 py-1 rounded-full bg-slate-150/60 backdrop-blur-sm text-slate-600 uppercase tracking-wider border border-white/40">
+                  {{ member.posicion }}
+                </span>
+              </div>
+
+              <h3 class="text-lg font-bold text-reasons-navy">{{ member.nombres }}</h3>
+              <span class="text-xs text-reasons-green font-medium tracking-wide">Investigador Científico</span>
+              <p class="text-xs text-slate-505 font-light leading-relaxed mt-4 line-clamp-3">
+                {{ member.biografia }}
+              </p>
+            </div>
+
+            <div class="flex items-center justify-between mt-6 border-t border-slate-100 pt-4">
+              <div class="flex gap-3 items-center">
+                <!-- ORCID SVG Icon -->
+                <a *ngIf="member.orcid" [href]="'https://orcid.org/' + member.orcid" target="_blank" class="w-7 h-7 rounded-full bg-slate-50 hover:bg-[#a6ce39]/10 border border-slate-100 hover:border-[#a6ce39]/30 flex items-center justify-center transition-all group/social" title="Perfil ORCID">
+                  <svg class="w-4 h-4 text-[#a6ce39] transition-transform duration-300 group-hover/social:scale-110" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zM7.369 4.378c.541 0 .98.439.98.98s-.439.98-.98.98-.98-.439-.98-.98.439-.98.98-.98zm-.016 3.125c.341 0 .618.277.618.618v9.502c0 .341-.277.618-.618.618H6.115c-.341 0-.618-.277-.618-.618V8.121c0-.341.277-.618.618-.618h1.238zm6.541.378c2.903 0 4.354 1.637 4.354 4.379 0 2.871-1.464 4.341-4.385 4.341h-2.9v-8.72h2.931zm-.914 1.84h-1.071v5.04h1.071c1.63 0 2.445-.884 2.445-2.52 0-1.645-.815-2.52-2.445-2.52z"/>
+                  </svg>
+                </a>
+              </div>
+              <button (click)="openDetail(member)" class="text-xs font-bold text-reasons-blue hover:text-reasons-green transition-colors flex items-center gap-1 group/btn">
+                Ver Perfil
+                <svg class="w-3.5 h-3.5 transition-transform duration-300 group-hover/btn:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Window (Futuristic Glass HUD) -->
+<div *ngIf="selectedMember" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-955/75 backdrop-blur-md animate-fade-in">
+  <div class="glass-card max-w-2xl w-full rounded-3xl shadow-2xl overflow-hidden relative border border-white/20 max-h-[90vh] flex flex-col">
+    <!-- Luxury visual glow elements on background -->
+    <div class="absolute -top-32 -left-32 w-64 h-64 rounded-full bg-reasons-blue/8 filter blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-32 -right-32 w-64 h-64 rounded-full bg-reasons-green/6 filter blur-3xl pointer-events-none"></div>
+
+    <!-- Close button circular tactile -->
+    <button (click)="closeDetail()" class="absolute top-6 right-6 w-9 h-9 rounded-full bg-slate-200/40 hover:bg-slate-250/70 text-slate-500 hover:text-slate-800 backdrop-blur-md shadow-sm border border-white/30 flex items-center justify-center transition-all z-15 active:scale-95 group/close">
+      <svg class="h-4.5 w-4.5 transition-transform duration-300 group-hover/close:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+
+    <div class="overflow-y-auto p-8 md:p-10 flex flex-col gap-8 relative z-10">
+      <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+        <!-- Large Avatar Emblem -->
+        <div class="w-30 h-30 rounded-full bg-gradient-to-br from-reasons-blue via-[#0c2e3f] to-reasons-green p-1 flex-shrink-0 flex items-center justify-center shadow-xl relative group/emblem">
+          <div class="absolute inset-0 rounded-full bg-gradient-to-br from-reasons-blue to-reasons-green opacity-0 group-hover/emblem:opacity-20 blur-md transition-opacity duration-300"></div>
+          <div class="w-full h-full rounded-full bg-[#f8fafc] p-0.5 flex items-center justify-center relative z-10">
+            <img *ngIf="selectedMember.foto_url" [src]="obtenerFotoUrl(selectedMember.foto_url)" 
+                 (error)="selectedMember.foto_url = ''" 
+                 class="w-full h-full object-cover rounded-full" alt="Foto" />
+            <div *ngIf="!selectedMember.foto_url" class="w-full h-full rounded-full bg-gradient-to-br from-[#0c2e3f] to-[#04131b] text-white flex items-center justify-center text-3xl font-extrabold font-display shadow-inner tracking-wider">
+              {{ getInitials(selectedMember.nombres) }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Details header -->
+        <div class="text-center sm:text-left flex flex-col gap-2">
+          <span class="inline-flex px-3 py-1 rounded-full text-[9px] font-extrabold text-reasons-green uppercase tracking-widest bg-reasons-green/10 border border-reasons-green/20 w-fit mx-auto sm:mx-0 shadow-sm">
+            {{ selectedMember.posicion }} de REASONS
+          </span>
+          <h2 class="text-2xl md:text-3xl font-extrabold text-reasons-navy tracking-tight mt-1">{{ selectedMember.nombres }}</h2>
+          <div class="flex flex-wrap gap-x-5 gap-y-2 mt-2 items-center justify-center sm:justify-start text-xs text-slate-505 font-light">
+            <span class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-reasons-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+              </svg>
+              <a [href]="'mailto:' + selectedMember.correo_institucional" class="text-reasons-blue hover:text-reasons-green font-medium transition-colors">{{ selectedMember.correo_institucional }}</a>
+            </span>
+            <span *ngIf="selectedMember.orcid" class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-[#a6ce39]" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zM7.369 4.378c.541 0 .98.439.98.98s-.439.98-.98.98-.98-.439-.98-.98.439-.98.98-.98zm-.016 3.125c.341 0 .618.277.618.618v9.502c0 .341-.277.618-.618.618H6.115c-.341 0-.618-.277-.618-.618V8.121c0-.341.277-.618.618-.618h1.238zm6.541.378c2.903 0 4.354 1.637 4.354 4.379 0 2.871-1.464 4.341-4.385 4.341h-2.9v-8.72h2.931zm-.914 1.84h-1.071v5.04h1.071c1.63 0 2.445-.884 2.445-2.52 0-1.645-.815-2.52-2.445-2.52z"/>
+              </svg>
+              <a [href]="'https://orcid.org/' + selectedMember.orcid" target="_blank" class="text-reasons-green hover:text-reasons-blue font-medium transition-colors">{{ selectedMember.orcid }}</a>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Biography Box Panel -->
+      <div class="border-t border-slate-100/80 pt-6 flex flex-col gap-4 text-left">
+        <h4 class="text-xs font-bold text-reasons-navy uppercase tracking-wider flex items-center gap-2">
+          <span class="w-1.5 h-3.5 rounded-full bg-reasons-green shadow-[0_0_8px_rgba(60,150,50,0.4)]"></span>
+          Resumen Biográfico
+        </h4>
+        <div class="p-5 rounded-2xl bg-slate-50/70 border border-slate-100/80 shadow-inner">
+          <p class="text-xs md:text-sm text-slate-600 font-light leading-relaxed whitespace-pre-line">
+            {{ selectedMember.biografia }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Associated Projects & Publications list if loaded -->
+      <div class="border-t border-slate-100/80 pt-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+        <!-- Projects -->
+        <div class="flex flex-col gap-4">
+          <h4 class="text-xs font-bold text-reasons-navy uppercase tracking-wider flex items-center gap-2">
+            <span class="w-1.5 h-3.5 rounded-full bg-reasons-blue shadow-[0_0_8px_rgba(10,50,70,0.3)]"></span>
+            Proyectos de Investigación
+          </h4>
+          <div *ngIf="!selectedMember.proyectos?.length" class="text-xs text-slate-400 font-light italic">
+            No tiene proyectos asociados registrados en este periodo.
+          </div>
+          <ul *ngIf="selectedMember.proyectos?.length" class="flex flex-col gap-3.5">
+            <li *ngFor="let proj of selectedMember.proyectos" class="p-4 rounded-2xl bg-white border border-slate-100 border-l-4 border-l-reasons-green flex flex-col gap-2 shadow-sm hover:shadow-md hover:translate-y-[-1.5px] transition-all duration-300">
+              <span class="text-xs font-bold text-reasons-navy line-clamp-2 leading-snug" [title]="proj.titulo">{{ proj.titulo }}</span>
+              <span class="text-[9px] font-bold px-2 py-0.5 rounded bg-reasons-green/10 text-reasons-green border border-reasons-green/20 w-fit uppercase tracking-wider">{{ proj.proyecto_investigador?.rol_proyecto || 'Participante' }}</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Publications -->
+        <div class="flex flex-col gap-4">
+          <h4 class="text-xs font-bold text-reasons-navy uppercase tracking-wider flex items-center gap-2">
+            <span class="w-1.5 h-3.5 rounded-full bg-reasons-blue shadow-[0_0_8px_rgba(10,50,70,0.3)]"></span>
+            Publicaciones Científicas
+          </h4>
+          <div *ngIf="!selectedMember.publicaciones?.length" class="text-xs text-slate-400 font-light italic">
+            Sin publicaciones indexadas registradas.
+          </div>
+          <ul *ngIf="selectedMember.publicaciones?.length" class="flex flex-col gap-3.5">
+            <li *ngFor="let pub of selectedMember.publicaciones" class="p-4 rounded-2xl bg-white border border-slate-100 border-l-4 border-l-reasons-blue flex flex-col gap-2 shadow-sm hover:shadow-md hover:translate-y-[-1.5px] transition-all duration-300">
+              <span class="text-xs font-bold text-reasons-navy line-clamp-2 leading-snug" [title]="pub.titulo">{{ pub.titulo }}</span>
+              <span class="text-[9px] font-bold px-2 py-0.5 rounded bg-reasons-blue/10 text-reasons-blue border border-reasons-blue/20 w-fit uppercase tracking-wider">{{ pub.publicacion_investigador?.rol_publicacion || 'Coautor' }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

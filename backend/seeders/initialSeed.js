@@ -6,6 +6,7 @@ const {
   Proyecto,
   Publicacion,
   Usuario,
+  Noticia,
   ProyectoInvestigador,
   PublicacionInvestigador
 } = require('../models/index');
@@ -280,6 +281,52 @@ async function runSeed() {
       { publicacion_id: publicaciones[2].id, investigador_id: investigadores[9].id, rol_publicacion: 'Coautor (Evaluadora Ambiental LCA)' }
     ]);
     console.log('Relaciones publicacion-investigador creadas.');
+
+    // ==========================================
+    // 7. SEMILLA DE NOTICIAS
+    // ==========================================
+    console.log('Insertando noticias semilla...');
+    await Noticia.bulkCreate([
+      {
+        titulo: 'Lanzamiento Oficial del Portal Web de Investigación REASONS',
+        resumen: 'El grupo de investigación REASONS de la Universidad Técnica de Ambato estrena su portal web para compartir proyectos, publicaciones y noticias sobre sostenibilidad.',
+        contenido: 'Nos complace anunciar el lanzamiento de nuestra nueva plataforma digital. Este portal servirá como un puente de comunicación para compartir avances en sostenibilidad, optimización e innovación tecnológica en beneficio de la sociedad.',
+        contenido_json: JSON.stringify([
+          { id: 'news-block-1', type: 'paragraph', content: 'Nos complace anunciar el lanzamiento de nuestra nueva plataforma digital. Este portal servirá como un puente de comunicación para compartir avances en sostenibilidad, optimización e innovación tecnológica en beneficio de la sociedad.' },
+          { id: 'news-block-2', type: 'callout', content: '¡Explora nuestras secciones públicas para conocer al equipo, los proyectos activos y las publicaciones científicas indexadas!', calloutVariant: 'success' }
+        ]),
+        imagen_url: null,
+        fecha: new Date('2026-06-01T10:00:00Z'),
+        categoria: 'Evento',
+        activo: true
+      },
+      {
+        titulo: 'REASONS Presenta Avances en el Congreso Internacional de Sostenibilidad',
+        resumen: 'Los investigadores Franklin Tigre e Israel Naranjo presentaron avances sobre optimización en la fabricación ecológica en el congreso anual de energías sostenibles.',
+        contenido: 'Durante el congreso internacional, nuestro director y subdirector presentaron ponencias sobre la simulación de procesos industriales sustentables y la reducción de huella de carbono mediante técnicas metaheurísticas avanzadas.',
+        contenido_json: JSON.stringify([
+          { id: 'news-block-3', type: 'paragraph', content: 'Durante el congreso internacional, nuestro director y subdirector presentaron ponencias sobre la simulación de procesos industriales sustentables y la reducción de huella de carbono mediante técnicas metaheurísticas avanzadas.' },
+          { id: 'news-block-4', type: 'quote', content: 'El desarrollo de tecnologías aplicadas a la producción ecológica es el camino indispensable hacia un futuro industrial circular.' }
+        ]),
+        imagen_url: null,
+        fecha: new Date('2026-06-05T14:30:00Z'),
+        categoria: 'Logro',
+        activo: true
+      },
+      {
+        titulo: 'Investigación en Ciencia de Datos y Machine Learning para Plantas Hidroeléctricas',
+        resumen: 'El equipo REASONS avanza en el monitoreo preventivo de pequeñas centrales hidroeléctricas mediante sensores IoT y modelos predictivos de Random Forest.',
+        contenido: 'El proyecto de investigación liderado por Carlos Sánchez y John Reyes ha completado su fase piloto de monitoreo predictivo. Los modelos entrenados alcanzaron una precisión del 92% en la detección temprana de anomalías por sedimentación.',
+        contenido_json: JSON.stringify([
+          { id: 'news-block-5', type: 'paragraph', content: 'El proyecto de investigación liderado por Carlos Sánchez y John Reyes ha completado su fase piloto de monitoreo predictivo. Los modelos entrenados alcanzaron una precisión del 92% en la detección temprana de anomalías por sedimentación.' }
+        ]),
+        imagen_url: null,
+        fecha: new Date('2026-06-10T09:15:00Z'),
+        categoria: 'Investigación',
+        activo: true
+      }
+    ]);
+    console.log('Noticias semilla insertadas.');
 
     console.log('🎉 PROCESO DE SEMILLA DE BASE DE DATOS FINALIZADO EXITOSAMENTE 🎉');
     process.exit(0);
