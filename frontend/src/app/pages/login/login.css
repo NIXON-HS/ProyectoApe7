@@ -30,27 +30,33 @@
   display: flex;
   align-items: center;
   gap: 0.85rem;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 1.15rem;
   font-size: 0.8125rem;
   font-weight: 500;
   color: #94a3b8;
   border-radius: 1.15rem;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
   text-align: left;
   width: 100%;
+  border: 1px solid transparent;
 }
 .sidebar-item:hover {
   color: white;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.05);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 .active-sidebar-item {
   color: white !important;
-  background: rgba(60, 150, 50, 0.15) !important;
-  border: 1px solid rgba(60, 150, 50, 0.25);
-  font-weight: 600;
-  transform: translateX(3px);
-  box-shadow: 0 4px 12px 0 rgba(60, 150, 50, 0.05);
+  background: linear-gradient(135deg, rgba(60, 150, 50, 0.2) 0%, rgba(10, 50, 70, 0.3) 100%) !important;
+  border: 1px solid rgba(60, 150, 50, 0.35) !important;
+  font-weight: 700;
+  transform: translateX(6px) scale(1.01);
+  box-shadow: 
+    0 8px 24px -8px rgba(60, 150, 50, 0.25),
+    0 0 15px -3px rgba(60, 150, 50, 0.15);
 }
 
 /* BREADCRUMB / TOPBAR SEARCH STYLES */
@@ -62,13 +68,15 @@
   font-size: 0.75rem;
   background: white;
   box-shadow: 0 4px 12px 0 rgba(10, 50, 70, 0.02);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .search-input:focus {
   outline: none;
-  border-color: var(--color-reasons-blue);
-  box-shadow: 0 0 0 4px rgba(10, 50, 70, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.02);
-  transform: translateY(-1px);
+  border-color: var(--color-reasons-green);
+  box-shadow: 
+    0 10px 20px -10px rgba(60, 150, 50, 0.1),
+    0 0 0 4px rgba(60, 150, 50, 0.08);
+  transform: translateY(-2px);
 }
 
 /* CRUD FORMS STYLES */
@@ -87,22 +95,25 @@
   border-radius: 0.95rem;
   font-size: 0.8125rem;
   background: white;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .form-input:focus {
   outline: none;
-  border-color: var(--color-reasons-blue);
-  box-shadow: 0 0 0 4px rgba(10, 50, 70, 0.05);
-  transform: translateY(-0.5px);
+  border-color: var(--color-reasons-green);
+  box-shadow: 
+    0 10px 20px -10px rgba(60, 150, 50, 0.1),
+    0 0 0 4px rgba(60, 150, 50, 0.08);
+  transform: translateY(-2px);
 }
 
 /* TABLE LAYOUT PREMIUM STYLES */
 table tbody tr {
-  transition: all 0.2s ease-in-out;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 table tbody tr:hover {
-  background-color: rgba(60, 150, 50, 0.025) !important;
-  transform: scale(1.002);
+  background-color: rgba(60, 150, 50, 0.035) !important;
+  transform: scale(1.004) translateX(2px);
+  box-shadow: 0 4px 12px rgba(10, 50, 70, 0.03);
 }
 
 /* BADGES DE CARGO Y ESTADO */
@@ -169,12 +180,31 @@ table tbody tr:hover {
 .save-btn:hover { background: #327e2a; transform: translateY(-1px); }
 
 /* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes adminFadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.985);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: none;
+  }
 }
 .animate-fade-in {
-  animation: fadeIn 0.35s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: adminFadeSlideUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Custom dashboard cards hover */
+.glass-card.p-6 {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glass-card.p-6:hover {
+  transform: translateY(-5px);
+  box-shadow: 
+    0 20px 35px -10px rgba(10, 50, 70, 0.1),
+    0 0 0 1px rgba(60, 150, 50, 0.15) inset;
 }
 
 @keyframes spin {
