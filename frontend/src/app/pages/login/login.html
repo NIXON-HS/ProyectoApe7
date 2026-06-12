@@ -157,9 +157,46 @@
 
 <!-- LOGGED IN: PREMIUM DASHBOARD SUITE -->
 <div *ngIf="isLoggedIn" class="min-h-screen bg-reasons-bg flex flex-col lg:flex-row relative">
+  <!-- Mobile Header Bar for Admin Panel -->
+  <header class="lg:hidden w-full bg-reasons-navy text-white px-5 py-4 flex items-center justify-between shadow-md sticky top-0 z-30">
+    <a routerLink="/" class="flex items-center gap-2.5">
+      <div class="w-8 h-8 rounded-full bg-white p-0.5 flex items-center justify-center">
+        <img src="/logo.svg" alt="REASONS Logo" class="h-5 w-auto object-contain" />
+      </div>
+      <div class="flex flex-col text-left">
+        <span class="text-base font-bold tracking-tight text-white leading-none">REASONS</span>
+        <span class="text-[8px] font-bold text-reasons-green tracking-widest uppercase mt-0.5">Admin</span>
+      </div>
+    </a>
+    
+    <button (click)="isMobileSidebarOpen = true" class="flex items-center justify-center p-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 transition-colors focus:outline-none cursor-pointer">
+      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+      </svg>
+    </button>
+  </header>
+
+  <!-- Sidebar Backdrop for Mobile -->
+  <div *ngIf="isMobileSidebarOpen" 
+       (click)="isMobileSidebarOpen = false" 
+       class="fixed inset-0 z-45 bg-slate-900/60 backdrop-blur-sm lg:hidden transition-opacity duration-300 animate-fade-in">
+  </div>
+
   <!-- Left Navigation Sidebar -->
-  <aside class="w-full lg:w-72 bg-reasons-navy text-white flex flex-col justify-between p-6 lg:fixed lg:h-screen lg:top-0 lg:left-0 z-40 border-r border-white/5 shadow-2xl">
-    <div class="flex flex-col gap-8">
+  <aside class="fixed lg:fixed top-0 left-0 h-full w-72 bg-reasons-navy text-white flex flex-col justify-between p-5 lg:p-6 z-50 lg:z-40 border-r border-white/5 shadow-2xl transition-transform duration-300 ease-in-out overflow-y-auto"
+         [class.translate-x-0]="isMobileSidebarOpen"
+         [class.-translate-x-full]="!isMobileSidebarOpen"
+         [class.lg:translate-x-0]="true">
+    <div class="flex flex-col gap-4 lg:gap-8">
+      <!-- Close button on Mobile Sidebar -->
+      <div class="flex justify-between items-center lg:hidden border-b border-white/10 pb-4 mb-2">
+        <span class="text-xs font-bold text-reasons-green uppercase tracking-widest">Navegación</span>
+        <button (click)="isMobileSidebarOpen = false" class="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white cursor-pointer transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
       <!-- Title & Branding -->
       <a routerLink="/" class="flex items-center gap-3 group">
         <div class="w-10 h-10 rounded-full bg-white p-1 flex items-center justify-center shadow-lg">
@@ -209,6 +246,16 @@
           <span>Mi Perfil Público</span>
         </button>
 
+        <button *ngIf="usuario?.rol === 'admin'" (click)="switchTab('info')" class="sidebar-item" [class.active-sidebar-item]="activeTab === 'info'">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+          <span>Contenido del Sitio</span>
+        </button>
+
+        <button *ngIf="usuario?.rol === 'admin'" (click)="switchTab('lineas')" class="sidebar-item" [class.active-sidebar-item]="activeTab === 'lineas'">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+          <span>Líneas de Investigación</span>
+        </button>
+
         <button *ngIf="usuario?.rol === 'admin'" (click)="switchTab('mensajes')" class="sidebar-item" [class.active-sidebar-item]="activeTab === 'mensajes'">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
           <span>Mensajes Recibidos</span>
@@ -244,7 +291,7 @@
       </div>
 
       <!-- Search bar when listing items -->
-      <div *ngIf="activeTab !== 'resumen' && !showForm" class="relative w-full md:w-80">
+      <div *ngIf="activeTab !== 'resumen' && activeTab !== 'perfil' && activeTab !== 'info' && activeTab !== 'lineas' && !showForm" class="relative w-full md:w-80">
         <input type="text" [(ngModel)]="searchQuery" class="search-input" placeholder="Buscar..." />
         <svg class="absolute right-3.5 top-3.5 text-slate-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
       </div>
@@ -474,7 +521,7 @@
         </div>
 
         <!-- Add / Edit Form -->
-        <div *ngIf="showForm" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-xl max-w-4xl w-full text-left">
+        <div *ngIf="showForm" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-xl w-full text-left">
           <h3 class="text-xl font-bold text-reasons-navy mb-6">{{ editMode ? 'Editar Investigador' : 'Agregar Nuevo Investigador' }}</h3>
           
           <form [formGroup]="investigadorForm" (ngSubmit)="guardarInvestigador()" class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -519,8 +566,8 @@
               <div class="flex flex-col sm:flex-row items-center gap-5 mt-1">
                 <!-- Avatar Preview -->
                 <div class="w-16 h-16 rounded-full border-2 border-slate-200 shadow-md overflow-hidden bg-white flex-shrink-0 flex items-center justify-center">
-                  <img [src]="obtenerFotoUrl(investigadorForm.get('foto_url')?.value)" 
-                       (error)="$event.target.src = defaultAvatar"
+                  <img [src]="uploadPreview || obtenerFotoUrl(investigadorForm.get('foto_url')?.value)" 
+                       (error)="$any($event.target).src = defaultAvatar"
                        class="w-full h-full object-cover" alt="Previsualización" />
                 </div>
                 
@@ -657,10 +704,92 @@
         </div>
 
         <!-- Add / Edit Form -->
-        <div *ngIf="showForm" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-xl max-w-4xl w-full text-left">
-          <h3 class="text-xl font-bold text-reasons-navy mb-6">{{ editMode ? 'Editar Proyecto' : 'Crear Nuevo Proyecto' }}</h3>
-          
-          <form [formGroup]="proyectoForm" (ngSubmit)="guardarProyecto()" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div *ngIf="showForm" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-xl w-full text-left">
+
+          <!-- Header con toggle Vista Previa -->
+          <div class="flex items-center justify-between gap-4 mb-6 flex-wrap">
+            <h3 class="text-xl font-bold text-reasons-navy">{{ editMode ? 'Editar Proyecto' : 'Nuevo Proyecto' }}</h3>
+            <div class="flex gap-1 p-1 bg-slate-100 rounded-xl">
+              <button type="button" (click)="proyVistaPrevia=false"
+                      class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5"
+                      [class]="!proyVistaPrevia?'bg-white shadow text-reasons-navy':'text-slate-400'">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                Formulario
+              </button>
+              <button type="button" (click)="proyVistaPrevia=true"
+                      class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5"
+                      [class]="proyVistaPrevia?'bg-white shadow text-reasons-blue':'text-slate-400'">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                Vista Previa
+              </button>
+            </div>
+          </div>
+
+          <!-- ── VISTA PREVIA — replica proyecto-detalle ── -->
+          <div *ngIf="proyVistaPrevia" class="flex flex-col gap-6 animate-fade-in">
+
+            <!-- Hero card (igual que proyecto-detalle) -->
+            <div class="glass-card rounded-3xl overflow-hidden shadow-xl">
+              <div class="h-2 bg-gradient-to-r from-reasons-navy via-reasons-blue to-reasons-green"></div>
+              <div class="p-6 sm:p-8">
+                <div class="flex flex-wrap items-center gap-2 mb-4">
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-reasons-blue/10 text-reasons-blue border border-reasons-blue/20">
+                    {{ getAbreviaturaLinea(proyectoForm.get('linea_id')?.value) }}
+                  </span>
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
+                        [class]="proyectoForm.get('estado')?.value==='Activo' ? 'bg-reasons-green/10 text-reasons-green border border-reasons-green/20' : 'bg-slate-100 text-slate-500 border border-slate-200'">
+                    <span class="w-1.5 h-1.5 rounded-full" [class]="proyectoForm.get('estado')?.value==='Activo'?'bg-reasons-green animate-pulse':'bg-slate-400'"></span>
+                    {{ proyectoForm.get('estado')?.value }}
+                  </span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-reasons-navy leading-tight">
+                  {{ proyectoForm.get('titulo')?.value || 'Sin título' }}
+                </h1>
+              </div>
+            </div>
+
+            <!-- Descripción -->
+            <div class="glass-card rounded-3xl p-6 shadow-lg">
+              <div class="flex items-center gap-2 mb-4">
+                <div class="w-7 h-7 rounded-lg bg-reasons-blue/10 text-reasons-blue flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h10M4 18h16"/></svg>
+                </div>
+                <h2 class="text-sm font-extrabold text-reasons-navy uppercase tracking-wide">Descripción</h2>
+              </div>
+              <div class="break-words overflow-hidden">
+                <app-block-renderer [blocksJson]="proyDescJSON" [fallback]="proyectoForm.get('descripcion')?.value"></app-block-renderer>
+              </div>
+            </div>
+
+            <!-- Objetivos -->
+            <div class="glass-card rounded-3xl p-6 shadow-lg">
+              <div class="flex items-center gap-2 mb-4">
+                <div class="w-7 h-7 rounded-lg bg-reasons-green/10 text-reasons-green flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><circle cx="12" cy="12" r="6" stroke-width="2"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>
+                </div>
+                <h2 class="text-sm font-extrabold text-reasons-navy uppercase tracking-wide">Objetivos</h2>
+              </div>
+              <div class="break-words overflow-hidden">
+                <app-block-renderer [blocksJson]="proyObjJSON" [fallback]="proyectoForm.get('objetivos')?.value"></app-block-renderer>
+              </div>
+            </div>
+
+            <!-- Resultados -->
+            <div class="glass-card rounded-3xl p-6 shadow-lg">
+              <div class="flex items-center gap-2 mb-4">
+                <div class="w-7 h-7 rounded-lg bg-reasons-navy/10 text-reasons-navy flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <h2 class="text-sm font-extrabold text-reasons-navy uppercase tracking-wide">Resultados Esperados</h2>
+              </div>
+              <div class="break-words overflow-hidden">
+                <app-block-renderer [blocksJson]="proyResJSON" [fallback]="proyectoForm.get('resultados')?.value"></app-block-renderer>
+              </div>
+            </div>
+
+          </div>
+
+          <form *ngIf="!proyVistaPrevia" [formGroup]="proyectoForm" (ngSubmit)="guardarProyecto()" class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Título (colspan 2) -->
             <div class="flex flex-col gap-1.5 md:col-span-2">
               <label class="form-label">Título del Proyecto</label>
@@ -687,43 +816,86 @@
               </select>
             </div>
 
-            <!-- Descripción (block editor) -->
-            <div class="flex flex-col gap-1.5 md:col-span-2">
-              <label class="form-label font-bold text-reasons-navy">
-                Descripción General
-                <span class="text-slate-400 font-normal normal-case tracking-normal ml-1">— usa los bloques para agregar texto, imágenes, PDFs y más</span>
-              </label>
-              <app-block-editor
-                #editorDesc
-                [initialBlocks]="proyDescBlocks"
-                (blocksChange)="proyDescBlocks = $event">
-              </app-block-editor>
+            <!-- ── Toggle de modo ───────────────────────────────────── -->
+            <div class="md:col-span-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+              <div class="flex flex-col gap-0.5">
+                <span class="text-xs font-bold text-reasons-navy">Modo de edición de contenido</span>
+                <span class="text-[10px] text-slate-400">
+                  {{ proyectoModoFlexible
+                    ? 'Editor flexible: bloques de texto, imágenes, PDFs, listas y más'
+                    : 'Modo simple: campos de texto directos, rápido y sencillo' }}
+                </span>
+              </div>
+              <div class="flex gap-1.5 p-1 bg-white border border-slate-200 rounded-xl self-start sm:self-auto">
+                <button type="button" (click)="proyectoModoFlexible = false"
+                        class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-all"
+                        [class]="!proyectoModoFlexible
+                          ? 'bg-reasons-navy text-white shadow-sm'
+                          : 'text-slate-500 hover:text-slate-700'">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                  </svg>
+                  Simple
+                </button>
+                <button type="button" (click)="proyectoModoFlexible = true"
+                        class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-all"
+                        [class]="proyectoModoFlexible
+                          ? 'bg-reasons-blue text-white shadow-sm'
+                          : 'text-slate-500 hover:text-slate-700'">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 010 2H5a1 1 0 01-1-1zM4 9a1 1 0 011-1h14a1 1 0 010 2H5a1 1 0 01-1-1zM4 13a1 1 0 011-1h10a1 1 0 010 2H5a1 1 0 01-1-1zM4 17a1 1 0 011-1h6a1 1 0 010 2H5a1 1 0 01-1-1z"/>
+                  </svg>
+                  ✦ Flexible
+                </button>
+              </div>
             </div>
 
-            <!-- Objetivos (block editor) -->
-            <div class="flex flex-col gap-1.5 md:col-span-2">
-              <label class="form-label font-bold text-reasons-navy">
-                Objetivos
-                <span class="text-slate-400 font-normal normal-case tracking-normal ml-1">— generales y específicos</span>
-              </label>
-              <app-block-editor
-                #editorObj
-                [initialBlocks]="proyObjBlocks"
-                (blocksChange)="proyObjBlocks = $event">
-              </app-block-editor>
-            </div>
+            <!-- ── MODO SIMPLE ──────────────────────────────────────── -->
+            <ng-container *ngIf="!proyectoModoFlexible">
+              <div class="flex flex-col gap-1.5 md:col-span-2">
+                <label class="form-label">Descripción General del Proyecto</label>
+                <textarea formControlName="descripcion" rows="4" class="form-input"
+                          placeholder="Resumen detallado de la investigación..."></textarea>
+              </div>
+              <div class="flex flex-col gap-1.5 md:col-span-2">
+                <label class="form-label">Objetivos (Generales y Específicos)</label>
+                <textarea formControlName="objetivos" rows="4" class="form-input"
+                          placeholder="1. Evaluar eco-eficiencia...&#10;2. Diseñar algoritmo..."></textarea>
+              </div>
+              <div class="flex flex-col gap-1.5 md:col-span-2">
+                <label class="form-label">Resultados y Entregables del Proyecto</label>
+                <textarea formControlName="resultados" rows="3" class="form-input"
+                          placeholder="ej. Publicación de artículo, guía metodológica..."></textarea>
+              </div>
+            </ng-container>
 
-            <!-- Resultados (block editor) -->
-            <div class="flex flex-col gap-1.5 md:col-span-2">
-              <label class="form-label font-bold text-reasons-navy">
-                Resultados y Entregables
-              </label>
-              <app-block-editor
-                #editorRes
-                [initialBlocks]="proyResBlocks"
-                (blocksChange)="proyResBlocks = $event">
-              </app-block-editor>
-            </div>
+            <!-- ── MODO FLEXIBLE (Block Editor) ────────────────────── -->
+            <ng-container *ngIf="proyectoModoFlexible">
+              <div class="flex flex-col gap-1.5 md:col-span-2">
+                <label class="form-label font-bold text-reasons-navy">Descripción General</label>
+                <app-block-editor
+                  #editorDesc
+                  [initialBlocks]="proyDescBlocks"
+                  (blocksChange)="proyDescBlocks = $event">
+                </app-block-editor>
+              </div>
+              <div class="flex flex-col gap-1.5 md:col-span-2">
+                <label class="form-label font-bold text-reasons-navy">Objetivos</label>
+                <app-block-editor
+                  #editorObj
+                  [initialBlocks]="proyObjBlocks"
+                  (blocksChange)="proyObjBlocks = $event">
+                </app-block-editor>
+              </div>
+              <div class="flex flex-col gap-1.5 md:col-span-2">
+                <label class="form-label font-bold text-reasons-navy">Resultados y Entregables</label>
+                <app-block-editor
+                  #editorRes
+                  [initialBlocks]="proyResBlocks"
+                  (blocksChange)="proyResBlocks = $event">
+                </app-block-editor>
+              </div>
+            </ng-container>
 
             <!-- N:M Researcher Multi-selector (Fullwidth checklist) -->
             <div class="flex flex-col gap-2.5 md:col-span-2 border-t border-slate-100 my-2 pt-4">
@@ -757,7 +929,8 @@
               </button>
             </div>
           </form>
-        </div>
+
+        </div><!-- /showForm proyecto -->
       </div>
 
       <!-- ==========================================
@@ -825,10 +998,84 @@
         </div>
 
         <!-- Add / Edit Form -->
-        <div *ngIf="showForm" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-xl max-w-4xl w-full text-left">
-          <h3 class="text-xl font-bold text-reasons-navy mb-6">{{ editMode ? 'Editar Publicación' : 'Registrar Nueva Publicación' }}</h3>
-          
-          <form [formGroup]="publicacionForm" (ngSubmit)="guardarPublicacion()" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div *ngIf="showForm" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-xl w-full text-left">
+
+          <!-- Header con toggle Vista Previa -->
+          <div class="flex items-center justify-between gap-4 mb-6 flex-wrap">
+            <h3 class="text-xl font-bold text-reasons-navy">{{ editMode ? 'Editar Publicación' : 'Nueva Publicación' }}</h3>
+            <div class="flex gap-1 p-1 bg-slate-100 rounded-xl">
+              <button type="button" (click)="pubVistaPrevia=false"
+                      class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5"
+                      [class]="!pubVistaPrevia?'bg-white shadow text-reasons-navy':'text-slate-400'">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                Formulario
+              </button>
+              <button type="button" (click)="pubVistaPrevia=true"
+                      class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5"
+                      [class]="pubVistaPrevia?'bg-white shadow text-reasons-blue':'text-slate-400'">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                Vista Previa
+              </button>
+            </div>
+          </div>
+
+          <!-- ── VISTA PREVIA — replica publicacion-detalle ── -->
+          <div *ngIf="pubVistaPrevia" class="flex flex-col gap-6 animate-fade-in">
+
+            <!-- Cover / hero oscuro -->
+            <div class="rounded-3xl overflow-hidden shadow-xl bg-gradient-to-br from-reasons-navy via-[#0a3246] to-[#051c27] relative">
+              <div class="absolute inset-0 opacity-10">
+                <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                  <path d="M0,50 Q25,30 50,50 T100,50" fill="none" stroke="white" stroke-width="0.5"/>
+                  <path d="M0,60 Q30,80 60,40 T100,60" fill="none" stroke="#3c9632" stroke-width="0.5"/>
+                </svg>
+              </div>
+              <div class="relative z-10 p-8 sm:p-10 flex flex-col gap-4">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white/15 text-white border border-white/20 w-fit backdrop-blur-sm">
+                  {{ getAbreviaturaLinea(publicacionForm.get('linea_id')?.value) }} · Artículo Científico
+                </span>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-white leading-tight break-words">
+                  {{ publicacionForm.get('titulo')?.value || 'Sin título' }}
+                </h1>
+                <a *ngIf="publicacionForm.get('doi_url')?.value"
+                   [href]="publicacionForm.get('doi_url')?.value" target="_blank"
+                   class="inline-flex items-center gap-2 px-4 py-2 bg-white text-reasons-navy text-xs font-bold rounded-full w-fit shadow">
+                  Ver artículo (DOI) ↗
+                </a>
+              </div>
+            </div>
+
+            <!-- Resumen -->
+            <div class="glass-card rounded-3xl p-6 shadow-lg">
+              <div class="flex items-center gap-3 mb-5">
+                <div class="w-8 h-8 rounded-xl bg-reasons-blue/10 text-reasons-blue flex items-center justify-center">
+                  <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+                <h2 class="text-lg font-extrabold text-reasons-navy">Resumen / Abstract</h2>
+              </div>
+              <div class="break-words overflow-hidden">
+                <app-block-renderer [blocksJson]="pubResumenJSON" [fallback]="publicacionForm.get('resumen')?.value"></app-block-renderer>
+              </div>
+            </div>
+
+            <!-- Cita APA -->
+            <div *ngIf="publicacionForm.get('cita')?.value" class="glass-card rounded-3xl p-6 shadow-lg">
+              <div class="flex items-center justify-between gap-4 mb-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-xl bg-reasons-green/10 text-reasons-green flex items-center justify-center">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/></svg>
+                  </div>
+                  <h2 class="text-lg font-extrabold text-reasons-navy">Cita Bibliográfica (APA)</h2>
+                </div>
+              </div>
+              <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 border-l-4 border-l-reasons-green">
+                <p class="text-sm font-serif italic text-slate-600 leading-relaxed break-words">{{ publicacionForm.get('cita')?.value }}</p>
+              </div>
+            </div>
+
+          </div>
+
+          <form *ngIf="!pubVistaPrevia" [formGroup]="publicacionForm" (ngSubmit)="guardarPublicacion()" class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Título (colspan 2) -->
             <div class="flex flex-col gap-1.5 md:col-span-2">
               <label class="form-label">Título del Artículo Científico</label>
@@ -851,12 +1098,50 @@
               <input type="text" formControlName="doi_url" class="form-input" placeholder="ej. https://doi.org/10.1016/j.jclepro.2025.123456" />
             </div>
 
-            <!-- Resumen (block editor) -->
-            <div class="flex flex-col gap-1.5 md:col-span-2">
-              <label class="form-label font-bold text-reasons-navy">
-                Resumen Académico (Abstract)
-                <span class="text-slate-400 font-normal normal-case tracking-normal ml-1">— usa bloques para enriquecer el contenido</span>
-              </label>
+            <!-- ── Toggle de modo ───────────────────────────────────── -->
+            <div class="md:col-span-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+              <div class="flex flex-col gap-0.5">
+                <span class="text-xs font-bold text-reasons-navy">Modo de edición del resumen</span>
+                <span class="text-[10px] text-slate-400">
+                  {{ pubModoFlexible
+                    ? 'Editor flexible: bloques de texto, imágenes, PDFs y más'
+                    : 'Modo simple: textarea de texto directo' }}
+                </span>
+              </div>
+              <div class="flex gap-1.5 p-1 bg-white border border-slate-200 rounded-xl self-start sm:self-auto">
+                <button type="button" (click)="pubModoFlexible = false"
+                        class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-all"
+                        [class]="!pubModoFlexible
+                          ? 'bg-reasons-navy text-white shadow-sm'
+                          : 'text-slate-500 hover:text-slate-700'">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                  </svg>
+                  Simple
+                </button>
+                <button type="button" (click)="pubModoFlexible = true"
+                        class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-all"
+                        [class]="pubModoFlexible
+                          ? 'bg-reasons-blue text-white shadow-sm'
+                          : 'text-slate-500 hover:text-slate-700'">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 010 2H5a1 1 0 01-1-1zM4 9a1 1 0 011-1h14a1 1 0 010 2H5a1 1 0 01-1-1zM4 13a1 1 0 011-1h10a1 1 0 010 2H5a1 1 0 01-1-1zM4 17a1 1 0 011-1h6a1 1 0 010 2H5a1 1 0 01-1-1z"/>
+                  </svg>
+                  ✦ Flexible
+                </button>
+              </div>
+            </div>
+
+            <!-- ── MODO SIMPLE ──────────────────────────────────────── -->
+            <div *ngIf="!pubModoFlexible" class="flex flex-col gap-1.5 md:col-span-2">
+              <label class="form-label">Resumen Académico (Abstract)</label>
+              <textarea formControlName="resumen" rows="5" class="form-input"
+                        placeholder="Resumen del contenido científico o abstract oficial..."></textarea>
+            </div>
+
+            <!-- ── MODO FLEXIBLE (Block Editor) ────────────────────── -->
+            <div *ngIf="pubModoFlexible" class="flex flex-col gap-1.5 md:col-span-2">
+              <label class="form-label font-bold text-reasons-navy">Resumen Académico (Abstract)</label>
               <app-block-editor
                 #editorResumen
                 [initialBlocks]="pubResumenBlocks"
@@ -1141,7 +1426,7 @@
           </div>
 
           <!-- EDIT MODE: REUSE RESEARCHER FORM DIRECTLY -->
-          <div *ngIf="showForm" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-xl max-w-4xl w-full text-left mx-auto animate-fade-in">
+          <div *ngIf="showForm" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-xl w-full text-left mx-auto animate-fade-in">
             <h3 class="text-xl font-bold text-reasons-navy mb-6">Modificar mi Perfil Público</h3>
             
             <form [formGroup]="investigadorForm" (ngSubmit)="guardarInvestigador()" class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1187,8 +1472,8 @@
                 <div class="flex flex-col sm:flex-row items-center gap-5 mt-1">
                   <!-- Avatar Preview -->
                   <div class="w-16 h-16 rounded-full border-2 border-slate-200 shadow-md overflow-hidden bg-white flex-shrink-0 flex items-center justify-center">
-                    <img [src]="obtenerFotoUrl(investigadorForm.get('foto_url')?.value)" 
-                         (error)="$event.target.src = defaultAvatar"
+                    <img [src]="uploadPreview || obtenerFotoUrl(investigadorForm.get('foto_url')?.value)" 
+                         (error)="$any($event.target).src = defaultAvatar"
                          class="w-full h-full object-cover" alt="Previsualización" />
                   </div>
                   
@@ -1258,8 +1543,351 @@
 
         </div>
 
-      </div>
+      </div><!-- /TAB: PERFIL -->
 
-    </div>
+      <!-- ==========================================
+           TAB: INFO DEL GRUPO
+           ========================================== -->
+      <div *ngIf="activeTab === 'info' && usuario?.rol === 'admin'" class="animate-fade-in flex flex-col gap-8 text-left">
+
+        <!-- Loading skeleton while data arrives -->
+        <div *ngIf="!infoLoaded" class="flex flex-col items-center justify-center py-20 gap-4">
+          <div class="w-10 h-10 border-4 border-reasons-green border-t-transparent rounded-full animate-spin"></div>
+          <span class="text-sm font-semibold text-reasons-blue">Cargando información del grupo...</span>
+        </div>
+
+      <ng-container *ngIf="infoLoaded">
+
+        <!-- ═══════════════════════════════════════════════════════════
+             FORMULARIO 1: INFORMACIÓN GENERAL DEL GRUPO
+             ═══════════════════════════════════════════════════════════ -->
+        <div class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-6">
+          <!-- Header -->
+          <div class="flex items-center justify-between flex-wrap gap-3 pb-4 border-b border-slate-100">
+            <h3 class="text-lg font-bold text-reasons-navy flex items-center gap-2">
+              <svg class="w-5 h-5 text-reasons-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Información General del Grupo
+            </h3>
+            <button type="button" (click)="guardarInfoGeneral()" class="save-btn">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+              Guardar
+            </button>
+          </div>
+
+          <!-- Logo + Dominio -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex flex-col gap-3">
+              <label class="form-label">Logo del grupo</label>
+
+              <!-- Preview -->
+              <div class="flex items-center gap-4">
+                <div class="w-20 h-20 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm">
+                  <ng-container *ngIf="infoGrupo.logo_url; else noLogo">
+                    <img [src]="infoGrupo.logo_url"
+                         (error)="$any(infoGrupo).logo_url = ''"
+                         class="w-full h-full object-contain p-2" alt="Logo" />
+                  </ng-container>
+                  <ng-template #noLogo>
+                    <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                  </ng-template>
+                </div>
+
+                <!-- Upload + URL -->
+                <div class="flex flex-col gap-2 flex-1 min-w-0">
+                  <div class="flex gap-2">
+                    <input type="file" #logoFileInput accept="image/*,image/svg+xml" class="hidden"
+                           (change)="onLogoFileSelected($event)" />
+                    <button type="button" (click)="logoFileInput.click()" [disabled]="isUploading"
+                            class="px-3 py-2 bg-reasons-blue hover:bg-reasons-navy text-white text-xs font-bold rounded-xl shadow-sm cursor-pointer transition-colors flex items-center gap-1.5 disabled:opacity-50">
+                      <span *ngIf="isUploading" class="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                      <svg *ngIf="!isUploading" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                      </svg>
+                      {{ isUploading ? 'Subiendo...' : 'Subir imagen' }}
+                    </button>
+                  </div>
+                  <div class="flex flex-col gap-1">
+                    <span class="text-[9px] text-slate-400 font-semibold uppercase tracking-wider">o ingresa una URL:</span>
+                    <input type="text" [(ngModel)]="infoGrupo.logo_url" class="form-input text-xs"
+                           placeholder="/logo.svg o https://..." />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="form-label">Dominio oficial del grupo</label>
+              <textarea [(ngModel)]="infoGrupo.dominio" rows="2" class="form-input" placeholder="Optimización de los Sistemas Productivos..."></textarea>
+            </div>
+          </div>
+
+          <!-- Descripción -->
+          <div class="flex flex-col gap-2 pt-2 border-t border-slate-100">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <label class="form-label mb-0">Descripción del Grupo</label>
+              <div class="flex gap-1 p-0.5 bg-slate-100 rounded-lg">
+                <button type="button" (click)="infoDescModo=false" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all" [class]="!infoDescModo?'bg-white shadow text-reasons-navy':'text-slate-400'">Simple</button>
+                <button type="button" (click)="infoDescModo=true"  class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all" [class]="infoDescModo?'bg-white shadow text-reasons-blue':'text-slate-400'">✦ Flexible</button>
+              </div>
+            </div>
+            <textarea *ngIf="!infoDescModo" [(ngModel)]="infoGrupo.descripcion" rows="4" class="form-input" placeholder="Descripción general del grupo..."></textarea>
+            <app-block-editor *ngIf="infoDescModo" [initialBlocks]="infoDescBlocks" (blocksChange)="infoDescBlocks=$event"></app-block-editor>
+          </div>
+
+          <!-- Misión -->
+          <div class="flex flex-col gap-2 pt-2 border-t border-slate-100">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <label class="form-label mb-0">Descripción del Grupo (Misión)</label>
+              <div class="flex gap-1 p-0.5 bg-slate-100 rounded-lg">
+                <button type="button" (click)="infoMisionModo=false" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all" [class]="!infoMisionModo?'bg-white shadow text-reasons-navy':'text-slate-400'">Simple</button>
+                <button type="button" (click)="infoMisionModo=true"  class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all" [class]="infoMisionModo?'bg-white shadow text-reasons-blue':'text-slate-400'">✦ Flexible</button>
+              </div>
+            </div>
+            <textarea *ngIf="!infoMisionModo" [(ngModel)]="infoGrupo.mision" rows="3" class="form-input" placeholder="Descripción o Misión del grupo..."></textarea>
+            <app-block-editor *ngIf="infoMisionModo" [initialBlocks]="infoMisionBlocks" (blocksChange)="infoMisionBlocks=$event"></app-block-editor>
+          </div>
+
+          <!-- Objetivo General -->
+          <div class="flex flex-col gap-2 pt-2 border-t border-slate-100">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <label class="form-label mb-0">Objetivo General</label>
+              <div class="flex gap-1 p-0.5 bg-slate-100 rounded-lg">
+                <button type="button" (click)="infoObjGenModo=false" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all" [class]="!infoObjGenModo?'bg-white shadow text-reasons-navy':'text-slate-400'">Simple</button>
+                <button type="button" (click)="infoObjGenModo=true"  class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all" [class]="infoObjGenModo?'bg-white shadow text-reasons-blue':'text-slate-400'">✦ Flexible</button>
+              </div>
+            </div>
+            <textarea *ngIf="!infoObjGenModo" [(ngModel)]="infoGrupo.objetivo_general" rows="3" class="form-input" placeholder="Objetivo general..."></textarea>
+            <app-block-editor *ngIf="infoObjGenModo" [initialBlocks]="infoObjGenBlocks" (blocksChange)="infoObjGenBlocks=$event"></app-block-editor>
+          </div>
+
+          <!-- Objetivos Específicos -->
+          <div class="flex flex-col gap-2 pt-2 border-t border-slate-100">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <label class="form-label mb-0">Objetivos Específicos</label>
+              <div class="flex gap-1 p-0.5 bg-slate-100 rounded-lg">
+                <button type="button" (click)="infoObjEspModo=false" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all" [class]="!infoObjEspModo?'bg-white shadow text-reasons-navy':'text-slate-400'">Simple</button>
+                <button type="button" (click)="infoObjEspModo=true"  class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all" [class]="infoObjEspModo?'bg-white shadow text-reasons-blue':'text-slate-400'">✦ Flexible</button>
+              </div>
+            </div>
+            <textarea *ngIf="!infoObjEspModo" [(ngModel)]="infoGrupo.objetivos_especificos" rows="4" class="form-input" placeholder="• Objetivo específico 1&#10;• Objetivo específico 2..."></textarea>
+            <app-block-editor *ngIf="infoObjEspModo" [initialBlocks]="infoObjEspBlocks" (blocksChange)="infoObjEspBlocks=$event"></app-block-editor>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             FORMULARIO 2: PÁGINA PROYECTOS
+             ═══════════════════════════════════════════════════════════ -->
+        <div class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-4">
+          <div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-100">
+            <h3 class="text-lg font-bold text-reasons-navy flex items-center gap-2">
+              <div class="w-7 h-7 rounded-lg bg-reasons-green/10 text-reasons-green flex items-center justify-center">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+              </div>
+              Página — Proyectos
+            </h3>
+            <button type="button" (click)="guardarInfoProyectos()" class="save-btn">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+              Guardar
+            </button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="flex flex-col gap-1.5">
+              <label class="form-label">Etiqueta (badge)</label>
+              <input type="text" [(ngModel)]="infoGrupo.proyectos_badge" class="form-input" placeholder="Investigación Aplicada" />
+            </div>
+            <div class="flex flex-col gap-1.5 sm:col-span-2">
+              <label class="form-label">Título de la página</label>
+              <input type="text" [(ngModel)]="infoGrupo.proyectos_titulo" class="form-input" placeholder="Nuestros Proyectos de Investigación" />
+            </div>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="form-label">Descripción / subtítulo</label>
+            <textarea [(ngModel)]="infoGrupo.proyectos_descripcion" rows="2" class="form-input" placeholder="Explore los proyectos científicos..."></textarea>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             FORMULARIO 3: PÁGINA PUBLICACIONES
+             ═══════════════════════════════════════════════════════════ -->
+        <div class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-4">
+          <div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-100">
+            <h3 class="text-lg font-bold text-reasons-navy flex items-center gap-2">
+              <div class="w-7 h-7 rounded-lg bg-reasons-blue/10 text-reasons-blue flex items-center justify-center">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+              </div>
+              Página — Publicaciones
+            </h3>
+            <button type="button" (click)="guardarInfoPublicaciones()" class="save-btn">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+              Guardar
+            </button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="flex flex-col gap-1.5">
+              <label class="form-label">Etiqueta (badge)</label>
+              <input type="text" [(ngModel)]="infoGrupo.publicaciones_badge" class="form-input" placeholder="Producción Científica" />
+            </div>
+            <div class="flex flex-col gap-1.5 sm:col-span-2">
+              <label class="form-label">Título de la página</label>
+              <input type="text" [(ngModel)]="infoGrupo.publicaciones_titulo" class="form-input" placeholder="Publicaciones Científicas" />
+            </div>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="form-label">Descripción / subtítulo</label>
+            <textarea [(ngModel)]="infoGrupo.publicaciones_descripcion" rows="2" class="form-input" placeholder="Consulte los artículos científicos..."></textarea>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             FORMULARIO 4: PÁGINA CONTACTO
+             ═══════════════════════════════════════════════════════════ -->
+        <div class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-4">
+          <div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-100">
+            <h3 class="text-lg font-bold text-reasons-navy flex items-center gap-2">
+              <div class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              </div>
+              Página — Contacto
+            </h3>
+            <button type="button" (click)="guardarInfoContacto()" class="save-btn">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+              Guardar
+            </button>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex flex-col gap-1.5">
+              <label class="form-label">Etiqueta (badge)</label>
+              <input type="text" [(ngModel)]="infoGrupo.contacto_badge" class="form-input" placeholder="Póngase en Contacto" />
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="form-label">Título de la página</label>
+              <input type="text" [(ngModel)]="infoGrupo.contacto_titulo" class="form-input" placeholder="Contacte con Nosotros" />
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="form-label">Correo electrónico</label>
+              <input type="email" [(ngModel)]="infoGrupo.contacto_email" class="form-input" placeholder="reasons@uta.edu.ec" />
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="form-label">Teléfono</label>
+              <input type="text" [(ngModel)]="infoGrupo.contacto_telefono" class="form-input" placeholder="(03) 240-0200" />
+            </div>
+            <div class="flex flex-col gap-1.5 md:col-span-2">
+              <label class="form-label">Descripción / subtítulo</label>
+              <textarea [(ngModel)]="infoGrupo.contacto_descripcion" rows="2" class="form-input" placeholder="¿Tiene alguna consulta...?"></textarea>
+            </div>
+            <div class="flex flex-col gap-1.5 md:col-span-2">
+              <label class="form-label">Dirección física</label>
+              <textarea [(ngModel)]="infoGrupo.contacto_direccion" rows="2" class="form-input" placeholder="Facultad de Ingeniería..."></textarea>
+            </div>
+          </div>
+        </div>
+
+      </ng-container><!-- /infoLoaded -->
+
+      </div><!-- /TAB INFO -->
+
+      <!-- ==========================================
+           TAB: LÍNEAS DE INVESTIGACIÓN
+           ========================================== -->
+      <div *ngIf="activeTab === 'lineas' && usuario?.rol === 'admin'" class="animate-fade-in flex flex-col gap-6 text-left">
+
+        <div class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-6">
+
+          <div class="flex items-center justify-between gap-4 flex-wrap">
+            <div>
+              <h3 class="text-xl font-bold text-reasons-navy">Líneas de Investigación</h3>
+              <p class="text-xs text-slate-400 mt-0.5">Administra las líneas del grupo. No se puede eliminar una línea que tenga proyectos o publicaciones asociadas.</p>
+            </div>
+            <button type="button" (click)="nuevaLinea()"
+                    class="px-4 py-2 bg-reasons-green hover:bg-[#327e2a] text-white text-xs font-bold rounded-xl shadow hover-premium flex items-center gap-1.5 cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              Nueva Línea
+            </button>
+          </div>
+
+          <!-- Lista de líneas -->
+          <div *ngIf="!showLineaForm" class="flex flex-col gap-3">
+            <div *ngFor="let linea of lineasAdmin"
+                 class="flex items-start justify-between gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-slate-200 transition-colors">
+              <div class="flex flex-col gap-1.5 min-w-0 flex-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-xs font-bold px-2 py-0.5 rounded bg-reasons-blue/10 text-reasons-blue border border-reasons-blue/20 uppercase tracking-wider">{{ linea.abreviatura }}</span>
+                  <span class="font-bold text-reasons-navy text-sm">{{ linea.nombre }}</span>
+                </div>
+                <p *ngIf="linea.descripcion_larga || linea.descripcion" class="text-xs text-slate-500 font-light leading-relaxed">
+                  {{ linea.descripcion_larga || linea.descripcion }}
+                </p>
+              </div>
+              <!-- Confirm inline o botones normales -->
+              <div *ngIf="lineaPendienteEliminar?.id !== linea.id" class="flex items-center gap-2 flex-shrink-0">
+                <button (click)="editarLinea(linea)" class="p-2 bg-reasons-blue/10 text-reasons-blue rounded-lg hover:bg-reasons-blue/20 transition-colors cursor-pointer" title="Editar">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                </button>
+                <button (click)="eliminarLinea(linea)" class="p-2 bg-rose-500/10 text-rose-500 rounded-lg hover:bg-rose-500/20 transition-colors cursor-pointer" title="Eliminar">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+              </div>
+
+              <!-- Confirmación inline cuando se presiona eliminar -->
+              <div *ngIf="lineaPendienteEliminar?.id === linea.id"
+                   class="flex items-center gap-2 flex-shrink-0 bg-rose-50 border border-rose-200 rounded-xl px-3 py-1.5 animate-fade-in">
+                <span class="text-xs text-rose-700 font-semibold whitespace-nowrap">¿Eliminar?</span>
+                <button (click)="confirmarEliminarLinea()"
+                        class="px-3 py-1 bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold rounded-lg transition-colors cursor-pointer">
+                  Sí
+                </button>
+                <button (click)="lineaPendienteEliminar=null"
+                        class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-lg transition-colors cursor-pointer">
+                  No
+                </button>
+              </div>
+            </div>
+            <p *ngIf="lineasAdmin.length === 0" class="text-slate-400 text-sm italic text-center py-6">
+              No hay líneas registradas aún.
+            </p>
+          </div>
+
+          <!-- Formulario nueva/editar línea -->
+          <div *ngIf="showLineaForm" class="flex flex-col gap-5 p-5 bg-slate-50 rounded-2xl border border-slate-200">
+            <h4 class="font-bold text-reasons-navy">{{ lineaEditando ? 'Editar Línea' : 'Nueva Línea de Investigación' }}</h4>
+            <form [formGroup]="lineaForm" class="flex flex-col gap-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="flex flex-col gap-1.5">
+                  <label class="form-label">Nombre completo</label>
+                  <input type="text" formControlName="nombre" class="form-input" placeholder="Diseño, Materiales y Producción..."/>
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label class="form-label">Abreviatura</label>
+                  <input type="text" formControlName="abreviatura" class="form-input" placeholder="DMP-IST"/>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between flex-wrap gap-3 p-3 bg-white border border-slate-200 rounded-xl">
+                <span class="text-xs font-bold text-reasons-navy">Descripción de la línea</span>
+                <div class="flex gap-1.5 p-1 bg-slate-100 rounded-xl">
+                  <button type="button" (click)="lineaModoFlexible=false" class="px-3 py-1 text-xs font-bold rounded-lg transition-all" [class]="!lineaModoFlexible?'bg-reasons-navy text-white':'text-slate-500'">Simple</button>
+                  <button type="button" (click)="lineaModoFlexible=true"  class="px-3 py-1 text-xs font-bold rounded-lg transition-all" [class]="lineaModoFlexible?'bg-reasons-blue text-white':'text-slate-500'">✦ Flexible</button>
+                </div>
+              </div>
+
+              <textarea *ngIf="!lineaModoFlexible" formControlName="descripcion" rows="4" class="form-input"
+                        placeholder="Descripción extendida de la línea de investigación..."></textarea>
+              <app-block-editor *ngIf="lineaModoFlexible" [initialBlocks]="lineaDescBlocks" (blocksChange)="lineaDescBlocks=$event"></app-block-editor>
+
+              <div class="flex justify-end gap-3 mt-2">
+                <button type="button" (click)="showLineaForm=false" class="px-5 py-2.5 bg-slate-150 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-all cursor-pointer">Cancelar</button>
+                <button type="button" (click)="guardarLinea()" [disabled]="lineaForm.invalid"
+                        class="px-6 py-2.5 bg-reasons-green hover:bg-[#327e2a] text-white font-bold rounded-xl text-xs shadow-md disabled:opacity-50 transition-all cursor-pointer">
+                  {{ lineaEditando ? 'Actualizar Línea' : 'Crear Línea' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </div><!-- /TAB LÍNEAS -->
+
+    </div><!-- /!isLoading -->
   </main>
 </div>

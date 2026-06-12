@@ -49,8 +49,8 @@ exports.getProyectoById = async (req, res, next) => {
 
 exports.crearProyecto = async (req, res, next) => {
   try {
-    const { titulo, descripcion, objetivos, resultados, estado, linea_id, investigadores } = req.body;
-    const newItem = await Proyecto.create({ titulo, descripcion, objetivos, resultados, estado, linea_id });
+    const { titulo, descripcion, objetivos, resultados, descripcion_json, objetivos_json, resultados_json, estado, linea_id, investigadores } = req.body;
+    const newItem = await Proyecto.create({ titulo, descripcion, objetivos, resultados, descripcion_json, objetivos_json, resultados_json, estado, linea_id });
     
     if (investigadores && Array.isArray(investigadores)) {
       await newItem.setInvestigadores(investigadores);
@@ -65,10 +65,10 @@ exports.crearProyecto = async (req, res, next) => {
 exports.actualizarProyecto = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { titulo, descripcion, objetivos, resultados, estado, linea_id, investigadores } = req.body;
-    
+    const { titulo, descripcion, objetivos, resultados, descripcion_json, objetivos_json, resultados_json, estado, linea_id, investigadores } = req.body;
+
     const [updated] = await Proyecto.update(
-      { titulo, descripcion, objetivos, resultados, estado, linea_id },
+      { titulo, descripcion, objetivos, resultados, descripcion_json, objetivos_json, resultados_json, estado, linea_id },
       { where: { id } }
     );
     

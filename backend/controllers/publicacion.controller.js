@@ -49,8 +49,8 @@ exports.getPublicacionById = async (req, res, next) => {
 
 exports.crearPublicacion = async (req, res, next) => {
   try {
-    const { titulo, resumen, cita, revista_portada_url, doi_url, linea_id, investigadores } = req.body;
-    const newItem = await Publicacion.create({ titulo, resumen, cita, revista_portada_url, doi_url, linea_id });
+    const { titulo, resumen, resumen_json, cita, revista_portada_url, doi_url, linea_id, investigadores } = req.body;
+    const newItem = await Publicacion.create({ titulo, resumen, resumen_json, cita, revista_portada_url, doi_url, linea_id });
     
     if (investigadores && Array.isArray(investigadores)) {
       await newItem.setInvestigadores(investigadores);
@@ -65,10 +65,10 @@ exports.crearPublicacion = async (req, res, next) => {
 exports.actualizarPublicacion = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { titulo, resumen, cita, revista_portada_url, doi_url, linea_id, investigadores } = req.body;
-    
+    const { titulo, resumen, resumen_json, cita, revista_portada_url, doi_url, linea_id, investigadores } = req.body;
+
     const [updated] = await Publicacion.update(
-      { titulo, resumen, cita, revista_portada_url, doi_url, linea_id },
+      { titulo, resumen, resumen_json, cita, revista_portada_url, doi_url, linea_id },
       { where: { id } }
     );
     

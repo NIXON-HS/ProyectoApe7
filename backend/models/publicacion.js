@@ -15,6 +15,10 @@ const Publicacion = sequelize.define('publicaciones', {
     type: DataTypes.TEXT,
     allowNull: false,
   },
+  resumen_json: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
   cita: {
     type: DataTypes.TEXT,
     allowNull: false,

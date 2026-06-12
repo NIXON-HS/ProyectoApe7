@@ -23,6 +23,18 @@ const Proyecto = sequelize.define('proyectos', {
     type: DataTypes.TEXT,
     allowNull: false,
   },
+  descripcion_json: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
+  objetivos_json: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
+  resultados_json: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
   estado: {
     type: DataTypes.ENUM('Activo', 'Finalizado', 'Propuesta'),
     defaultValue: 'Activo',

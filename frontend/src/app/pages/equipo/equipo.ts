@@ -1,23 +1,35 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { InvestigadorService } from '../../core/services/investigador.service';
+import { InfoGrupoService } from '../../core/services/info-grupo.service';
+import { InfoGrupo } from '../../core/models/info-grupo.model';
+import { AdminBarComponent } from '../../shared/admin-bar/admin-bar';
 import { Investigador } from '../../core/models/investigador.model';
 
 @Component({
   selector: 'app-equipo',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, AdminBarComponent],
   template: `
+    <app-admin-bar editTab="investigadores"
+      [editMode]="editMode"
+      (editStart)="startEdit()"
+      (editSave)="saveEdit()"
+      (editCancel)="cancelEdit()">
+    </app-admin-bar>
     <div class="min-h-screen pt-32 pb-24 bg-reasons-bg bg-grid-pattern relative">
       <div class="max-w-7xl mx-auto px-6">
         <!-- Header -->
         <div class="text-center max-w-3xl mx-auto flex flex-col gap-4 mb-20 animate-fade-in">
-          <span class="text-xs font-bold text-reasons-green tracking-widest uppercase">Talento Humano</span>
-          <h1 class="text-4xl md:text-5xl font-extrabold text-reasons-navy">Nuestro Equipo de Investigación</h1>
+          <div *ngIf="editMode" class="px-4 py-2 bg-reasons-green/10 border border-reasons-green/30 rounded-2xl text-xs text-reasons-green font-semibold text-center mb-2">✏ Modo edición activo</div>
+          <span *ngIf="!editMode" class="text-xs font-bold text-reasons-green tracking-widest uppercase">{{ info?.equipo_badge || 'Talento Humano' }}</span>
+          <input *ngIf="editMode" [(ngModel)]="draft.equipo_badge" class="ie-badge ie-badge-green" placeholder="Etiqueta..."/>
+          <h1 *ngIf="!editMode" class="text-4xl md:text-5xl font-extrabold text-reasons-navy">{{ info?.equipo_titulo || 'Nuestro Equipo de Investigación' }}</h1>
+          <input *ngIf="editMode" [(ngModel)]="draft.equipo_titulo" class="ie-title" placeholder="Título..."/>
           <div class="w-16 h-1 bg-reasons-green mx-auto rounded-full"></div>
-          <p class="text-slate-500 font-light leading-relaxed">
-            Conoce a los científicos, ingenieros y expertos multidisciplinares que lideran el desarrollo sostenible y la innovación tecnológica avanzada en REASONS.
-          </p>
+          <p *ngIf="!editMode" class="text-slate-500 font-light leading-relaxed">{{ info?.equipo_descripcion || 'Conoce a los científicos, ingenieros y expertos multidisciplinares que forman parte de REASONS.' }}</p>
+          <textarea *ngIf="editMode" [(ngModel)]="draft.equipo_descripcion" rows="3" class="ie-desc" placeholder="Descripción..."></textarea>
         </div>
 
         <!-- Spinner Loading Indicator -->
@@ -256,9 +268,11 @@ import { Investigador } from '../../core/models/investigador.model';
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .animate-fade-in {
-      animation: fadeIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    }
+    .animate-fade-in { animation: fadeIn 0.35s cubic-bezier(0.4,0,.2,1) forwards; }
+    .ie-badge { display:block;width:100%;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#3c9632;background:transparent;border:none;border-bottom:2px dashed #3c9632;text-align:center;outline:none;padding:2px 4px; }
+    .ie-badge-green::placeholder { color:#a7f3d0; }
+    .ie-title { display:block;width:100%;font-size:2.5rem;font-weight:800;color:#00283c;background:rgba(10,50,70,.04);border:2px dashed #0a3246;border-radius:12px;text-align:center;outline:none;padding:8px 12px; }
+    .ie-desc { display:block;width:100%;font-weight:300;color:#64748b;background:rgba(0,0,0,.02);border:2px dashed #cbd5e1;border-radius:10px;outline:none;padding:8px 12px;resize:vertical;line-height:1.6;text-align:center; }
   `]
 })
 export class EquipoComponent implements OnInit {
@@ -266,8 +280,15 @@ export class EquipoComponent implements OnInit {
   directiva: Investigador[] = [];
   investigadoresList: Investigador[] = [];
   selectedMember: Investigador | null = null;
+  info: InfoGrupo | null = null;
+  editMode = false;
+  draft: InfoGrupo = {};
 
-  constructor(private service: InvestigadorService, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private service: InvestigadorService,
+    private cdr: ChangeDetectorRef,
+    private infoSvc: InfoGrupoService
+  ) {}
 
   obtenerFotoUrl(url: string | null | undefined): string | null {
     if (!url) return null;
@@ -279,6 +300,8 @@ export class EquipoComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.infoSvc.getInfoGrupo().subscribe({ next: (d) => { this.info = d; this.cdr.detectChanges(); }, error: () => {} });
+    this.infoSvc.contentUpdated$.subscribe(() => this.infoSvc.getInfoGrupo().subscribe({ next: (d) => { this.info = d; this.cdr.detectChanges(); } }));
     this.service.getInvestigadores().subscribe({
       next: (data) => {
         this.directiva = data.filter(m => m.posicion === 'Director' || m.posicion === 'Subdirector');
@@ -306,7 +329,21 @@ export class EquipoComponent implements OnInit {
     this.selectedMember = member;
   }
 
-  closeDetail() {
-    this.selectedMember = null;
+  closeDetail() { this.selectedMember = null; }
+
+  startEdit() {
+    this.draft = { ...this.info };
+    if (!this.draft.equipo_badge)       this.draft.equipo_badge       = 'Talento Humano';
+    if (!this.draft.equipo_titulo)      this.draft.equipo_titulo      = 'Nuestro Equipo de Investigación';
+    if (!this.draft.equipo_descripcion) this.draft.equipo_descripcion = 'Conoce a los científicos, ingenieros y expertos multidisciplinares que forman parte de REASONS.';
+    this.editMode = true;
+  }
+  cancelEdit() { this.editMode = false; this.draft = {}; }
+  saveEdit() {
+    this.infoSvc.actualizarInfoGrupo({
+      equipo_badge:       this.draft.equipo_badge,
+      equipo_titulo:      this.draft.equipo_titulo,
+      equipo_descripcion: this.draft.equipo_descripcion,
+    }).subscribe({ next: () => { this.editMode = false; this.infoSvc.notifyUpdate(); this.infoSvc.getInfoGrupo().subscribe({ next: (d) => { this.info = d; this.cdr.detectChanges(); } }); } });
   }
 }

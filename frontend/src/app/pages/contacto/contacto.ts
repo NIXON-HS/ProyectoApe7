@@ -1,23 +1,34 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { ContactoService } from '../../core/services/contacto.service';
+import { InfoGrupoService } from '../../core/services/info-grupo.service';
+import { InfoGrupo } from '../../core/models/info-grupo.model';
+import { AdminBarComponent } from '../../shared/admin-bar/admin-bar';
 
 @Component({
   selector: 'app-contacto',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, AdminBarComponent],
   template: `
+    <app-admin-bar editTab="mensajes"
+      [editMode]="editMode"
+      (editStart)="startEdit()"
+      (editSave)="saveEdit()"
+      (editCancel)="cancelEdit()">
+    </app-admin-bar>
     <div class="min-h-screen pt-32 pb-24 bg-reasons-bg bg-grid-pattern relative">
       <div class="max-w-7xl mx-auto px-6">
         <!-- Header -->
         <div class="text-center max-w-3xl mx-auto flex flex-col gap-4 mb-20 animate-fade-in">
-          <span class="text-xs font-bold text-reasons-green tracking-widest uppercase">Póngase en Contacto</span>
-          <h1 class="text-4xl font-extrabold text-reasons-navy">Contacte con Nosotros</h1>
+          <div *ngIf="editMode" class="px-4 py-2 bg-reasons-green/10 border border-reasons-green/30 rounded-2xl text-xs text-reasons-green font-semibold text-center mb-2">✏ Modo edición activo — edita los textos de la página</div>
+          <span *ngIf="!editMode" class="text-xs font-bold text-reasons-green tracking-widest uppercase">{{ info?.contacto_badge || 'Póngase en Contacto' }}</span>
+          <input *ngIf="editMode" [(ngModel)]="draft.contacto_badge" class="ie-badge ie-badge-green" placeholder="Etiqueta..."/>
+          <h1 *ngIf="!editMode" class="text-4xl font-extrabold text-reasons-navy">{{ info?.contacto_titulo || 'Contacte con Nosotros' }}</h1>
+          <input *ngIf="editMode" [(ngModel)]="draft.contacto_titulo" class="ie-title" placeholder="Título..."/>
           <div class="w-16 h-1 bg-reasons-green mx-auto rounded-full"></div>
-          <p class="text-slate-500 font-light leading-relaxed">
-            ¿Tiene alguna consulta sobre nuestras líneas de investigación, proyectos o desea colaborar con nosotros? Complete el formulario y responderemos lo antes posible.
-          </p>
+          <p *ngIf="!editMode" class="text-slate-500 font-light leading-relaxed">{{ info?.contacto_descripcion || '¿Tiene alguna consulta sobre nuestros proyectos o desea colaborar con REASONS? Escríbanos.' }}</p>
+          <textarea *ngIf="editMode" [(ngModel)]="draft.contacto_descripcion" rows="3" class="ie-desc" placeholder="Descripción..."></textarea>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch animate-fade-in">
@@ -40,7 +51,8 @@ import { ContactoService } from '../../core/services/contacto.service';
                     </div>
                     <div class="flex flex-col gap-1.5">
                       <span class="font-bold text-reasons-navy text-xs uppercase tracking-wider">Dirección Principal</span>
-                      <span class="leading-relaxed">Facultad de Ingeniería en Sistemas, Electrónica e Industrial. Av. de Los Chasquis y Av. Río Payamino. Universidad Técnica de Ambato. Ambato – Ecuador.</span>
+                      <span *ngIf="!editMode" class="leading-relaxed">{{ info?.contacto_direccion || 'Facultad de Ingeniería en Sistemas, Electrónica e Industrial. Av. de Los Chasquis y Av. Río Payamino. Universidad Técnica de Ambato. Ambato – Ecuador.' }}</span>
+                      <textarea *ngIf="editMode" [(ngModel)]="draft.contacto_direccion" rows="3" class="form-input text-sm w-full" placeholder="Dirección..."></textarea>
                     </div>
                   </div>
 
@@ -53,7 +65,8 @@ import { ContactoService } from '../../core/services/contacto.service';
                     </div>
                     <div class="flex flex-col gap-1.5">
                       <span class="font-bold text-reasons-navy text-xs uppercase tracking-wider">Correo Electrónico</span>
-                      <a href="mailto:reasons@uta.edu.ec" class="text-reasons-blue hover:text-reasons-green transition-colors font-medium text-sm leading-relaxed">reasons&#64;uta.edu.ec</a>
+                      <a *ngIf="!editMode" [href]="'mailto:' + (info?.contacto_email || 'reasons@uta.edu.ec')" class="text-reasons-blue hover:text-reasons-green transition-colors font-medium text-sm leading-relaxed">{{ info?.contacto_email || 'reasons&#64;uta.edu.ec' }}</a>
+                      <input *ngIf="editMode" [(ngModel)]="draft.contacto_email" type="email" class="form-input text-sm" placeholder="Email..." />
                     </div>
                   </div>
                 </div>
@@ -174,11 +187,47 @@ export class ContactoComponent implements OnInit {
   isSubmitting = false;
   feedbackMsg = '';
   isSuccess = false;
+  info: InfoGrupo | null = null;
+  editMode = false;
+  draft: InfoGrupo = {};
 
-  constructor(private fb: FormBuilder, private service: ContactoService) {}
+  constructor(
+    private fb: FormBuilder,
+    private service: ContactoService,
+    private infoSvc: InfoGrupoService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
     this.initForm();
+    this.loadInfo();
+    this.infoSvc.contentUpdated$.subscribe(() => this.loadInfo());
+  }
+
+  loadInfo() {
+    this.infoSvc.getInfoGrupo().subscribe({ next: (d) => { this.info = d; this.cdr.detectChanges(); }, error: () => {} });
+  }
+
+  startEdit() {
+    this.draft = { ...this.info };
+    if (!this.draft.contacto_badge)       this.draft.contacto_badge       = 'Póngase en Contacto';
+    if (!this.draft.contacto_titulo)      this.draft.contacto_titulo      = 'Contacte con Nosotros';
+    if (!this.draft.contacto_descripcion) this.draft.contacto_descripcion = '¿Tiene alguna consulta sobre nuestros proyectos o desea colaborar con REASONS? Escríbanos.';
+    if (!this.draft.contacto_email)       this.draft.contacto_email       = 'reasons@uta.edu.ec';
+    if (!this.draft.contacto_telefono)    this.draft.contacto_telefono    = '';
+    if (!this.draft.contacto_direccion)   this.draft.contacto_direccion   = 'Facultad de Ingeniería en Sistemas, Electrónica e Industrial. Av. de Los Chasquis y Av. Río Payamino. Universidad Técnica de Ambato. Ambato – Ecuador.';
+    this.editMode = true;
+  }
+  cancelEdit() { this.editMode = false; this.draft = {}; }
+  saveEdit() {
+    this.infoSvc.actualizarInfoGrupo({
+      contacto_badge:       this.draft.contacto_badge,
+      contacto_titulo:      this.draft.contacto_titulo,
+      contacto_descripcion: this.draft.contacto_descripcion,
+      contacto_email:       this.draft.contacto_email,
+      contacto_telefono:    this.draft.contacto_telefono,
+      contacto_direccion:   this.draft.contacto_direccion,
+    }).subscribe({ next: () => { this.editMode = false; this.infoSvc.notifyUpdate(); this.loadInfo(); } });
   }
 
   initForm() {

@@ -1,24 +1,59 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { ProyectoService } from '../../core/services/proyecto.service';
 import { Proyecto } from '../../core/models/proyecto.model';
 import { BlockRendererComponent } from '../../shared/block-renderer/block-renderer';
+import { InfoGrupoService } from '../../core/services/info-grupo.service';
+import { InfoGrupo } from '../../core/models/info-grupo.model';
+import { AdminBarComponent } from '../../shared/admin-bar/admin-bar';
 
 @Component({
   selector: 'app-proyectos',
   standalone: true,
-  imports: [CommonModule, BlockRendererComponent],
+  imports: [CommonModule, FormsModule, RouterLink, BlockRendererComponent, AdminBarComponent],
   template: `
+    <app-admin-bar editTab="proyectos"
+      [editMode]="editMode"
+      (editStart)="startEdit()"
+      (editSave)="saveEdit()"
+      (editCancel)="cancelEdit()">
+    </app-admin-bar>
+
     <div class="min-h-screen pt-32 pb-24 bg-reasons-bg bg-grid-pattern relative">
       <div class="max-w-7xl mx-auto px-6">
+
+        <!-- ── Edit mode highlight frame ─────────────────────────────── -->
+        <div *ngIf="editMode" class="mb-4 px-4 py-2 bg-reasons-green/10 border border-reasons-green/30 rounded-2xl text-xs text-reasons-green font-semibold text-center animate-fade-in">
+          ✏ Modo edición activo — modifica los textos directamente y presiona "Guardar cambios"
+        </div>
+
         <!-- Header -->
         <div class="text-center max-w-3xl mx-auto flex flex-col gap-4 mb-20 animate-fade-in">
-          <span class="text-xs font-bold text-reasons-green tracking-widest uppercase">Investigación Aplicada</span>
-          <h1 class="text-4xl font-extrabold text-reasons-navy">Nuestros Proyectos de Investigación</h1>
+
+          <!-- Badge -->
+          <span *ngIf="!editMode" class="text-xs font-bold text-reasons-green tracking-widest uppercase">
+            {{ info?.proyectos_badge || 'Investigación Aplicada' }}
+          </span>
+          <input *ngIf="editMode" [(ngModel)]="draft.proyectos_badge"
+                 class="ie-badge ie-badge-green" placeholder="Etiqueta..."/>
+
+          <!-- Title -->
+          <h1 *ngIf="!editMode" class="text-4xl font-extrabold text-reasons-navy">
+            {{ info?.proyectos_titulo || 'Nuestros Proyectos de Investigación' }}
+          </h1>
+          <input *ngIf="editMode" [(ngModel)]="draft.proyectos_titulo"
+                 class="ie-title" placeholder="Título..."/>
+
           <div class="w-16 h-1 bg-reasons-green mx-auto rounded-full"></div>
-          <p class="text-slate-500 font-light leading-relaxed">
-            Explore los proyectos científicos liderados por REASONS, desarrollados en colaboración con socios industriales e instituciones académicas nacionales.
+
+          <!-- Description -->
+          <p *ngIf="!editMode" class="text-slate-500 font-light leading-relaxed">
+            {{ info?.proyectos_descripcion || 'Explore los proyectos científicos liderados por REASONS en distintas áreas del conocimiento.' }}
           </p>
+          <textarea *ngIf="editMode" [(ngModel)]="draft.proyectos_descripcion" rows="3"
+                    class="ie-desc" placeholder="Descripción..."></textarea>
         </div>
 
         <!-- Spinner loader -->
@@ -99,26 +134,43 @@ import { BlockRendererComponent } from '../../shared/block-renderer/block-render
               </div>
             </div>
 
-            <!-- Footer with participants and expand action -->
-            <div class="border-t border-slate-100 pt-4 flex items-center justify-between gap-4">
+            <!-- Footer with participants and actions -->
+            <div class="border-t border-slate-100 pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <!-- Collaborators avatars -->
               <div class="flex items-center gap-2.5">
                 <span class="text-xs text-slate-400 font-light">Colaboradores:</span>
                 <div class="flex -space-x-2">
-                  <div *ngFor="let author of proj.investigadores" class="w-8 h-8 rounded-full bg-gradient-to-br from-reasons-navy to-reasons-blue border-2 border-white flex items-center justify-center text-white text-[10px] font-bold shadow overflow-hidden" [title]="author.nombres">
-                    <img *ngIf="author.foto_url" [src]="obtenerFotoUrl(author.foto_url)" 
-                         (error)="author.foto_url = ''" 
-                         class="w-full h-full object-cover" alt="Avatar" />
+                  <div *ngFor="let author of proj.investigadores"
+                       class="w-8 h-8 rounded-full bg-gradient-to-br from-reasons-navy to-reasons-blue border-2 border-white flex items-center justify-center text-white text-[10px] font-bold shadow overflow-hidden"
+                       [title]="author.nombres">
+                    <img *ngIf="author.foto_url" [src]="obtenerFotoUrl(author.foto_url)"
+                         (error)="author.foto_url = ''" class="w-full h-full object-cover" alt="Avatar" />
                     <span *ngIf="!author.foto_url">{{ author.nombres.charAt(0) }}</span>
                   </div>
-                  <span *ngIf="!proj.investigadores || proj.investigadores.length === 0" class="text-slate-400 text-xs italic ml-2">Ninguno asignado</span>
+                  <span *ngIf="!proj.investigadores || proj.investigadores.length === 0"
+                        class="text-slate-400 text-xs italic ml-2">Ninguno asignado</span>
                 </div>
               </div>
-              <button (click)="toggleExpand(proj.id)" class="text-xs font-bold text-reasons-blue hover:text-reasons-green transition-all flex items-center gap-1 group/btn cursor-pointer">
-                {{ expandedProjectId === proj.id ? 'Contraer Detalle' : 'Ver Detalles' }}
-                <svg class="w-3.5 h-3.5 transition-transform duration-300" [class.rotate-90]="expandedProjectId === proj.id" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
-                </svg>
-              </button>
+
+              <!-- Action buttons -->
+              <div class="flex items-center gap-2 flex-wrap">
+                <!-- Expand/collapse preview -->
+                <button (click)="toggleExpand(proj.id)"
+                        class="text-xs font-semibold text-slate-500 hover:text-reasons-blue transition-all flex items-center gap-1 cursor-pointer border border-slate-200 rounded-full px-3 py-1.5 hover:border-reasons-blue hover:bg-reasons-blue/5">
+                  {{ expandedProjectId === proj.id ? 'Contraer' : 'Vista previa' }}
+                  <svg class="w-3 h-3 transition-transform duration-300" [class.rotate-90]="expandedProjectId === proj.id" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </button>
+                <!-- Full detail link -->
+                <a [routerLink]="['/proyectos', proj.id]"
+                   class="text-xs font-bold text-white bg-reasons-blue hover:bg-reasons-navy transition-all flex items-center gap-1.5 rounded-full px-4 py-1.5 shadow-sm hover:shadow-md">
+                  Ver proyecto completo
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -144,17 +196,37 @@ import { BlockRendererComponent } from '../../shared/block-renderer/block-render
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
     }
-    .animate-spin {
-      animation: spin 1s linear infinite;
-    }
+    .animate-spin { animation: spin 1s linear infinite; }
+    /* ── Inline edit styles ────────────────────────────────── */
+    .ie-badge { display:block; width:100%; font-size:10px; font-weight:700;
+      text-transform:uppercase; letter-spacing:.1em; color:#3c9632;
+      background:transparent; border:none; border-bottom:2px dashed #3c9632;
+      text-align:center; outline:none; padding:2px 4px; }
+    .ie-badge-green::placeholder { color:#a7f3d0; }
+    .ie-title { display:block; width:100%; font-size:2.25rem; font-weight:800;
+      color:#00283c; background:rgba(10,50,70,.04); border:2px dashed #0a3246;
+      border-radius:12px; text-align:center; outline:none; padding:8px 12px; }
+    .ie-desc { display:block; width:100%; font-weight:300; color:#64748b;
+      background:rgba(0,0,0,.02); border:2px dashed #cbd5e1;
+      border-radius:10px; outline:none; padding:8px 12px; resize:vertical;
+      line-height:1.6; text-align:center; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+    .animate-fade-in { animation:fadeIn .35s cubic-bezier(.4,0,.2,1) forwards; }
   `]
 })
 export class ProyectosComponent implements OnInit {
   isLoading = true;
   proyectos: Proyecto[] = [];
   expandedProjectId: number | null = null;
+  info: InfoGrupo | null = null;
+  editMode = false;
+  draft: InfoGrupo = {};
 
-  constructor(private service: ProyectoService, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private service: ProyectoService,
+    private cdr: ChangeDetectorRef,
+    private infoSvc: InfoGrupoService
+  ) {}
 
   obtenerFotoUrl(url: string | null | undefined): string | null {
     if (!url) return null;
@@ -167,6 +239,38 @@ export class ProyectosComponent implements OnInit {
 
   ngOnInit() {
     this.fetchProyectos();
+    this.loadInfo();
+    this.infoSvc.contentUpdated$.subscribe(() => this.loadInfo());
+  }
+
+  loadInfo() {
+    this.infoSvc.getInfoGrupo().subscribe({ next: (d) => { this.info = d; this.cdr.detectChanges(); }, error: () => {} });
+  }
+
+  startEdit() {
+    this.draft = { ...this.info };
+    if (!this.draft.proyectos_badge)        this.draft.proyectos_badge        = 'Investigación Aplicada';
+    if (!this.draft.proyectos_titulo)       this.draft.proyectos_titulo       = 'Nuestros Proyectos de Investigación';
+    if (!this.draft.proyectos_descripcion)  this.draft.proyectos_descripcion  = 'Explore los proyectos científicos liderados por REASONS en distintas áreas del conocimiento.';
+    this.editMode = true;
+    this.cdr.detectChanges();
+  }
+
+  cancelEdit() { this.editMode = false; this.draft = {}; }
+
+  saveEdit() {
+    this.infoSvc.actualizarInfoGrupo({
+      proyectos_badge:        this.draft.proyectos_badge,
+      proyectos_titulo:       this.draft.proyectos_titulo,
+      proyectos_descripcion:  this.draft.proyectos_descripcion,
+    }).subscribe({
+      next: () => {
+        this.editMode = false;
+        this.infoSvc.notifyUpdate();
+        this.loadInfo();
+      },
+      error: () => {}
+    });
   }
 
   fetchProyectos() {
