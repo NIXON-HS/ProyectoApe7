@@ -1,0 +1,248 @@
+<div class="be-root">
+
+  <!-- ── Toolbar ──────────────────────────────────────────────────────── -->
+  <div class="be-toolbar">
+    <span class="be-toolbar-label">Añadir:</span>
+    <div class="be-toolbar-btns">
+      <button type="button" (click)="add('paragraph')"    class="be-tbtn be-tbtn-text" title="Párrafo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h16"/></svg>Párrafo
+      </button>
+      <button type="button" (click)="add('heading')"      class="be-tbtn be-tbtn-head" title="Título H2">
+        <b>H2</b>
+      </button>
+      <button type="button" (click)="add('subheading')"   class="be-tbtn be-tbtn-head" title="Subtítulo H3">
+        <span style="font-size:10px;font-weight:800">H3</span>
+      </button>
+      <button type="button" (click)="add('list-bullet')"  class="be-tbtn be-tbtn-list" title="Lista con viñetas">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Lista
+      </button>
+      <button type="button" (click)="add('list-number')"  class="be-tbtn be-tbtn-list" title="Lista numerada">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 6h11M10 12h11M10 18h11M4 6h1M4 12l2-2v4M4 18h2a1 1 0 01-1 1H4a1 1 0 010-2"/></svg>Nros.
+      </button>
+      <button type="button" (click)="add('quote')"        class="be-tbtn be-tbtn-quote" title="Cita / Blockquote">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1zm12 0c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>Cita
+      </button>
+      <button type="button" (click)="add('callout')"      class="be-tbtn be-tbtn-call" title="Recuadro destacado">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Aviso
+      </button>
+      <button type="button" (click)="add('code')"         class="be-tbtn be-tbtn-code" title="Bloque de código">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Código
+      </button>
+      <button type="button" (click)="add('image')"        class="be-tbtn be-tbtn-media" title="Imagen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Imagen
+      </button>
+      <button type="button" (click)="add('pdf')"          class="be-tbtn be-tbtn-media" title="PDF">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>PDF
+      </button>
+      <button type="button" (click)="add('separator')"    class="be-tbtn be-tbtn-sep" title="Separador">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>—
+      </button>
+    </div>
+    <span class="be-counter">{{ blocks.length }} bloque{{ blocks.length !== 1 ? 's' : '' }}</span>
+  </div>
+
+  <!-- ── Empty state ──────────────────────────────────────────────────── -->
+  <div *ngIf="blocks.length === 0" class="be-empty">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+    <p>Empieza añadiendo bloques con la barra de arriba</p>
+    <div class="be-empty-hints">
+      <span (click)="add('paragraph')">+ Párrafo</span>
+      <span (click)="add('heading')">+ Título</span>
+      <span (click)="add('list-bullet')">+ Lista</span>
+      <span (click)="add('image')">+ Imagen</span>
+      <span (click)="add('pdf')">+ PDF</span>
+    </div>
+  </div>
+
+  <!-- ── Block list ────────────────────────────────────────────────────── -->
+  <div class="be-list">
+    <div *ngFor="let block of blocks; let i = index; trackBy: trackById"
+         class="be-block"
+         [class.be-block-active]="activeId === block.id">
+
+      <!-- Block header -->
+      <div class="be-bhead">
+        <div class="be-btype" [class]="typeChip(block.type)">
+          <span [innerHTML]="typeIcon(block.type)"></span>
+          {{ typeLabel(block.type) }}
+        </div>
+
+        <!-- Callout variant selector -->
+        <div *ngIf="block.type === 'callout'" class="flex gap-1">
+          <button type="button" (click)="block.calloutVariant='info';    emit()" class="be-variant-btn" [class.active]="!block.calloutVariant || block.calloutVariant==='info'"    title="Info">ℹ</button>
+          <button type="button" (click)="block.calloutVariant='warning'; emit()" class="be-variant-btn" [class.active]="block.calloutVariant==='warning'" title="Aviso">⚠</button>
+          <button type="button" (click)="block.calloutVariant='success'; emit()" class="be-variant-btn" [class.active]="block.calloutVariant==='success'" title="Éxito">✓</button>
+        </div>
+
+        <div class="be-bactions">
+          <!-- Format buttons (text blocks) -->
+          <ng-container *ngIf="isText(block.type)">
+            <div class="be-fmts">
+              <button type="button" (click)="fmt('bold')"      title="Negrita (Ctrl+B)"  class="be-fmt-btn"><b>B</b></button>
+              <button type="button" (click)="fmt('italic')"    title="Cursiva (Ctrl+I)"  class="be-fmt-btn"><i>I</i></button>
+              <button type="button" (click)="fmt('underline')" title="Subrayado (Ctrl+U)" class="be-fmt-btn"><u>U</u></button>
+              <button type="button" (click)="fmtStrike()"      title="Tachado"            class="be-fmt-btn"><s>S</s></button>
+              <button type="button" (click)="fmtLink()"        title="Insertar enlace"    class="be-fmt-btn">🔗</button>
+              <button type="button" (click)="fmtClear()"       title="Limpiar formato"    class="be-fmt-btn text-rose-400">✕f</button>
+            </div>
+            <div class="be-divider"></div>
+          </ng-container>
+
+          <!-- Duplicate -->
+          <button type="button" (click)="duplicate(i)" title="Duplicar" class="be-ctrl-btn be-ctrl-dup">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+          <!-- Move up -->
+          <button type="button" (click)="moveUp(i)"   [disabled]="i===0"                    title="Subir"  class="be-ctrl-btn">↑</button>
+          <!-- Move down -->
+          <button type="button" (click)="moveDown(i)" [disabled]="i===blocks.length-1"       title="Bajar"  class="be-ctrl-btn">↓</button>
+          <!-- Delete -->
+          <button type="button" (click)="remove(i)"  title="Eliminar" class="be-ctrl-btn be-ctrl-del">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Block content area -->
+      <div class="be-bbody">
+
+        <!-- PARAGRAPH -->
+        <div *ngIf="block.type==='paragraph'"
+             contenteditable="true"
+             [blockEditable]="block.content||''"
+             (htmlChange)="onHtml($event,block)"
+             (focus)="activeId=block.id"
+             (blur)="activeId=null"
+             [attr.data-bt]="'paragraph'"
+             class="be-editable be-para"
+             data-ph="Escribe un párrafo..."></div>
+
+        <!-- HEADING H2 -->
+        <div *ngIf="block.type==='heading'"
+             contenteditable="true"
+             [blockEditable]="block.content||''"
+             (htmlChange)="onHtml($event,block)"
+             (focus)="activeId=block.id" (blur)="activeId=null"
+             [attr.data-bt]="'heading'"
+             class="be-editable be-h2"
+             data-ph="Título principal..."></div>
+
+        <!-- SUBHEADING H3 -->
+        <div *ngIf="block.type==='subheading'"
+             contenteditable="true"
+             [blockEditable]="block.content||''"
+             (htmlChange)="onHtml($event,block)"
+             (focus)="activeId=block.id" (blur)="activeId=null"
+             [attr.data-bt]="'subheading'"
+             class="be-editable be-h3"
+             data-ph="Subtítulo..."></div>
+
+        <!-- LIST BULLET -->
+        <ul *ngIf="block.type==='list-bullet'"
+            contenteditable="true"
+            [blockEditable]="block.content||'<li>Elemento</li>'"
+            (htmlChange)="onHtml($event,block)"
+            (focus)="activeId=block.id" (blur)="activeId=null"
+            class="be-editable be-list-ul"
+            data-ph="• Elemento (Enter para nuevo)..."></ul>
+
+        <!-- LIST NUMBER -->
+        <ol *ngIf="block.type==='list-number'"
+            contenteditable="true"
+            [blockEditable]="block.content||'<li>Elemento</li>'"
+            (htmlChange)="onHtml($event,block)"
+            (focus)="activeId=block.id" (blur)="activeId=null"
+            class="be-editable be-list-ol"
+            data-ph="1. Elemento (Enter para nuevo)..."></ol>
+
+        <!-- QUOTE -->
+        <blockquote *ngIf="block.type==='quote'"
+             contenteditable="true"
+             [blockEditable]="block.content||''"
+             (htmlChange)="onHtml($event,block)"
+             (focus)="activeId=block.id" (blur)="activeId=null"
+             class="be-editable be-quote"
+             data-ph="Escribe una cita o texto destacado..."></blockquote>
+
+        <!-- CALLOUT -->
+        <div *ngIf="block.type==='callout'"
+             [class]="calloutClass(block)"
+             class="be-callout">
+          <span class="be-callout-icon">{{ calloutIcon(block) }}</span>
+          <div contenteditable="true"
+               [blockEditable]="block.content||''"
+               (htmlChange)="onHtml($event,block)"
+               (focus)="activeId=block.id" (blur)="activeId=null"
+               class="be-editable flex-1"
+               data-ph="Escribe un aviso importante..."></div>
+        </div>
+
+        <!-- CODE -->
+        <pre *ngIf="block.type==='code'"
+             contenteditable="true"
+             [blockEditable]="block.content||''"
+             (htmlChange)="onHtml($event,block)"
+             (focus)="activeId=block.id" (blur)="activeId=null"
+             [attr.data-bt]="'code'"
+             class="be-editable be-code"
+             data-ph="// Escribe código aquí..."></pre>
+
+        <!-- SEPARATOR -->
+        <div *ngIf="block.type==='separator'" class="be-separator">
+          <hr />
+        </div>
+
+        <!-- IMAGE -->
+        <div *ngIf="block.type==='image'" class="be-media">
+          <div *ngIf="block.url" class="be-img-preview">
+            <img [src]="resolve(block.url)" alt="Imagen" />
+            <button type="button" (click)="clearMedia(block)" class="be-img-del" title="Quitar imagen">×</button>
+          </div>
+          <label *ngIf="!block.url" class="be-upload-zone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+            <strong>Haz clic para subir imagen</strong>
+            <span>JPG, PNG, GIF, WEBP · máx. 10 MB</span>
+            <input type="file" accept="image/*" class="sr-only" (change)="upload($event, block)" />
+          </label>
+          <div class="be-url-row">
+            <span>o pega URL:</span>
+            <input type="text" placeholder="https://..." [(ngModel)]="block.url" (change)="emit()"
+                   class="be-url-input" />
+          </div>
+          <div *ngIf="uploadingId===block.id" class="be-uploading">
+            <span class="be-spinner"></span> Subiendo imagen...
+          </div>
+        </div>
+
+        <!-- PDF -->
+        <div *ngIf="block.type==='pdf'" class="be-media">
+          <div *ngIf="block.url" class="be-pdf-preview">
+            <svg class="be-pdf-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8" fill="none" stroke="currentColor" stroke-width="2"/><line x1="9" y1="13" x2="15" y2="13" fill="none" stroke="currentColor" stroke-width="2"/><line x1="9" y1="17" x2="15" y2="17" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            <div class="be-pdf-info">
+              <p>{{ block.fileName || 'Documento PDF' }}</p>
+              <a [href]="resolve(block.url)" target="_blank">Abrir / Descargar ↗</a>
+            </div>
+            <button type="button" (click)="clearMedia(block)" class="be-pdf-del" title="Quitar PDF">×</button>
+          </div>
+          <label *ngIf="!block.url" class="be-upload-zone be-upload-pdf">
+            <svg class="be-pdf-icon-lg" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            <strong>Haz clic para subir PDF</strong>
+            <span>Archivo PDF · máx. 10 MB</span>
+            <input type="file" accept=".pdf" class="sr-only" (change)="upload($event, block)" />
+          </label>
+          <div *ngIf="uploadingId===block.id" class="be-uploading be-uploading-pdf">
+            <span class="be-spinner be-spinner-red"></span> Subiendo PDF...
+          </div>
+        </div>
+
+      </div><!-- /bbody -->
+    </div><!-- /be-block -->
+  </div><!-- /be-list -->
+
+  <!-- ── Undo bar ───────────────────────────────────────────────────────── -->
+  <div *ngIf="undoBlock" class="be-undo-bar">
+    <span>Bloque eliminado</span>
+    <button type="button" (click)="undo()">Deshacer</button>
+  </div>
+
+</div><!-- /be-root -->

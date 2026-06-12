@@ -1,0 +1,37 @@
+.input-field {
+  width: 100%;
+  padding: 0.8rem 1.1rem;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 1rem;
+  font-size: 0.8125rem;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(4px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.input-field:focus {
+  outline: none;
+  border-color: var(--color-reasons-blue);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(10, 50, 70, 0.06), 0 10px 15px -3px rgba(0, 0, 0, 0.03);
+  transform: translateY(-1px);
+}
+.validation-error {
+  font-size: 9px;
+  color: #ef4444;
+  font-weight: 500;
+  padding-left: 0.25rem;
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-down {
+  animation: slideDown 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fadeIn 0.35s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
