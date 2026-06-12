@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 import { ToastService } from '../../core/services/toast.service';
 import { LoginCardComponent } from './components/login-card/login-card';
-import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard';
+import { AdminDashboardComponent } from '../admin/admin-dashboard/admin-dashboard';
 
 @Component({
   selector: 'app-login',
