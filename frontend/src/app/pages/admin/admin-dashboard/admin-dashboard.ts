@@ -14,6 +14,7 @@ import { AdminInfoComponent } from '../admin-info/admin-info';
 import { AdminLineasComponent } from '../admin-lineas/admin-lineas';
 import { AdminNoticiasComponent } from '../admin-noticias/admin-noticias';
 import { AdminMensajesComponent } from '../admin-mensajes/admin-mensajes';
+import { AdminAnalyticsComponent } from '../admin-analytics/admin-analytics';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -30,7 +31,8 @@ import { AdminMensajesComponent } from '../admin-mensajes/admin-mensajes';
     AdminInfoComponent,
     AdminLineasComponent,
     AdminNoticiasComponent,
-    AdminMensajesComponent
+    AdminMensajesComponent,
+    AdminAnalyticsComponent
   ],
   templateUrl: './admin-dashboard.html',
   styleUrls: ['./admin-dashboard.css']
@@ -39,7 +41,7 @@ export class AdminDashboardComponent implements OnInit {
   @Input() usuario: any = null;
   @Output() logout = new EventEmitter<void>();
 
-  activeTab: 'resumen' | 'investigadores' | 'proyectos' | 'publicaciones' | 'mensajes' | 'perfil' | 'info' | 'lineas' | 'noticias' = 'resumen';
+  activeTab: 'resumen' | 'investigadores' | 'proyectos' | 'publicaciones' | 'mensajes' | 'perfil' | 'info' | 'lineas' | 'noticias' | 'analytics' = 'resumen';
   isMobileSidebarOpen = false;
   searchQuery = '';
   mensajesCount = 0;
@@ -68,7 +70,7 @@ export class AdminDashboardComponent implements OnInit {
     }
   }
 
-  switchTab(tab: 'resumen' | 'investigadores' | 'proyectos' | 'publicaciones' | 'mensajes' | 'perfil' | 'info' | 'lineas' | 'noticias') {
+  switchTab(tab: 'resumen' | 'investigadores' | 'proyectos' | 'publicaciones' | 'mensajes' | 'perfil' | 'info' | 'lineas' | 'noticias' | 'analytics') {
     this.activeTab = tab;
     this.searchQuery = '';
     this.isMobileSidebarOpen = false;
