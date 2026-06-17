@@ -84,28 +84,28 @@
             <form [formGroup]="contactoForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-5 mt-2">
               <!-- Nombre Completo -->
               <div class="flex flex-col gap-1.5">
-                <label class="text-[10px] font-bold text-slate-505 uppercase tracking-wider pl-1">Nombre Completo</label>
+                <label class="text-[10px] font-bold text-slate-505 uppercase tracking-wider pl-1">Nombre Completo <span class="text-red-500 font-bold">*</span></label>
                 <input type="text" formControlName="nombre_completo" class="input-field" placeholder="Su nombre y apellido..." />
                 <span *ngIf="isFieldInvalid('nombre_completo')" class="validation-error">El nombre completo es requerido (mínimo 3 caracteres).</span>
               </div>
 
               <!-- Correo -->
               <div class="flex flex-col gap-1.5">
-                <label class="text-[10px] font-bold text-slate-505 uppercase tracking-wider pl-1">Correo Electrónico</label>
+                <label class="text-[10px] font-bold text-slate-505 uppercase tracking-wider pl-1">Correo Electrónico <span class="text-red-500 font-bold">*</span></label>
                 <input type="email" formControlName="correo" class="input-field" placeholder="ejemplo@dominio.com" />
                 <span *ngIf="isFieldInvalid('correo')" class="validation-error">Se requiere un correo electrónico válido.</span>
               </div>
 
               <!-- Asunto -->
               <div class="flex flex-col gap-1.5">
-                <label class="text-[10px] font-bold text-slate-550 uppercase tracking-wider pl-1">Asunto</label>
+                <label class="text-[10px] font-bold text-slate-550 uppercase tracking-wider pl-1">Asunto <span class="text-red-500 font-bold">*</span></label>
                 <input type="text" formControlName="asunto" class="input-field" placeholder="Motivo de su mensaje..." />
                 <span *ngIf="isFieldInvalid('asunto')" class="validation-error">El asunto es requerido.</span>
               </div>
 
               <!-- Mensaje -->
               <div class="flex flex-col gap-1.5">
-                <label class="text-[10px] font-bold text-slate-550 uppercase tracking-wider pl-1">Mensaje</label>
+                <label class="text-[10px] font-bold text-slate-550 uppercase tracking-wider pl-1">Mensaje <span class="text-red-500 font-bold">*</span></label>
                 <textarea formControlName="mensaje" rows="4" class="input-field" placeholder="Redacte su mensaje aquí..."></textarea>
                 <span *ngIf="isFieldInvalid('mensaje')" class="validation-error">El mensaje debe tener al menos 10 caracteres.</span>
               </div>

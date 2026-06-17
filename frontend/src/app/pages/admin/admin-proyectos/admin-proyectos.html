@@ -150,13 +150,13 @@
     <form *ngIf="!proyVistaPrevia" [formGroup]="proyectoForm" (ngSubmit)="guardarProyecto()" class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
       <!-- Título (colspan 2) -->
       <div class="flex flex-col gap-1.5 md:col-span-2">
-        <label class="form-label">Título del Proyecto</label>
+        <label class="form-label">Título del Proyecto <span class="req">*</span></label>
         <input type="text" formControlName="titulo" class="form-input" placeholder="ej. Optimización de Operaciones..." />
       </div>
 
       <!-- Estado -->
       <div class="flex flex-col gap-1.5">
-        <label class="form-label">Estado Operativo</label>
+        <label class="form-label">Estado Operativo <span class="req">*</span></label>
         <select formControlName="estado" class="form-input">
           <option value="Activo">Activo</option>
           <option value="Finalizado">Finalizado</option>
@@ -166,7 +166,7 @@
 
       <!-- Línea de Investigación -->
       <div class="flex flex-col gap-1.5">
-        <label class="form-label">Línea de Investigación</label>
+        <label class="form-label">Línea de Investigación <span class="req">*</span></label>
         <select formControlName="linea_id" class="form-input">
           <option *ngFor="let l of lineasDeInvestigacion" [value]="l.id">
             {{ l.abreviatura }} - {{ l.nombre }}

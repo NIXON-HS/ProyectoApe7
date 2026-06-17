@@ -64,13 +64,13 @@
     <form [formGroup]="investigadorForm" (ngSubmit)="guardarInvestigador()" class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <!-- Nombres -->
       <div class="flex flex-col gap-1.5">
-        <label class="form-label">Nombres Completos</label>
+        <label class="form-label">Nombres Completos <span class="req">*</span></label>
         <input type="text" formControlName="nombres" class="form-input" placeholder="ej. John Reyes" />
       </div>
 
       <!-- Correo -->
       <div class="flex flex-col gap-1.5">
-        <label class="form-label">Correo Institucional</label>
+        <label class="form-label">Correo Institucional <span class="req">*</span></label>
         <input type="email" formControlName="correo_institucional" class="form-input" placeholder="ej. john.reyes@uta.edu.ec" />
       </div>
 
@@ -82,7 +82,7 @@
 
       <!-- Posición -->
       <div class="flex flex-col gap-1.5">
-        <label class="form-label">Cargo / Posición</label>
+        <label class="form-label">Cargo / Posición <span class="req">*</span></label>
         <select formControlName="posicion" class="form-input">
           <option value="Director">Director</option>
           <option value="Subdirector">Subdirector</option>
@@ -92,7 +92,7 @@
 
       <!-- Biografía (Textarea fullwidth) -->
       <div class="flex flex-col gap-1.5 md:col-span-2">
-        <label class="form-label">Trayectoria / Biografía Académica</label>
+        <label class="form-label">Trayectoria / Biografía Académica <span class="req">*</span></label>
         <textarea formControlName="biografia" rows="4" class="form-input" placeholder="Trayectoria, estudios y áreas de interés científico..."></textarea>
       </div>
 

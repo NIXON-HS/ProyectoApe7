@@ -105,14 +105,14 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
         <!-- Title -->
         <div class="flex flex-col gap-1.5 md:col-span-2">
-          <label class="form-label">Título de la Noticia</label>
+          <label class="form-label">Título de la Noticia <span class="req">*</span></label>
           <input type="text" formControlName="titulo" class="form-input"
             placeholder="ej. Nuevo laboratorio de investigación inaugurado..." />
         </div>
 
         <!-- Categoria -->
         <div class="flex flex-col gap-1.5">
-          <label class="form-label">Categoría</label>
+          <label class="form-label">Categoría <span class="req">*</span></label>
           <select formControlName="categoria" class="form-input">
             <option value="General">General</option>
             <option value="Evento">Evento</option>
@@ -130,7 +130,7 @@
 
         <!-- Resumen -->
         <div class="flex flex-col gap-1.5 md:col-span-2">
-          <label class="form-label">Resumen Breve (Aparece en la tarjeta del carrusel)</label>
+          <label class="form-label">Resumen Breve (Aparece en la tarjeta del carrusel) <span class="req">*</span></label>
           <textarea formControlName="resumen" rows="2" class="form-input"
             placeholder="Resumen corto para captar la atención del lector..."></textarea>
         </div>
