@@ -18,6 +18,7 @@ import { AdminLineasComponent } from '../admin-lineas/admin-lineas';
 import { AdminNoticiasComponent } from '../admin-noticias/admin-noticias';
 import { AdminMensajesComponent } from '../admin-mensajes/admin-mensajes';
 import { AdminAnalyticsComponent } from '../admin-analytics/admin-analytics';
+import { AdminCarouselComponent } from '../admin-carousel/admin-carousel';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -36,7 +37,8 @@ import { AdminAnalyticsComponent } from '../admin-analytics/admin-analytics';
     AdminLineasComponent,
     AdminNoticiasComponent,
     AdminMensajesComponent,
-    AdminAnalyticsComponent
+    AdminAnalyticsComponent,
+    AdminCarouselComponent
   ],
   templateUrl: './admin-dashboard.html',
   styleUrls: ['./admin-dashboard.css']
@@ -46,6 +48,9 @@ export class AdminDashboardComponent implements OnInit {
   @Output() logout = new EventEmitter<void>();
 
   activeTab: 'resumen' | 'investigadores' | 'proyectos' | 'publicaciones' | 'mensajes' | 'perfil' | 'info' | 'lineas' | 'noticias' | 'analytics' = 'resumen';
+  infoExpanded = false;
+  infoSubPage: 'inicio' | 'proyectos' | 'publicaciones' | 'contacto' = 'inicio';
+
   isMobileSidebarOpen = false;
   searchQuery = '';
   mensajesCount = 0;
@@ -86,6 +91,25 @@ export class AdminDashboardComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
+  toggleInfoSection() {
+    if (this.activeTab !== 'info') {
+      this.activeTab = 'info';
+      this.infoExpanded = true;
+    } else {
+      this.infoExpanded = !this.infoExpanded;
+    }
+    this.isMobileSidebarOpen = false;
+    this.cdr.detectChanges();
+  }
+
+  openInfoPage(sub: 'inicio' | 'proyectos' | 'publicaciones' | 'contacto') {
+    this.activeTab = 'info';
+    this.infoSubPage = sub;
+    this.infoExpanded = true;
+    this.isMobileSidebarOpen = false;
+    this.cdr.detectChanges();
+  }
+
   onTabChange(tab: string) {
     if (tab === 'publicaciones-nuevo') {
       this.activeTab = 'publicaciones';
@@ -111,8 +135,8 @@ export class AdminDashboardComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  onSplashComplete() {
-    this.showSplash = false;
+  onSplashWillExit() {
+    // Navigate while splash is still fading
     if (this.splashAction === 'logout') {
       this.authService.logout();
       this.toastService.show('Sesión cerrada correctamente.', 'info');
@@ -121,5 +145,10 @@ export class AdminDashboardComponent implements OnInit {
       this.router.navigate(['/home']);
     }
     this.splashAction = null;
+  }
+
+  onSplashComplete() {
+    // Splash fully invisible — remove from DOM
+    this.showSplash = false;
   }
 }

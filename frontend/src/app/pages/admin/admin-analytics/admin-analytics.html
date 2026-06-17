@@ -250,16 +250,16 @@
             <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold"
                  [class.bg-emerald-100]="v.page === '/'"
                  [class.bg-blue-100]="v.page === '/equipo'"
-                 [class.bg-amber-100]="v.page?.startsWith('/proyectos')"
-                 [class.bg-violet-100]="v.page?.startsWith('/publicaciones')"
+                 [class.bg-amber-100]="v.page.startsWith('/proyectos')"
+                 [class.bg-violet-100]="v.page.startsWith('/publicaciones')"
                  [class.bg-rose-100]="v.page === '/contacto'"
-                 [class.bg-slate-200]="v.page !== '/' && v.page !== '/equipo' && !v.page?.startsWith('/proyectos') && !v.page?.startsWith('/publicaciones') && v.page !== '/contacto'"
+                 [class.bg-slate-200]="v.page !== '/' && v.page !== '/equipo' && !v.page.startsWith('/proyectos') && !v.page.startsWith('/publicaciones') && v.page !== '/contacto'"
                  [class.text-emerald-600]="v.page === '/'"
                  [class.text-blue-600]="v.page === '/equipo'"
-                 [class.text-amber-600]="v.page?.startsWith('/proyectos')"
-                 [class.text-violet-600]="v.page?.startsWith('/publicaciones')"
+                 [class.text-amber-600]="v.page.startsWith('/proyectos')"
+                 [class.text-violet-600]="v.page.startsWith('/publicaciones')"
                  [class.text-rose-600]="v.page === '/contacto'"
-                 [class.text-slate-500]="v.page !== '/' && v.page !== '/equipo' && !v.page?.startsWith('/proyectos') && !v.page?.startsWith('/publicaciones') && v.page !== '/contacto'">
+                 [class.text-slate-500]="v.page !== '/' && v.page !== '/equipo' && !v.page.startsWith('/proyectos') && !v.page.startsWith('/publicaciones') && v.page !== '/contacto'">
               {{ v.page.charAt(1).toUpperCase() || '/' }}
             </div>
             <div class="flex-1 min-w-0">

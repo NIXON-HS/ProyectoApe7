@@ -8,6 +8,8 @@ import { BlockRendererComponent } from '../../shared/block-renderer/block-render
 import { AdminBarComponent } from '../../shared/admin-bar/admin-bar';
 import { NoticiaService } from '../../core/services/noticia.service';
 import { Noticia } from '../../core/models/noticia.model';
+import { CarouselService } from '../../core/services/carousel.service';
+import { CarouselSlide } from '../../core/models/carousel-slide.model';
 import { environment } from '../../../environments/environment';
 
 // Fallback constants (used while API loads or if no data saved yet)
@@ -30,6 +32,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   editMode = false;
   draft: InfoGrupo = {};
 
+  // Carousel state
+  slides: CarouselSlide[] = [];
+  currentSlideIndex = 0;
+  private slideIntervalId: any;
+
   // Noticias state
   noticias: Noticia[] = [];
   selectedNoticia: Noticia | null = null;
@@ -48,13 +55,15 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(
     private cdr: ChangeDetectorRef,
     private infoSvc: InfoGrupoService,
-    private noticiaSvc: NoticiaService
+    private noticiaSvc: NoticiaService,
+    private carouselSvc: CarouselService
   ) {}
 
   ngOnInit() {
     this.startRotation();
     this.cargarInfo();
     this.cargarNoticias();
+    this.cargarSlides();
     this.infoSvc.contentUpdated$.subscribe(() => {
       this.cargarInfo();
       this.cargarNoticias();
@@ -64,6 +73,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.stopRotation();
     this.stopNewsRotation();
+    this.stopSlideRotation();
   }
 
   cargarInfo() {
@@ -130,6 +140,49 @@ export class HomeComponent implements OnInit, OnDestroy {
       objetivos_especificos:   this.draft.objetivos_especificos,
       dominio:                 this.draft.dominio,
     }).subscribe({ next: () => { this.editMode = false; this.infoSvc.notifyUpdate(); this.cargarInfo(); } });
+  }
+
+  // ── Carousel ────────────────────────────────────────────────────────────────
+  cargarSlides() {
+    this.carouselSvc.getSlides().subscribe({
+      next: (data) => {
+        this.slides = data;
+        this.currentSlideIndex = 0;
+        this.cdr.detectChanges();
+        this.startSlideRotation();
+      },
+      error: () => {}
+    });
+  }
+
+  startSlideRotation() {
+    this.stopSlideRotation();
+    if (this.slides.length <= 1) return;
+    this.slideIntervalId = setInterval(() => { this.nextSlide(); }, 6000);
+  }
+
+  stopSlideRotation() {
+    if (this.slideIntervalId) clearInterval(this.slideIntervalId);
+  }
+
+  prevSlide() {
+    if (!this.slides.length) return;
+    this.currentSlideIndex = (this.currentSlideIndex - 1 + this.slides.length) % this.slides.length;
+    this.cdr.detectChanges();
+    this.startSlideRotation();
+  }
+
+  nextSlide() {
+    if (!this.slides.length) return;
+    this.currentSlideIndex = (this.currentSlideIndex + 1) % this.slides.length;
+    this.cdr.detectChanges();
+    this.startSlideRotation();
+  }
+
+  selectSlide(index: number) {
+    this.currentSlideIndex = index;
+    this.cdr.detectChanges();
+    this.startSlideRotation();
   }
 
   lineaIconBg(i: number): string {

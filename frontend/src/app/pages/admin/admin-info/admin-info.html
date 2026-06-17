@@ -9,7 +9,7 @@
   <ng-container *ngIf="infoLoaded">
 
     <!-- FORMULARIO 1: INFORMACIÓN GENERAL DEL GRUPO -->
-    <div class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-6 bg-white">
+    <div *ngIf="section === 'all' || section === 'inicio'" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-6 bg-white">
       <!-- Header -->
       <div class="flex items-center justify-between flex-wrap gap-3 pb-4 border-b border-slate-100">
         <h3 class="text-lg font-bold text-reasons-navy flex items-center gap-2 mb-0">
@@ -123,8 +123,64 @@
       </div>
     </div>
 
-    <!-- FORMULARIO 2: PÁGINA PROYECTOS -->
-    <div class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-4 bg-white">
+    <!-- FORMULARIO 2: PÁGINA INICIO — HERO -->
+    <div *ngIf="section === 'all' || section === 'inicio'" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-4 bg-white">
+      <div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-100">
+        <h3 class="text-lg font-bold text-reasons-navy flex items-center gap-2 mb-0">
+          <div class="w-7 h-7 rounded-lg bg-reasons-navy/10 text-reasons-navy flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          </div>
+          Página — Inicio (Hero)
+        </h3>
+        <button type="button" (click)="guardarInfoHero()" class="save-btn">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+          Guardar
+        </button>
+      </div>
+
+      <!-- Row 1: badge + card nombre + card grupo -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="flex flex-col gap-1.5">
+          <label class="form-label">Etiqueta superior (badge)</label>
+          <input type="text" [(ngModel)]="infoGrupo.hero_badge" class="form-input" placeholder="Universidad Técnica de Ambato" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="form-label">Nombre en la tarjeta (card)</label>
+          <input type="text" [(ngModel)]="infoGrupo.hero_card_nombre" class="form-input" placeholder="REASONS" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="form-label">Subtítulo de la tarjeta</label>
+          <input type="text" [(ngModel)]="infoGrupo.hero_card_grupo" class="form-input" placeholder="Grupo de Investigación UTA" />
+        </div>
+      </div>
+
+      <!-- Row 2: title line 1 + title line 2 (gold) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="flex flex-col gap-1.5">
+          <label class="form-label">Título principal (parte 1)</label>
+          <input type="text" [(ngModel)]="infoGrupo.hero_titulo" class="form-input" placeholder="Research in Engineering and Advanced..." />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="form-label">Título principal (parte dorada)</label>
+          <input type="text" [(ngModel)]="infoGrupo.hero_nombre" class="form-input" placeholder="Nature, and Society" />
+        </div>
+      </div>
+
+      <!-- Row 3: subtítulo + cita -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="flex flex-col gap-1.5">
+          <label class="form-label">Subtítulo / descripción breve</label>
+          <textarea [(ngModel)]="infoGrupo.hero_subtitulo" rows="3" class="form-input" placeholder="Investigación innovadora desde la Facultad..."></textarea>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="form-label">Cita en la tarjeta (sin comillas)</label>
+          <textarea [(ngModel)]="infoGrupo.hero_cita" rows="3" class="form-input" placeholder="Investigación innovadora desde la Facultad..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORMULARIO 4: PÁGINA PROYECTOS -->
+    <div *ngIf="section === 'all' || section === 'proyectos'" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-4 bg-white">
       <div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-100">
         <h3 class="text-lg font-bold text-reasons-navy flex items-center gap-2 mb-0">
           <div class="w-7 h-7 rounded-lg bg-reasons-green/10 text-reasons-green flex items-center justify-center">
@@ -153,8 +209,8 @@
       </div>
     </div>
 
-    <!-- FORMULARIO 3: PÁGINA PUBLICACIONES -->
-    <div class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-4 bg-white">
+    <!-- FORMULARIO 5: PÁGINA PUBLICACIONES -->
+    <div *ngIf="section === 'all' || section === 'publicaciones'" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-4 bg-white">
       <div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-100">
         <h3 class="text-lg font-bold text-reasons-navy flex items-center gap-2 mb-0">
           <div class="w-7 h-7 rounded-lg bg-reasons-blue/10 text-reasons-blue flex items-center justify-center">
@@ -183,8 +239,8 @@
       </div>
     </div>
 
-    <!-- FORMULARIO 4: PÁGINA CONTACTO -->
-    <div class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-4 bg-white">
+    <!-- FORMULARIO 6: PÁGINA CONTACTO -->
+    <div *ngIf="section === 'all' || section === 'contacto'" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-4 bg-white">
       <div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-100">
         <h3 class="text-lg font-bold text-reasons-navy flex items-center gap-2 mb-0">
           <div class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-650 flex items-center justify-center">

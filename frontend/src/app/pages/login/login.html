@@ -1,3 +1,6 @@
-<app-splash-screen *ngIf="showSplash" (splashComplete)="onSplashComplete()"></app-splash-screen>
+<app-splash-screen *ngIf="showSplash"
+  (splashWillExit)="onSplashWillExit()"
+  (splashComplete)="onSplashComplete()">
+</app-splash-screen>
 <app-login-card *ngIf="!isLoggedIn && !showSplash" (loginSuccess)="onLoginSuccess()"></app-login-card>
 <app-admin-dashboard *ngIf="showDashboard" [usuario]="usuario" (logout)="onLogout()"></app-admin-dashboard>

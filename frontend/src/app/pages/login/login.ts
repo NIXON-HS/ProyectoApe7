@@ -59,11 +59,17 @@ export class LoginComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  onSplashComplete() {
-    this.showSplash = false;
+  onSplashWillExit() {
+    // Show dashboard while splash is still fading — renders underneath
     this.showDashboard = true;
     this.isLoggedIn = true;
     this.usuario = this.authService.getUsuarioActual();
+    this.cdr.detectChanges();
+  }
+
+  onSplashComplete() {
+    // Splash fully invisible — remove from DOM
+    this.showSplash = false;
     this.cdr.detectChanges();
   }
 
