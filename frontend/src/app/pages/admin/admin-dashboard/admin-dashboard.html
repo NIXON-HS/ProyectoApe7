@@ -1,4 +1,6 @@
 <div class="min-h-screen bg-reasons-bg flex flex-col lg:flex-row relative w-full">
+  <!-- Splash Screen -->
+  <app-splash-screen *ngIf="showSplash" (splashComplete)="onSplashComplete()"></app-splash-screen>
   <!-- Mobile Header Bar for Admin Panel -->
   <header class="lg:hidden w-full bg-reasons-navy text-white px-5 py-4 flex items-center justify-between shadow-md sticky top-0 z-30">
     <a routerLink="/" class="flex items-center gap-2.5">
@@ -120,7 +122,7 @@
 
     <!-- Back to Public Site & Logout Buttons -->
     <div class="flex flex-col gap-2 mt-8 lg:mt-0">
-      <a routerLink="/" class="flex items-center gap-3 text-sm text-slate-350 hover:text-white transition-colors py-2 px-3 rounded-xl hover:bg-white/5">
+      <a (click)="goHome()" class="flex items-center gap-3 text-sm text-slate-350 hover:text-white transition-colors py-2 px-3 rounded-xl hover:bg-white/5 cursor-pointer">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
         <span>Volver a Sitio Público</span>
       </a>

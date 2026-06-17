@@ -1,8 +1,11 @@
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ContactoService } from '../../../core/services/contacto.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
+import { SplashScreenComponent } from '../../../shared/splash-screen/splash-screen';
 
 // Tabs Components
 import { AdminResumenComponent } from '../admin-resumen/admin-resumen';
@@ -23,6 +26,7 @@ import { AdminAnalyticsComponent } from '../admin-analytics/admin-analytics';
     CommonModule,
     RouterLink,
     FormsModule,
+    SplashScreenComponent,
     AdminResumenComponent,
     AdminInvestigadoresComponent,
     AdminProyectosComponent,
@@ -46,13 +50,18 @@ export class AdminDashboardComponent implements OnInit {
   searchQuery = '';
   mensajesCount = 0;
   isLoading = false;
+  showSplash = false;
+  splashAction: 'logout' | 'home' | null = null;
 
   proyectosAction = '';
   publicacionesAction = '';
 
   constructor(
     private contactoService: ContactoService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router,
+    private authService: AuthService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit() {
@@ -91,6 +100,26 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   onLogout() {
-    this.logout.emit();
+    this.splashAction = 'logout';
+    this.showSplash = true;
+    this.cdr.detectChanges();
+  }
+
+  goHome() {
+    this.splashAction = 'home';
+    this.showSplash = true;
+    this.cdr.detectChanges();
+  }
+
+  onSplashComplete() {
+    this.showSplash = false;
+    if (this.splashAction === 'logout') {
+      this.authService.logout();
+      this.toastService.show('Sesión cerrada correctamente.', 'info');
+      this.router.navigate(['/home']);
+    } else if (this.splashAction === 'home') {
+      this.router.navigate(['/home']);
+    }
+    this.splashAction = null;
   }
 }
