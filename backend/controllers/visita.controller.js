@@ -8,6 +8,22 @@ exports.registrarVisita = async (req, res, next) => {
     const sessionId = req.body.session_id || null;
     const page = req.body.page || '/';
 
+    if (sessionId) {
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+      const existente = await Visita.findOne({
+        where: {
+          session_id: sessionId,
+          created_at: { [Op.gte]: hoy },
+        },
+        order: [['created_at', 'DESC']],
+      });
+      if (existente) {
+        const total = await Visita.count();
+        return res.status(200).json({ success: true, data: { contador: total } });
+      }
+    }
+
     const registro = await Visita.create({
       session_id: sessionId,
       ip_address: ip ? ip.substring(0, 45) : null,
@@ -81,9 +97,9 @@ exports.obtenerAnalytics = async (req, res, next) => {
     const visitasPorDia = await Visita.findAll({
       attributes: [
         [fn('DATE', col('created_at')), 'fecha'],
-        [fn('COUNT', col('id')), 'total'],
+        [fn('COUNT', fn('DISTINCT', col('session_id'))), 'total'],
       ],
-      where: { created_at: { [Op.gte]: inicioMes } },
+      where: { created_at: { [Op.gte]: inicioMes }, session_id: { [Op.ne]: null } },
       group: [fn('DATE', col('created_at'))],
       order: [[fn('DATE', col('created_at')), 'ASC']],
       raw: true,
