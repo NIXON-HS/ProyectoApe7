@@ -9,12 +9,10 @@ exports.registrarVisita = async (req, res, next) => {
     const page = req.body.page || '/';
 
     if (sessionId) {
-      const hoy = new Date();
-      hoy.setHours(0, 0, 0, 0);
       const existente = await Visita.findOne({
         where: {
           session_id: sessionId,
-          created_at: { [Op.gte]: hoy },
+          created_at: { [Op.gte]: literal("CURRENT_DATE") },
         },
         order: [['created_at', 'DESC']],
       });
@@ -51,31 +49,33 @@ exports.obtenerAnalytics = async (req, res, next) => {
   try {
     const totalVisitas = await Visita.count();
 
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
-    const ayer = new Date(hoy);
-    ayer.setDate(ayer.getDate() - 1);
-
-    const inicioSemana = new Date(hoy);
-    inicioSemana.setDate(inicioSemana.getDate() - 7);
-
-    const inicioMes = new Date(hoy);
-    inicioMes.setDate(inicioMes.getDate() - 30);
-
-    const visitasHoy = await Visita.count({ where: { created_at: { [Op.gte]: hoy } } });
-    const visitasAyer = await Visita.count({ where: { [Op.and]: [{ created_at: { [Op.gte]: ayer } }, { created_at: { [Op.lt]: hoy } }] } });
-    const visitasSemana = await Visita.count({ where: { created_at: { [Op.gte]: inicioSemana } } });
-    const visitasMes = await Visita.count({ where: { created_at: { [Op.gte]: inicioMes } } });
+    const visitasHoy = await Visita.count({
+      where: { created_at: { [Op.gte]: literal("CURRENT_DATE") } }
+    });
+    const visitasAyer = await Visita.count({
+      where: {
+        [Op.and]: [
+          { created_at: { [Op.gte]: literal("CURRENT_DATE - INTERVAL '1 day'") } },
+          { created_at: { [Op.lt]: literal("CURRENT_DATE") } }
+        ]
+      }
+    });
+    const visitasSemana = await Visita.count({
+      where: { created_at: { [Op.gte]: literal("CURRENT_DATE - INTERVAL '7 days'") } }
+    });
+    const visitasMes = await Visita.count({
+      where: { created_at: { [Op.gte]: literal("CURRENT_DATE - INTERVAL '30 days'") } }
+    });
 
     const sesionesUnicas = await Visita.count({
       col: 'session_id',
       distinct: true,
-      where: { created_at: { [Op.gte]: inicioMes } },
+      where: { created_at: { [Op.gte]: literal("CURRENT_DATE - INTERVAL '30 days'") } },
     });
 
     const paginasRows = await Visita.findAll({
       attributes: ['page', [fn('COUNT', col('id')), 'count']],
-      where: { created_at: { [Op.gte]: inicioMes } },
+      where: { created_at: { [Op.gte]: literal("CURRENT_DATE - INTERVAL '30 days'") } },
       group: ['page'],
       order: [[literal('count'), 'DESC']],
       limit: 10,
@@ -85,13 +85,13 @@ exports.obtenerAnalytics = async (req, res, next) => {
     const usuariosUnicos = await Visita.count({
       col: 'ip_address',
       distinct: true,
-      where: { created_at: { [Op.gte]: inicioMes } },
+      where: { created_at: { [Op.gte]: literal("CURRENT_DATE - INTERVAL '30 days'") } },
     });
 
     const usuariosUnicosHoy = await Visita.count({
       col: 'ip_address',
       distinct: true,
-      where: { created_at: { [Op.gte]: hoy } },
+      where: { created_at: { [Op.gte]: literal("CURRENT_DATE") } },
     });
 
     const visitasPorDia = await Visita.findAll({
@@ -99,7 +99,7 @@ exports.obtenerAnalytics = async (req, res, next) => {
         [fn('DATE', col('created_at')), 'fecha'],
         [fn('COUNT', fn('DISTINCT', col('session_id'))), 'total'],
       ],
-      where: { created_at: { [Op.gte]: inicioMes }, session_id: { [Op.ne]: null } },
+      where: { created_at: { [Op.gte]: literal("CURRENT_DATE - INTERVAL '30 days'") }, session_id: { [Op.ne]: null } },
       group: [fn('DATE', col('created_at'))],
       order: [[fn('DATE', col('created_at')), 'ASC']],
       raw: true,
@@ -122,8 +122,8 @@ exports.obtenerAnalytics = async (req, res, next) => {
         INNER JOIN visitas v2 ON v1.session_id = v2.session_id AND v2.created_at = (
           SELECT MIN(v3.created_at) FROM visitas v3 WHERE v3.session_id = v1.session_id AND v3.created_at > v1.created_at
         )
-        WHERE v1.created_at >= :inicioSemana AND v1.session_id IS NOT NULL
-      `, { replacements: { inicioSemana }, type: sequelize.QueryTypes.SELECT });
+        WHERE v1.created_at >= CURRENT_DATE - INTERVAL '7 days' AND v1.session_id IS NOT NULL
+      `, { type: sequelize.QueryTypes.SELECT });
       avgDuration = parseFloat(duracionResult[0]?.segundos) || 0;
     } catch (e) {
       avgDuration = 0;
@@ -143,10 +143,10 @@ exports.obtenerAnalytics = async (req, res, next) => {
           END as browser,
           COUNT(id) as count
         FROM visitas
-        WHERE created_at >= :inicioMes
+        WHERE created_at >= CURRENT_DATE - INTERVAL '30 days'
         GROUP BY browser
         ORDER BY count DESC
-      `, { replacements: { inicioMes }, type: sequelize.QueryTypes.SELECT });
+      `, { type: sequelize.QueryTypes.SELECT });
     } catch (e) {
       browserRows = [];
     }
@@ -161,10 +161,10 @@ exports.obtenerAnalytics = async (req, res, next) => {
           END as tipo,
           COUNT(id) as count
         FROM visitas
-        WHERE created_at >= :inicioMes
+        WHERE created_at >= CURRENT_DATE - INTERVAL '30 days'
         GROUP BY tipo
         ORDER BY count DESC
-      `, { replacements: { inicioMes }, type: sequelize.QueryTypes.SELECT });
+      `, { type: sequelize.QueryTypes.SELECT });
     } catch (e) {
       mobileRows = [];
     }
