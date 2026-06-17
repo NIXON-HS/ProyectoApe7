@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: reasons_postgres
+    environment:
+      POSTGRES_DB: reasons_db
+      POSTGRES_USER: reasons_user
+      POSTGRES_PASSWORD: reasons_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
