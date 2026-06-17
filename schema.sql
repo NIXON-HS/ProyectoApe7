@@ -14,6 +14,7 @@ DROP TABLE IF EXISTS lineas_investigacion CASCADE;
 DROP TABLE IF EXISTS investigadores CASCADE;
 DROP TABLE IF EXISTS usuarios CASCADE;
 DROP TABLE IF EXISTS noticias CASCADE;
+DROP TABLE IF EXISTS visitas CASCADE;
 
 -- Eliminación de tipos ENUM previos si existen
 DROP TYPE IF EXISTS posicion_enum CASCADE;
@@ -99,6 +100,12 @@ CREATE TABLE usuarios (
     correo VARCHAR(150) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     rol VARCHAR(50) DEFAULT 'admin' NOT NULL
+);
+
+-- Tabla: visitas (Contador de visitas a la página)
+CREATE TABLE visitas (
+    id SERIAL PRIMARY KEY,
+    contador INTEGER NOT NULL DEFAULT 0
 );
 
 -- Tabla: noticias (Noticias y Eventos del Grupo)
