@@ -95,7 +95,7 @@
 
         <button *ngIf="usuario?.rol === 'admin'" (click)="switchTab('analytics')" class="sidebar-item" [class.active-sidebar-item]="activeTab === 'analytics'">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-          <span>Analytics</span>
+          <span>Analíticas</span>
         </button>
 
         <button *ngIf="usuario?.rol === 'admin'" (click)="switchTab('info')" class="sidebar-item" [class.active-sidebar-item]="activeTab === 'info'">
@@ -138,7 +138,7 @@
       <div class="flex flex-col text-left">
         <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Panel Administrativo</span>
         <h2 class="text-3xl font-extrabold text-reasons-navy capitalize mb-0">
-          {{ activeTab === 'mensajes' ? 'Mensajes de Contacto' : (activeTab === 'perfil' ? 'Mi Perfil Público' : (activeTab === 'info' ? 'Contenido del Sitio' : (activeTab === 'lineas' ? 'Líneas de Investigación' : (activeTab === 'noticias' ? 'Noticias y Eventos' : (activeTab === 'analytics' ? 'Analytics del Sitio' : activeTab))))) }}
+          {{ activeTab === 'mensajes' ? 'Mensajes de Contacto' : (activeTab === 'perfil' ? 'Mi Perfil Público' : (activeTab === 'info' ? 'Contenido del Sitio' : (activeTab === 'lineas' ? 'Líneas de Investigación' : (activeTab === 'noticias' ? 'Noticias y Eventos' : (activeTab === 'analytics' ? 'Analíticas del Sitio' : activeTab))))) }}
         </h2>
       </div>
 
