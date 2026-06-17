@@ -1,1 +1,156 @@
-/* Estilos para el componente de Analytics */
+/* ===== Analytics Animations ===== */
+
+/* KPI Cards stagger fade-in */
+.analytics-card {
+  opacity: 0;
+  transform: translateY(24px);
+  animation: cardSlideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.analytics-card:nth-child(1) { animation-delay: 0.05s; }
+.analytics-card:nth-child(2) { animation-delay: 0.12s; }
+.analytics-card:nth-child(3) { animation-delay: 0.19s; }
+.analytics-card:nth-child(4) { animation-delay: 0.26s; }
+
+@keyframes cardSlideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Chart bars grow animation */
+.chart-bar {
+  transform-origin: bottom;
+  transform: scaleY(0);
+  animation: barGrow 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes barGrow {
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* Chart bar stagger by index (set via [style.animation-delay]) */
+.chart-bar-wrapper {
+  opacity: 0;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+/* Progress bar fill animation */
+.progress-fill {
+  width: 0 !important;
+  transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.progress-fill.animate {
+  /* width is set inline via style binding */
+}
+
+/* Section panels slide-in */
+.panel-section {
+  opacity: 0;
+  transform: translateY(18px);
+  animation: panelSlide 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.panel-section:nth-child(1) { animation-delay: 0.3s; }
+.panel-section:nth-child(2) { animation-delay: 0.4s; }
+.panel-section:nth-child(3) { animation-delay: 0.5s; }
+
+@keyframes panelSlide {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Bottom row stagger */
+.bottom-section {
+  opacity: 0;
+  transform: translateY(18px);
+  animation: panelSlide 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.bottom-section:nth-child(1) { animation-delay: 0.55s; }
+.bottom-section:nth-child(2) { animation-delay: 0.65s; }
+.bottom-section:nth-child(3) { animation-delay: 0.75s; }
+
+/* Recent visits cards */
+.visit-item {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: visitCard 0.4s ease forwards;
+}
+
+@keyframes visitCard {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* KPI card hover glow */
+.kpi-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.kpi-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px -8px rgba(16, 185, 129, 0.2);
+}
+
+/* Chart bar hover pulse */
+.chart-bar:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.35);
+}
+
+/* Badge pulse for live indicator */
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  animation: livePulse 2s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.4); }
+}
+
+/* Shimmer loading skeleton */
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Number counter pop */
+.counter-pop {
+  animation: counterPop 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes counterPop {
+  0% { transform: scale(0.8); opacity: 0; }
+  60% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Page item hover */
+.page-item {
+  transition: background-color 0.2s ease, transform 0.15s ease;
+  border-radius: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  margin: 0 -0.75rem;
+}
+.page-item:hover {
+  background-color: rgba(241, 245, 249, 0.8);
+  transform: translateX(3px);
+}
