@@ -8,6 +8,7 @@ const Usuario = require('./usuario');
 const Noticia = require('./noticia');
 const ProyectoInvestigador = require('./proyecto_investigador');
 const PublicacionInvestigador = require('./publicacion_investigador');
+const Visita = require('./visita');
 
 // ==========================================
 // CONFIGURACIÓN DE RELACIONES (ASOCIACIONES)
@@ -75,5 +76,6 @@ module.exports = {
   Usuario,
   Noticia,
   ProyectoInvestigador,
-  PublicacionInvestigador
+  PublicacionInvestigador,
+  Visita
 };

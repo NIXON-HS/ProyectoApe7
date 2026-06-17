@@ -1,2 +1,3 @@
-<app-login-card *ngIf="!isLoggedIn" (loginSuccess)="onLoginSuccess()"></app-login-card>
-<app-admin-dashboard *ngIf="isLoggedIn" [usuario]="usuario" (logout)="onLogout()"></app-admin-dashboard>
+<app-splash-screen *ngIf="showSplash" (splashComplete)="onSplashComplete()"></app-splash-screen>
+<app-login-card *ngIf="!isLoggedIn && !showSplash" (loginSuccess)="onLoginSuccess()"></app-login-card>
+<app-admin-dashboard *ngIf="showDashboard" [usuario]="usuario" (logout)="onLogout()"></app-admin-dashboard>

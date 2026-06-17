@@ -1,0 +1,134 @@
+.splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  animation: splashFadeOut 0.3s ease forwards;
+  animation-delay: 1.7s;
+}
+
+.splash-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  transform: translateY(-8px);
+}
+
+.word-wrap {
+  position: relative;
+  display: inline-block;
+  line-height: 1;
+  padding-top: 28px;
+}
+
+.word {
+  margin: 0;
+  font-size: clamp(2.3rem, 6vw, 5.2rem);
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: #1b1c1f;
+  white-space: nowrap;
+  display: flex;
+  gap: 0.02em;
+  line-height: 1;
+  position: relative;
+  z-index: 2;
+}
+
+.char {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(12px);
+  filter: blur(1.5px);
+  animation: charRise 0.2s cubic-bezier(0.2, 1, 0.25, 1) forwards;
+}
+
+.char:nth-child(1) { animation-delay: 0.02s; }
+.char:nth-child(2) { animation-delay: 0.05s; }
+.char:nth-child(3) { animation-delay: 0.08s; }
+.char:nth-child(4) { animation-delay: 0.11s; }
+.char:nth-child(5) { animation-delay: 0.14s; }
+.char:nth-child(6) { animation-delay: 0.17s; }
+.char:nth-child(7) { animation-delay: 0.20s; }
+
+.arc {
+  width: 84px;
+  height: 84px;
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  display: grid;
+  place-items: center;
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.arc::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 8px solid rgba(22, 58, 83, 0.12);
+  border-right-color: #163a53;
+  border-top-color: #43a93a;
+  animation: arcSpin 0.4s linear 1;
+}
+
+.subtitle {
+  margin: 0.25rem 0 0;
+  font-size: clamp(0.78rem, 1.6vw, 1rem);
+  line-height: 1.25;
+  color: #6f7782;
+  max-width: 34ch;
+  opacity: 0;
+  animation: subtitleFadeUp 0.2s ease forwards;
+  animation-delay: 0.25s;
+  text-align: center;
+}
+
+@keyframes charRise {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes arcSpin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes subtitleFadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes splashFadeOut {
+  to {
+    opacity: 0;
+    transform: scale(1.02);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .char,
+  .subtitle,
+  .arc {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+  .splash-screen {
+    animation: none !important;
+  }
+}

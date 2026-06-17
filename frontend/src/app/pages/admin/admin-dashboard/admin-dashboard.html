@@ -1,4 +1,6 @@
 <div class="min-h-screen bg-reasons-bg flex flex-col lg:flex-row relative w-full">
+  <!-- Splash Screen -->
+  <app-splash-screen *ngIf="showSplash" (splashComplete)="onSplashComplete()"></app-splash-screen>
   <!-- Mobile Header Bar for Admin Panel -->
   <header class="lg:hidden w-full bg-reasons-navy text-white px-5 py-4 flex items-center justify-between shadow-md sticky top-0 z-30">
     <a routerLink="/" class="flex items-center gap-2.5">
@@ -93,6 +95,11 @@
           <span>Noticias y Eventos</span>
         </button>
 
+        <button *ngIf="usuario?.rol === 'admin'" (click)="switchTab('analytics')" class="sidebar-item" [class.active-sidebar-item]="activeTab === 'analytics'">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          <span>Analíticas</span>
+        </button>
+
         <button *ngIf="usuario?.rol === 'admin'" (click)="switchTab('info')" class="sidebar-item" [class.active-sidebar-item]="activeTab === 'info'">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
           <span>Contenido del Sitio</span>
@@ -115,7 +122,7 @@
 
     <!-- Back to Public Site & Logout Buttons -->
     <div class="flex flex-col gap-2 mt-8 lg:mt-0">
-      <a routerLink="/" class="flex items-center gap-3 text-sm text-slate-350 hover:text-white transition-colors py-2 px-3 rounded-xl hover:bg-white/5">
+      <a (click)="goHome()" class="flex items-center gap-3 text-sm text-slate-350 hover:text-white transition-colors py-2 px-3 rounded-xl hover:bg-white/5 cursor-pointer">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
         <span>Volver a Sitio Público</span>
       </a>
@@ -133,12 +140,12 @@
       <div class="flex flex-col text-left">
         <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Panel Administrativo</span>
         <h2 class="text-3xl font-extrabold text-reasons-navy capitalize mb-0">
-          {{ activeTab === 'mensajes' ? 'Mensajes de Contacto' : (activeTab === 'perfil' ? 'Mi Perfil Público' : (activeTab === 'info' ? 'Contenido del Sitio' : (activeTab === 'lineas' ? 'Líneas de Investigación' : (activeTab === 'noticias' ? 'Noticias y Eventos' : activeTab)))) }}
+          {{ activeTab === 'mensajes' ? 'Mensajes de Contacto' : (activeTab === 'perfil' ? 'Mi Perfil Público' : (activeTab === 'info' ? 'Contenido del Sitio' : (activeTab === 'lineas' ? 'Líneas de Investigación' : (activeTab === 'noticias' ? 'Noticias y Eventos' : (activeTab === 'analytics' ? 'Analíticas del Sitio' : activeTab))))) }}
         </h2>
       </div>
 
       <!-- Search bar when listing items -->
-      <div *ngIf="activeTab !== 'resumen' && activeTab !== 'perfil' && activeTab !== 'info' && activeTab !== 'lineas'" class="relative w-full md:w-80">
+      <div *ngIf="activeTab !== 'resumen' && activeTab !== 'perfil' && activeTab !== 'info' && activeTab !== 'lineas' && activeTab !== 'analytics'" class="relative w-full md:w-80">
         <input type="text" [(ngModel)]="searchQuery" class="search-input" placeholder="Buscar..." />
         <svg class="absolute right-3.5 top-3.5 text-slate-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
       </div>
@@ -172,6 +179,7 @@
       <app-admin-lineas *ngIf="activeTab === 'lineas'"></app-admin-lineas>
       <app-admin-noticias *ngIf="activeTab === 'noticias'" [searchQuery]="searchQuery"></app-admin-noticias>
       <app-admin-mensajes *ngIf="activeTab === 'mensajes'" [searchQuery]="searchQuery"></app-admin-mensajes>
+      <app-admin-analytics *ngIf="activeTab === 'analytics'"></app-admin-analytics>
     </div>
   </main>
 </div>
