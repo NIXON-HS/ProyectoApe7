@@ -5,8 +5,8 @@ async function createDatabase() {
     user: 'postgres',
     host: 'localhost',
     database: 'postgres', // Connect to default database
-    password: '12345',
-    port: 5432,
+    password: '123456',
+    port: 5433,
   });
 
   try {
