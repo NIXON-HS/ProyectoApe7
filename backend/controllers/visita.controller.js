@@ -1,6 +1,9 @@
 const { Visita, sequelize } = require('../models/index');
 const { Op, fn, col, literal } = require('sequelize');
 
+const EC = "created_at AT TIME ZONE 'America/Guayaquil'";
+const EC_DATE = `(${EC})::date`;
+
 exports.registrarVisita = async (req, res, next) => {
   try {
     const ip = req.headers['x-forwarded-for'] || req.connection?.remoteAddress || null;
@@ -8,7 +11,25 @@ exports.registrarVisita = async (req, res, next) => {
     const sessionId = req.body.session_id || null;
     const page = req.body.page || '/';
 
-    const registro = await Visita.create({
+    if (sessionId) {
+      const existente = await Visita.findOne({
+        where: { session_id: sessionId },
+        attributes: ['id', 'created_at'],
+        order: [['created_at', 'DESC']],
+      });
+      if (existente) {
+        const [{ es_hoy }] = await sequelize.query(
+          `SELECT ${EC_DATE} = CURRENT_DATE as es_hoy FROM visitas WHERE id = :id`,
+          { replacements: { id: existente.id }, type: sequelize.QueryTypes.SELECT }
+        );
+        if (es_hoy) {
+          const total = await Visita.count();
+          return res.status(200).json({ success: true, data: { contador: total } });
+        }
+      }
+    }
+
+    await Visita.create({
       session_id: sessionId,
       ip_address: ip ? ip.substring(0, 45) : null,
       user_agent: ua ? ua.substring(0, 512) : null,
@@ -35,59 +56,38 @@ exports.obtenerAnalytics = async (req, res, next) => {
   try {
     const totalVisitas = await Visita.count();
 
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
-    const ayer = new Date(hoy);
-    ayer.setDate(ayer.getDate() - 1);
+    const [vh] = await sequelize.query(`SELECT COUNT(*) as c FROM visitas WHERE ${EC_DATE} = CURRENT_DATE`);
+    const [va] = await sequelize.query(`SELECT COUNT(*) as c FROM visitas WHERE ${EC_DATE} = CURRENT_DATE - 1`);
+    const [vs] = await sequelize.query(`SELECT COUNT(*) as c FROM visitas WHERE ${EC_DATE} >= CURRENT_DATE - 7`);
+    const [vm] = await sequelize.query(`SELECT COUNT(*) as c FROM visitas WHERE ${EC_DATE} >= CURRENT_DATE - 30`);
 
-    const inicioSemana = new Date(hoy);
-    inicioSemana.setDate(inicioSemana.getDate() - 7);
+    const visitasHoyCount = parseInt(vh[0].c);
+    const visitasAyerCount = parseInt(va[0].c);
+    const visitasSemanaCount = parseInt(vs[0].c);
+    const visitasMesCount = parseInt(vm[0].c);
 
-    const inicioMes = new Date(hoy);
-    inicioMes.setDate(inicioMes.getDate() - 30);
+    const [su] = await sequelize.query(`SELECT COUNT(DISTINCT session_id) as c FROM visitas WHERE ${EC_DATE} >= CURRENT_DATE - 30`);
+    const sesionesUnicas = parseInt(su[0].c);
 
-    const visitasHoy = await Visita.count({ where: { created_at: { [Op.gte]: hoy } } });
-    const visitasAyer = await Visita.count({ where: { [Op.and]: [{ created_at: { [Op.gte]: ayer } }, { created_at: { [Op.lt]: hoy } }] } });
-    const visitasSemana = await Visita.count({ where: { created_at: { [Op.gte]: inicioSemana } } });
-    const visitasMes = await Visita.count({ where: { created_at: { [Op.gte]: inicioMes } } });
+    const paginasRows = await sequelize.query(`
+      SELECT page, COUNT(id) as count FROM visitas
+      WHERE ${EC_DATE} >= CURRENT_DATE - 30
+      GROUP BY page ORDER BY count DESC LIMIT 10
+    `, { type: sequelize.QueryTypes.SELECT });
 
-    const sesionesUnicas = await Visita.count({
-      col: 'session_id',
-      distinct: true,
-      where: { created_at: { [Op.gte]: inicioMes } },
-    });
+    const [uu] = await sequelize.query(`SELECT COUNT(DISTINCT ip_address) as c FROM visitas WHERE ${EC_DATE} >= CURRENT_DATE - 30`);
+    const usuariosUnicos = parseInt(uu[0].c);
 
-    const paginasRows = await Visita.findAll({
-      attributes: ['page', [fn('COUNT', col('id')), 'count']],
-      where: { created_at: { [Op.gte]: inicioMes } },
-      group: ['page'],
-      order: [[literal('count'), 'DESC']],
-      limit: 10,
-      raw: true,
-    });
+    const [uuh] = await sequelize.query(`SELECT COUNT(DISTINCT ip_address) as c FROM visitas WHERE ${EC_DATE} = CURRENT_DATE`);
+    const usuariosUnicosHoy = parseInt(uuh[0].c);
 
-    const usuariosUnicos = await Visita.count({
-      col: 'ip_address',
-      distinct: true,
-      where: { created_at: { [Op.gte]: inicioMes } },
-    });
-
-    const usuariosUnicosHoy = await Visita.count({
-      col: 'ip_address',
-      distinct: true,
-      where: { created_at: { [Op.gte]: hoy } },
-    });
-
-    const visitasPorDia = await Visita.findAll({
-      attributes: [
-        [fn('DATE', col('created_at')), 'fecha'],
-        [fn('COUNT', col('id')), 'total'],
-      ],
-      where: { created_at: { [Op.gte]: inicioMes } },
-      group: [fn('DATE', col('created_at'))],
-      order: [[fn('DATE', col('created_at')), 'ASC']],
-      raw: true,
-    });
+    const visitasPorDia = await sequelize.query(`
+      SELECT ${EC_DATE} as fecha, COUNT(DISTINCT session_id) as total
+      FROM visitas
+      WHERE ${EC_DATE} >= CURRENT_DATE - 30 AND session_id IS NOT NULL
+      GROUP BY ${EC_DATE}
+      ORDER BY ${EC_DATE} ASC
+    `, { type: sequelize.QueryTypes.SELECT });
 
     const ultimasVisitas = await Visita.findAll({
       attributes: ['id', 'session_id', 'ip_address', 'page', 'created_at'],
@@ -96,7 +96,7 @@ exports.obtenerAnalytics = async (req, res, next) => {
       raw: true,
     });
 
-    const promedioDiario = visitasMes / 30;
+    const promedioDiario = Math.round(visitasMesCount / 30);
 
     let avgDuration = 0;
     try {
@@ -106,8 +106,9 @@ exports.obtenerAnalytics = async (req, res, next) => {
         INNER JOIN visitas v2 ON v1.session_id = v2.session_id AND v2.created_at = (
           SELECT MIN(v3.created_at) FROM visitas v3 WHERE v3.session_id = v1.session_id AND v3.created_at > v1.created_at
         )
-        WHERE v1.created_at >= :inicioSemana AND v1.session_id IS NOT NULL
-      `, { replacements: { inicioSemana }, type: sequelize.QueryTypes.SELECT });
+        WHERE (v1.created_at AT TIME ZONE 'America/Guayaquil')::date >= CURRENT_DATE - 7
+          AND v1.session_id IS NOT NULL
+      `, { type: sequelize.QueryTypes.SELECT });
       avgDuration = parseFloat(duracionResult[0]?.segundos) || 0;
     } catch (e) {
       avgDuration = 0;
@@ -127,10 +128,10 @@ exports.obtenerAnalytics = async (req, res, next) => {
           END as browser,
           COUNT(id) as count
         FROM visitas
-        WHERE created_at >= :inicioMes
+        WHERE ${EC_DATE} >= CURRENT_DATE - 30
         GROUP BY browser
         ORDER BY count DESC
-      `, { replacements: { inicioMes }, type: sequelize.QueryTypes.SELECT });
+      `, { type: sequelize.QueryTypes.SELECT });
     } catch (e) {
       browserRows = [];
     }
@@ -145,10 +146,10 @@ exports.obtenerAnalytics = async (req, res, next) => {
           END as tipo,
           COUNT(id) as count
         FROM visitas
-        WHERE created_at >= :inicioMes
+        WHERE ${EC_DATE} >= CURRENT_DATE - 30
         GROUP BY tipo
         ORDER BY count DESC
-      `, { replacements: { inicioMes }, type: sequelize.QueryTypes.SELECT });
+      `, { type: sequelize.QueryTypes.SELECT });
     } catch (e) {
       mobileRows = [];
     }
@@ -157,14 +158,14 @@ exports.obtenerAnalytics = async (req, res, next) => {
       success: true,
       data: {
         totalVisitas,
-        visitasHoy,
-        visitasAyer,
-        visitasSemana,
-        visitasMes,
+        visitasHoy: visitasHoyCount,
+        visitasAyer: visitasAyerCount,
+        visitasSemana: visitasSemanaCount,
+        visitasMes: visitasMesCount,
         sesionesUnicas,
         usuariosUnicos,
         usuariosUnicosHoy,
-        promedioDiario: Math.round(promedioDiario),
+        promedioDiario,
         avgDuration: Math.round(avgDuration),
         bounceRate,
         paginasMasVistas: paginasRows,
