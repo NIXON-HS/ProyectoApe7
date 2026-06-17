@@ -1,0 +1,199 @@
+::ng-deep .accessibility-fab {
+	position: fixed;
+	right: 1.5rem;
+	bottom: 1.5rem;
+	z-index: 60;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0;
+	border: 1px solid rgba(255, 255, 255, 0.35);
+	border-radius: 9999px;
+	padding: 0.85rem 1rem;
+	background: linear-gradient(135deg, var(--color-reasons-navy), var(--color-reasons-blue));
+	color: #fff;
+	box-shadow: 0 18px 40px rgba(0, 40, 60, 0.28);
+	font-size: 0.85rem;
+	font-weight: 700;
+	cursor: pointer;
+	transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+::ng-deep .accessibility-fab-text {
+	display: inline-block;
+	max-width: 0;
+	opacity: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	transform: translateX(-0.35rem);
+	transition:
+		max-width 0.28s ease,
+		opacity 0.28s ease,
+		transform 0.28s ease,
+		margin-left 0.28s ease;
+}
+
+::ng-deep .accessibility-fab:hover .accessibility-fab-text {
+	max-width: 10rem;
+	opacity: 1;
+	transform: translateX(0);
+	margin-left: 0.1rem;
+}
+
+::ng-deep .accessibility-fab:focus-visible .accessibility-fab-text {
+	max-width: 10rem;
+	opacity: 1;
+	transform: translateX(0);
+	margin-left: 0.1rem;
+}
+
+::ng-deep .accessibility-fab:hover,
+::ng-deep .accessibility-fab:focus-visible {
+	gap: 0.55rem;
+}
+
+::ng-deep .accessibility-fab:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 22px 48px rgba(0, 40, 60, 0.34);
+}
+
+::ng-deep .accessibility-fab:focus-visible,
+::ng-deep .accessibility-icon-button:focus-visible,
+::ng-deep .accessibility-option:focus-visible,
+::ng-deep .accessibility-mini-button:focus-visible {
+	outline: 3px solid #ffd24a;
+	outline-offset: 2px;
+}
+
+::ng-deep .accessibility-backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: 50;
+	background: rgba(15, 23, 42, 0.18);
+	backdrop-filter: blur(2px);
+}
+
+::ng-deep .accessibility-panel {
+	position: fixed;
+	right: 1.5rem;
+	bottom: 5.5rem;
+	z-index: 60;
+	width: min(22rem, calc(100vw - 1.5rem * 2));
+	border: 1px solid rgba(148, 163, 184, 0.24);
+	border-radius: 1.35rem;
+	background: rgba(255, 255, 255, 0.96);
+	color: var(--color-reasons-slate);
+	box-shadow: 0 28px 70px rgba(15, 23, 42, 0.18);
+	padding: 1.1rem;
+	backdrop-filter: blur(18px);
+}
+
+::ng-deep .accessibility-icon-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.25rem;
+	height: 2.25rem;
+	border: 1px solid rgba(148, 163, 184, 0.22);
+	border-radius: 9999px;
+	background: #fff;
+	color: #475569;
+	cursor: pointer;
+}
+
+::ng-deep .accessibility-option {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 0.9rem 1rem;
+	border: 1px solid rgba(148, 163, 184, 0.18);
+	border-radius: 1rem;
+	background: #f8fafc;
+	color: inherit;
+	cursor: pointer;
+	text-align: left;
+}
+
+::ng-deep .accessibility-option--stacked {
+	display: block;
+}
+
+::ng-deep .accessibility-option strong {
+	display: block;
+	font-size: 0.95rem;
+	color: #0f172a;
+}
+
+::ng-deep .accessibility-option small {
+	display: block;
+	margin-top: 0.15rem;
+	color: #64748b;
+	font-size: 0.78rem;
+}
+
+::ng-deep .accessibility-pill {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 3rem;
+	padding: 0.35rem 0.6rem;
+	border-radius: 9999px;
+	background: #dbeafe;
+	color: #0f172a;
+	font-size: 0.72rem;
+	font-weight: 800;
+	letter-spacing: 0.08em;
+}
+
+::ng-deep .accessibility-pill.is-active {
+	background: #0a3246;
+	color: #fff;
+}
+
+::ng-deep .accessibility-font-actions {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 0.55rem;
+	margin-top: 0.85rem;
+}
+
+::ng-deep .accessibility-mini-button {
+	border: 1px solid rgba(148, 163, 184, 0.2);
+	border-radius: 0.85rem;
+	background: #fff;
+	color: #0f172a;
+	padding: 0.7rem 0.5rem;
+	font-size: 0.82rem;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+::ng-deep .accessibility-mini-button:hover:not(:disabled) {
+	background: #e2e8f0;
+}
+
+::ng-deep .accessibility-mini-button:disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+	::ng-deep .accessibility-fab {
+		right: 1rem;
+		bottom: 1rem;
+		padding: 0.8rem 0.9rem;
+	}
+
+	::ng-deep .accessibility-fab span {
+		display: none;
+	}
+
+	::ng-deep .accessibility-panel {
+		right: 1rem;
+		left: 1rem;
+		bottom: 4.8rem;
+		width: auto;
+	}
+}

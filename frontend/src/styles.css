@@ -23,9 +23,18 @@
   --color-reasons-slate: #1e293b;       /* Texto gris oscuro principal slate-800 */
 }
 
+:root {
+  --reasons-font-scale: 1;
+}
+
 /* ==========================================
    CONFIGURACIONES BASE Y RESETS NATIVOS
    ========================================== */
+html {
+  font-size: calc(16px * var(--reasons-font-scale));
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
 body {
   font-family: var(--font-sans);
   background-color: var(--color-reasons-bg);
@@ -38,6 +47,76 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
   font-weight: 700;
   letter-spacing: -0.025em;
+}
+
+html.a11y-high-contrast {
+  --color-reasons-bg: #000000;
+  --color-reasons-slate: #ffffff;
+}
+
+html.a11y-high-contrast body {
+  background: #000;
+  color: #fff;
+}
+
+html.a11y-high-contrast a {
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+}
+
+html.a11y-high-contrast :is(button, a, input, select, textarea):focus-visible {
+  outline: 3px solid #ffd400;
+  outline-offset: 3px;
+}
+
+/* DEFAULT: White text for dark backgrounds */
+html.a11y-high-contrast * {
+  color: #ffffff !important;
+  background-color: transparent !important;
+}
+
+/* Override body and html specifically */
+html.a11y-high-contrast,
+html.a11y-high-contrast body {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* Completely remove glass effects and apply dark background */
+html.a11y-high-contrast .glass-card,
+html.a11y-high-contrast .glass-dark-card {
+  background-color: #1a1f3a !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Hover states highlight in yellow */
+html.a11y-high-contrast .hover\:text-reasons-navy:hover,
+html.a11y-high-contrast .hover\:text-reasons-blue:hover,
+html.a11y-high-contrast .hover\:text-reasons-green:hover {
+  color: #ffd400 !important;
+}
+
+/* Make borders visible */
+html.a11y-high-contrast .border-slate-100,
+html.a11y-high-contrast .border-slate-150,
+html.a11y-high-contrast .border-slate-200,
+html.a11y-high-contrast .border-slate-300,
+html.a11y-high-contrast .border-white {
+  border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+html.a11y-high-contrast .shadow-sm,
+html.a11y-high-contrast .shadow-md,
+html.a11y-high-contrast .shadow-lg,
+html.a11y-high-contrast .shadow-xl,
+html.a11y-high-contrast .shadow-2xl {
+  box-shadow: none !important;
+}
+
+html.a11y-high-contrast img {
+  filter: brightness(1.1) contrast(1.2);
 }
 
 /* ==========================================
@@ -73,6 +152,14 @@ h1, h2, h3, h4, h5, h6 {
   background: linear-gradient(135deg, #ffffff 0%, #7dd87a 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+html.a11y-high-contrast .text-gradient-brand,
+html.a11y-high-contrast .text-gradient-gold {
+  background: none;
+  -webkit-background-clip: border-box;
+  -webkit-text-fill-color: #fff;
+  color: #fff;
 }
 
 /* Micro-animación Hover Premium */
