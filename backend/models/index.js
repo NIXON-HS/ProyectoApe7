@@ -9,6 +9,7 @@ const Noticia = require('./noticia');
 const ProyectoInvestigador = require('./proyecto_investigador');
 const PublicacionInvestigador = require('./publicacion_investigador');
 const Visita = require('./visita');
+const CarouselSlide = require('./carousel_slide');
 
 // ==========================================
 // CONFIGURACIÓN DE RELACIONES (ASOCIACIONES)
@@ -77,5 +78,6 @@ module.exports = {
   Noticia,
   ProyectoInvestigador,
   PublicacionInvestigador,
-  Visita
+  Visita,
+  CarouselSlide
 };

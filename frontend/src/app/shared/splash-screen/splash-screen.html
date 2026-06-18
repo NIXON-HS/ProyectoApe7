@@ -1,17 +1,70 @@
-<main class="splash-screen" aria-label="Pantalla de carga de REASONS">
-  <div class="splash-content">
-    <div class="word-wrap">
-      <div class="arc" aria-hidden="true"></div>
-      <h1 class="word" aria-label="REASONS">
-        <span class="char">R</span>
-        <span class="char">E</span>
-        <span class="char">A</span>
-        <span class="char">S</span>
-        <span class="char">O</span>
-        <span class="char">N</span>
-        <span class="char">S</span>
-      </h1>
+<div class="splash-root" [class.splash-exiting]="isExiting" aria-label="Cargando REASONS">
+
+  <!-- Decorative background blobs -->
+  <div class="splash-blob splash-blob-1"></div>
+  <div class="splash-blob splash-blob-2"></div>
+  <div class="splash-blob splash-blob-3"></div>
+
+  <!-- ── LOADING / RETRYING state ─────────────────────────────────────── -->
+  <div class="splash-body" [class.splash-body-faded]="state === 'error'">
+
+    <!-- Logo + ring -->
+    <div class="splash-logo-wrap">
+      <div class="splash-ring"></div>
+      <div class="splash-logo-circle">
+        <img src="/logo.svg" alt="REASONS" class="splash-logo-img" />
+      </div>
     </div>
-    <p class="subtitle">Research in Engineering and Advanced Sustainable Operations, Nature and Society</p>
+
+    <!-- REASONS lettering -->
+    <div class="splash-wordmark" aria-label="REASONS">
+      <span class="schar s1">R</span>
+      <span class="schar s2">E</span>
+      <span class="schar s3">A</span>
+      <span class="schar s4">S</span>
+      <span class="schar s5">O</span>
+      <span class="schar s6">N</span>
+      <span class="schar s7">S</span>
+    </div>
+
+    <!-- Meta line -->
+    <div class="splash-meta">
+      <span class="splash-meta-uta">Universidad Técnica de Ambato</span>
+      <span class="splash-meta-sep">·</span>
+      <span class="splash-meta-fac">Facultad de Ingeniería</span>
+    </div>
+
+    <!-- Subtitle -->
+    <p class="splash-subtitle">
+      Research in Engineering and Advanced<br />
+      Sustainable Operations, Nature and Society
+    </p>
+
   </div>
-</main>
+
+  <!-- ── ERROR state ───────────────────────────────────────────────────── -->
+  <div class="splash-error" [class.splash-error-visible]="state === 'error'">
+
+    <h2 class="splash-error-title">Sin conexión</h2>
+    <p class="splash-error-msg">
+      No se puede conectar al servidor.<br />
+      Verifica tu conexión a internet e inténtalo de nuevo.
+    </p>
+
+    <button class="splash-retry-btn" (click)="retry()" [class.retrying]="state === 'retrying'" [disabled]="state === 'retrying'">
+      <span class="retry-spinner" *ngIf="state === 'retrying'"></span>
+      <svg *ngIf="state !== 'retrying'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+        <path d="M3 3v5h5"/>
+      </svg>
+      {{ state === 'retrying' ? 'Verificando…' : 'Reintentar' }}
+    </button>
+
+  </div>
+
+  <!-- Progress bar (only during loading/retrying) -->
+  <div class="splash-progress-track" [class.progress-hidden]="state === 'error'">
+    <div class="splash-progress-bar" [class.progress-retry]="state === 'retrying'"></div>
+  </div>
+
+</div>

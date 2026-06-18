@@ -10,6 +10,7 @@ const infoGrupoRoutes = require('./info_grupo.routes');
 const lineaRoutes = require('./linea.routes');
 const noticiaRoutes = require('./noticia.routes');
 const visitaRoutes = require('./visita.routes');
+const carouselRoutes = require('./carousel.routes');
 
 const router = express.Router();
 
@@ -23,6 +24,7 @@ router.use('/info-grupo', infoGrupoRoutes);
 router.use('/lineas', lineaRoutes);
 router.use('/noticias', noticiaRoutes);
 router.use('/visitas', visitaRoutes);
+router.use('/carousel', carouselRoutes);
 
 // Endpoint liviano para subida de fotos de investigadores en Base64
 router.post('/upload', (req, res) => {

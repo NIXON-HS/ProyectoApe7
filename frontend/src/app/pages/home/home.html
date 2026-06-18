@@ -4,6 +4,76 @@
   (editSave)="saveEdit()"
   (editCancel)="cancelEdit()">
 </app-admin-bar>
+<!-- ══════════════════════════════════════
+     CARRUSEL DE PORTADA
+     ══════════════════════════════════════ -->
+<section *ngIf="slides.length > 0"
+         class="carousel-section relative w-full overflow-hidden"
+         (mouseenter)="stopSlideRotation()"
+         (mouseleave)="startSlideRotation()">
+
+  <!-- Slides (crossfade) -->
+  <div *ngFor="let slide of slides; let i = index"
+       class="carousel-slide absolute inset-0"
+       [class.slide-active]="i === currentSlideIndex"
+       [class.slide-inactive]="i !== currentSlideIndex">
+
+    <!-- Background image -->
+    <img *ngIf="slide.imagen_url"
+         [src]="resolveUrl(slide.imagen_url)"
+         [alt]="slide.titulo || ''"
+         class="w-full h-full object-cover" />
+    <div *ngIf="!slide.imagen_url" class="w-full h-full bg-gradient-to-br from-reasons-navy to-reasons-blue"></div>
+
+    <!-- Gradient overlays -->
+    <div class="carousel-overlay-left"></div>
+    <div class="carousel-overlay-bottom"></div>
+
+    <!-- Content -->
+    <div class="carousel-content">
+      <div class="max-w-7xl mx-auto px-8 lg:px-16">
+        <div class="carousel-text" [class.content-active]="i === currentSlideIndex">
+          <div *ngIf="slide.titulo" class="carousel-titulo">{{ slide.titulo }}</div>
+          <p *ngIf="slide.subtitulo" class="carousel-subtitulo">{{ slide.subtitulo }}</p>
+          <a *ngIf="slide.enlace" [href]="slide.enlace"
+             class="mt-2 inline-flex w-fit px-8 py-3 bg-reasons-green hover:bg-[#327e2a] text-white font-semibold rounded-full shadow-lg transition-all">
+            Ver más
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Prev / Next arrows -->
+  <button *ngIf="slides.length > 1" (click)="prevSlide()"
+          class="carousel-arrow left-4 md:left-8" aria-label="Anterior">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+    </svg>
+  </button>
+  <button *ngIf="slides.length > 1" (click)="nextSlide()"
+          class="carousel-arrow right-4 md:right-8" aria-label="Siguiente">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+    </svg>
+  </button>
+
+  <!-- Dots -->
+  <div *ngIf="slides.length > 1" class="carousel-dots">
+    <button *ngFor="let slide of slides; let i = index"
+            (click)="selectSlide(i)"
+            class="carousel-dot"
+            [class.dot-active]="i === currentSlideIndex"
+            [attr.aria-label]="'Slide ' + (i + 1)">
+    </button>
+  </div>
+
+  <!-- Counter -->
+  <div *ngIf="slides.length > 1" class="carousel-counter">
+    {{ currentSlideIndex + 1 }}&thinsp;/&thinsp;{{ slides.length }}
+  </div>
+</section>
+
 <!-- Hero Section -->
 <section class="relative min-h-[90vh] flex items-center justify-center pt-24 pb-16 bg-gradient-to-br from-reasons-navy via-[#0a3246] to-reasons-green overflow-hidden">
   <div class="absolute inset-0 opacity-15">

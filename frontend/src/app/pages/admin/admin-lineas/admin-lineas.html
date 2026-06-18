@@ -62,11 +62,11 @@
       <form [formGroup]="lineaForm" class="flex flex-col gap-4">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div class="flex flex-col gap-1.5">
-            <label class="form-label">Nombre completo</label>
+            <label class="form-label">Nombre completo <span class="req">*</span></label>
             <input type="text" formControlName="nombre" class="form-input" placeholder="Diseño, Materiales y Producción..."/>
           </div>
           <div class="flex flex-col gap-1.5">
-            <label class="form-label">Abreviatura</label>
+            <label class="form-label">Abreviatura <span class="req">*</span></label>
             <input type="text" formControlName="abreviatura" class="form-input" placeholder="DMP-IST"/>
           </div>
         </div>

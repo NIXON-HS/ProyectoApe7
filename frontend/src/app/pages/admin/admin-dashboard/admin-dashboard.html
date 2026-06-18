@@ -1,6 +1,9 @@
 <div class="min-h-screen bg-reasons-bg flex flex-col lg:flex-row relative w-full">
   <!-- Splash Screen -->
-  <app-splash-screen *ngIf="showSplash" (splashComplete)="onSplashComplete()"></app-splash-screen>
+  <app-splash-screen *ngIf="showSplash"
+    (splashWillExit)="onSplashWillExit()"
+    (splashComplete)="onSplashComplete()">
+  </app-splash-screen>
   <!-- Mobile Header Bar for Admin Panel -->
   <header class="lg:hidden w-full bg-reasons-navy text-white px-5 py-4 flex items-center justify-between shadow-md sticky top-0 z-30">
     <a routerLink="/" class="flex items-center gap-2.5">
@@ -100,10 +103,53 @@
           <span>Analíticas</span>
         </button>
 
-        <button *ngIf="usuario?.rol === 'admin'" (click)="switchTab('info')" class="sidebar-item" [class.active-sidebar-item]="activeTab === 'info'">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-          <span>Contenido del Sitio</span>
-        </button>
+        <!-- Contenido del Sitio — acordeón expandible -->
+        <div *ngIf="usuario?.rol === 'admin'">
+          <button (click)="toggleInfoSection()" class="sidebar-item" [class.active-sidebar-item]="activeTab === 'info'">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+            <span>Contenido del Sitio</span>
+            <svg class="w-4 h-4 ml-auto flex-shrink-0 transition-transform duration-200"
+                 [style.transform]="infoExpanded ? 'rotate(90deg)' : 'rotate(0deg)'"
+                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </button>
+
+          <div *ngIf="infoExpanded" class="sidebar-sub-group">
+            <button (click)="openInfoPage('inicio')" class="sidebar-sub-item"
+                    [class.active-sidebar-sub-item]="activeTab === 'info' && infoSubPage === 'inicio'">
+              <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+              </svg>
+              <span>Inicio</span>
+            </button>
+
+            <button (click)="openInfoPage('proyectos')" class="sidebar-sub-item"
+                    [class.active-sidebar-sub-item]="activeTab === 'info' && infoSubPage === 'proyectos'">
+              <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+              </svg>
+              <span>Proyectos</span>
+            </button>
+
+            <button (click)="openInfoPage('publicaciones')" class="sidebar-sub-item"
+                    [class.active-sidebar-sub-item]="activeTab === 'info' && infoSubPage === 'publicaciones'">
+              <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+              </svg>
+              <span>Publicaciones</span>
+            </button>
+
+            <button (click)="openInfoPage('contacto')" class="sidebar-sub-item"
+                    [class.active-sidebar-sub-item]="activeTab === 'info' && infoSubPage === 'contacto'">
+              <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+              <span>Contacto</span>
+            </button>
+
+          </div>
+        </div>
 
         <button *ngIf="usuario?.rol === 'admin'" (click)="switchTab('mensajes')" class="sidebar-item" [class.active-sidebar-item]="activeTab === 'mensajes'">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
@@ -140,7 +186,17 @@
       <div class="flex flex-col text-left">
         <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Panel Administrativo</span>
         <h2 class="text-3xl font-extrabold text-reasons-navy capitalize mb-0">
-          {{ activeTab === 'mensajes' ? 'Mensajes de Contacto' : (activeTab === 'perfil' ? 'Mi Perfil Público' : (activeTab === 'info' ? 'Contenido del Sitio' : (activeTab === 'lineas' ? 'Líneas de Investigación' : (activeTab === 'noticias' ? 'Noticias y Eventos' : (activeTab === 'analytics' ? 'Analíticas del Sitio' : activeTab))))) }}
+          <ng-container [ngSwitch]="activeTab">
+            <ng-container *ngSwitchCase="'mensajes'">Mensajes de Contacto</ng-container>
+            <ng-container *ngSwitchCase="'perfil'">Mi Perfil Público</ng-container>
+            <ng-container *ngSwitchCase="'lineas'">Líneas de Investigación</ng-container>
+            <ng-container *ngSwitchCase="'noticias'">Noticias y Eventos</ng-container>
+            <ng-container *ngSwitchCase="'analytics'">Analíticas del Sitio</ng-container>
+            <ng-container *ngSwitchCase="'info'">
+              Página — {{ infoSubPage === 'inicio' ? 'Inicio' : infoSubPage === 'proyectos' ? 'Proyectos' : infoSubPage === 'publicaciones' ? 'Publicaciones' : 'Contacto' }}
+            </ng-container>
+            <ng-container *ngSwitchDefault>{{ activeTab }}</ng-container>
+          </ng-container>
         </h2>
       </div>
 
@@ -175,7 +231,23 @@
       <app-admin-proyectos *ngIf="activeTab === 'proyectos'" [searchQuery]="searchQuery" [action]="proyectosAction" (actionReset)="proyectosAction = ''"></app-admin-proyectos>
       <app-admin-publicaciones *ngIf="activeTab === 'publicaciones'" [searchQuery]="searchQuery" [action]="publicacionesAction" (actionReset)="publicacionesAction = ''"></app-admin-publicaciones>
       <app-admin-perfil *ngIf="activeTab === 'perfil'"></app-admin-perfil>
-      <app-admin-info *ngIf="activeTab === 'info'"></app-admin-info>
+      <ng-container *ngIf="activeTab === 'info'">
+        <app-admin-info [section]="$any(infoSubPage)"></app-admin-info>
+        <ng-container *ngIf="infoSubPage === 'inicio'">
+          <div class="mt-8 pt-8 border-t border-slate-200">
+            <div class="mb-6 flex items-center gap-2">
+              <div class="w-7 h-7 rounded-lg bg-reasons-green/10 text-reasons-green flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <rect x="2" y="6" width="20" height="12" rx="2" stroke-width="1.8" stroke="currentColor" fill="none"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 6v12M17 6v12"/>
+                </svg>
+              </div>
+              <h3 class="text-lg font-bold text-reasons-navy mb-0">Carrusel de Portada</h3>
+            </div>
+            <app-admin-carousel></app-admin-carousel>
+          </div>
+        </ng-container>
+      </ng-container>
       <app-admin-lineas *ngIf="activeTab === 'lineas'"></app-admin-lineas>
       <app-admin-noticias *ngIf="activeTab === 'noticias'" [searchQuery]="searchQuery"></app-admin-noticias>
       <app-admin-mensajes *ngIf="activeTab === 'mensajes'" [searchQuery]="searchQuery"></app-admin-mensajes>

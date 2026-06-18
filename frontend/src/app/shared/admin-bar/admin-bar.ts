@@ -40,8 +40,13 @@ export class AdminBarComponent {
     this.cdr.detectChanges();
   }
 
-  onSplashComplete() {
-    this.showSplash = false;
+  onSplashWillExit() {
+    // Navigate while the splash is still fading — new page renders underneath
     this.router.navigate(['/login'], { queryParams: { dashboard: true } });
+  }
+
+  onSplashComplete() {
+    // Splash is fully invisible now — safe to remove from DOM
+    this.showSplash = false;
   }
 }
