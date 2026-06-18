@@ -6,12 +6,13 @@ import { InvestigadorService } from '../../../core/services/investigador.service
 import { ToastService } from '../../../core/services/toast.service';
 import { ConfirmService } from '../../../core/services/confirm.service';
 import { BlockEditorComponent, Block } from '../../../shared/block-editor/block-editor';
+import { PaginationComponent } from '../../../shared/pagination/pagination';
 import { Noticia } from '../../../core/models/noticia.model';
 
 @Component({
   selector: 'app-admin-noticias',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, BlockEditorComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, BlockEditorComponent, PaginationComponent],
   templateUrl: './admin-noticias.html',
   styleUrls: ['./admin-noticias.css']
 })
@@ -19,6 +20,12 @@ export class AdminNoticiasComponent implements OnInit {
   @Input() searchQuery = '';
 
   noticias: Noticia[] = [];
+
+  filterCategoria = '';
+  filterActivo = '';
+  currentPage = 1;
+  readonly pageSize = 10;
+
   showForm = false;
   editMode = false;
   activeRecordId: number | null = null;
@@ -241,14 +248,27 @@ export class AdminNoticiasComponent implements OnInit {
     return url;
   }
 
+  onFilterChange() { this.currentPage = 1; }
+  onPageChange(page: number) { this.currentPage = page; }
+
   filtrarLista(items: any[]): any[] {
-    if (!this.searchQuery) return items;
-    const q = this.searchQuery.toLowerCase();
-    
-    return items.filter(item => {
-      return item.titulo.toLowerCase().includes(q) || 
-             (item.resumen && item.resumen.toLowerCase().includes(q)) || 
-             (item.categoria && item.categoria.toLowerCase().includes(q));
-    });
+    let result = items;
+    if (this.filterCategoria) result = result.filter(i => i.categoria === this.filterCategoria);
+    if (this.filterActivo !== '') result = result.filter(i => String(i.activo) === this.filterActivo);
+    if (this.searchQuery) {
+      const q = this.searchQuery.toLowerCase();
+      result = result.filter(i =>
+        i.titulo.toLowerCase().includes(q) ||
+        (i.resumen && i.resumen.toLowerCase().includes(q)) ||
+        (i.categoria && i.categoria.toLowerCase().includes(q))
+      );
+    }
+    return result;
+  }
+
+  pagedList(items: any[]): any[] {
+    const filtered = this.filtrarLista(items);
+    const start = (this.currentPage - 1) * this.pageSize;
+    return filtered.slice(start, start + this.pageSize);
   }
 }

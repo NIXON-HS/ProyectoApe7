@@ -46,9 +46,39 @@
       <span class="text-sm font-semibold text-reasons-blue">Cargando proyectos...</span>
     </div>
 
+    <!-- Filtros y buscador -->
+    <div *ngIf="!isLoading" class="max-w-4xl mx-auto flex flex-wrap gap-3 mb-8 animate-fade-in">
+      <!-- Buscador -->
+      <div class="relative glass-card flex items-center gap-2 px-4 py-2.5 rounded-full border border-white/50 shadow-sm flex-1 min-w-[180px] hover-premium focus-within:ring-4 focus-within:ring-reasons-blue/5 transition-all">
+        <svg class="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input type="text" [(ngModel)]="searchQuery" (input)="onFilterChange()"
+               class="bg-transparent border-0 outline-none text-sm text-slate-700 placeholder-slate-400 w-full"
+               placeholder="Buscar proyectos..." />
+        <button *ngIf="searchQuery" (click)="searchQuery=''; onFilterChange()" class="text-slate-400 hover:text-slate-600">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <!-- Estado -->
+      <select [(ngModel)]="filterEstado" (change)="onFilterChange()"
+              class="glass-card border border-white/50 shadow-sm rounded-full px-4 py-2.5 text-sm text-slate-700 bg-transparent outline-none cursor-pointer">
+        <option value="">Todos los estados</option>
+        <option value="Activo">Activo</option>
+        <option value="Finalizado">Finalizado</option>
+        <option value="En Pausa">En Pausa</option>
+      </select>
+      <!-- Línea -->
+      <select [(ngModel)]="filterLinea" (change)="onFilterChange()"
+              class="glass-card border border-white/50 shadow-sm rounded-full px-4 py-2.5 text-sm text-slate-700 bg-transparent outline-none cursor-pointer">
+        <option [value]="0">Todas las líneas</option>
+        <option *ngFor="let l of lineas" [value]="l.id">{{ l.abreviatura }}</option>
+      </select>
+    </div>
+
     <div *ngIf="!isLoading" class="max-w-4xl mx-auto flex flex-col gap-8 animate-fade-in">
       <!-- Projects List -->
-      <div *ngFor="let proj of proyectos" class="glowing-card glass-card p-6 md:p-8 rounded-3xl flex flex-col gap-6 relative overflow-hidden text-left">
+      <div *ngFor="let proj of pagedProyectos()" class="glowing-card glass-card p-6 md:p-8 rounded-3xl flex flex-col gap-6 relative overflow-hidden text-left">
         <!-- Top decoration and status badge with pulsing LED -->
         <div class="flex items-center justify-between gap-4">
           <span class="text-[10px] font-bold text-reasons-green uppercase tracking-widest">
@@ -157,6 +187,16 @@
           </div>
         </div>
       </div>
+      <div *ngIf="filtrarProyectos().length === 0" class="text-center py-16 text-slate-400 font-light">
+        No se encontraron proyectos que coincidan con los filtros.
+      </div>
+      <app-pagination
+        [totalItems]="filtrarProyectos().length"
+        [pageSize]="pageSize"
+        [currentPage]="currentPage"
+        (pageChange)="onPageChange($event)"
+        class="mt-4">
+      </app-pagination>
     </div>
   </div>
 </div>

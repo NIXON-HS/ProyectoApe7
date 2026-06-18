@@ -2,12 +2,28 @@
   
   <!-- Table List -->
   <div *ngIf="!showForm" class="flex flex-col gap-4">
-    <div class="flex justify-between items-center">
+    <div class="flex justify-between items-center flex-wrap gap-3">
       <h3 class="text-xl font-bold text-reasons-navy text-left">Proyectos de Investigación</h3>
       <button (click)="nuevoProyecto()" class="px-5 py-2.5 bg-reasons-green hover:bg-[#327e2a] text-white text-xs font-bold rounded-xl shadow hover-premium flex items-center gap-1.5 cursor-pointer">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
         Nuevo Proyecto
       </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="flex flex-wrap gap-3 items-center">
+      <select [(ngModel)]="filterEstado" (change)="onFilterChange()"
+              class="form-input text-xs py-2 px-3 rounded-xl min-w-[140px] flex-1 sm:flex-none">
+        <option value="">Todos los estados</option>
+        <option value="Activo">Activo</option>
+        <option value="Finalizado">Finalizado</option>
+        <option value="En Pausa">En Pausa</option>
+      </select>
+      <select [(ngModel)]="filterLinea" (change)="onFilterChange()"
+              class="form-input text-xs py-2 px-3 rounded-xl min-w-[160px] flex-1 sm:flex-none">
+        <option [value]="0">Todas las líneas</option>
+        <option *ngFor="let l of lineasDeInvestigacion" [value]="l.id">{{ l.abreviatura }}</option>
+      </select>
     </div>
 
     <div class="glass-card rounded-3xl overflow-hidden shadow-lg border border-slate-100">
@@ -23,7 +39,7 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 text-slate-600 font-light">
-            <tr *ngFor="let proj of filtrarLista(proyectos)" class="hover:bg-slate-50/50 transition-colors">
+            <tr *ngFor="let proj of pagedList(proyectos)" class="hover:bg-slate-50/50 transition-colors">
               <td class="p-4 font-bold text-reasons-navy leading-normal">{{ proj.titulo }}</td>
               <td class="p-4">
                 <span class="px-2 py-0.5 bg-slate-100 rounded text-slate-500 font-mono font-bold" [title]="proj.linea?.nombre">
@@ -59,6 +75,13 @@
           </tbody>
         </table>
       </div>
+      <app-pagination
+        [totalItems]="filtrarLista(proyectos).length"
+        [pageSize]="pageSize"
+        [currentPage]="currentPage"
+        (pageChange)="onPageChange($event)"
+        class="px-4">
+      </app-pagination>
     </div>
   </div>
 

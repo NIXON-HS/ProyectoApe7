@@ -1,0 +1,36 @@
+<div *ngIf="totalItems > 0" class="pagination-wrap">
+
+  <!-- Info text -->
+  <span class="pagination-info">
+    Mostrando <strong>{{ startItem }}–{{ endItem }}</strong> de <strong>{{ totalItems }}</strong>
+  </span>
+
+  <!-- Controls -->
+  <div class="pagination-controls">
+    <!-- Prev -->
+    <button class="pg-btn pg-nav" (click)="go(currentPage - 1)" [disabled]="currentPage === 1" aria-label="Página anterior">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+    </button>
+
+    <!-- Page numbers (hidden on very small screens) -->
+    <ng-container *ngFor="let p of pages">
+      <span *ngIf="p === null" class="pg-ellipsis">…</span>
+      <button *ngIf="p !== null"
+              class="pg-btn pg-num"
+              [class.pg-active]="p === currentPage"
+              (click)="go(p)">{{ p }}</button>
+    </ng-container>
+
+    <!-- Mobile: current / total -->
+    <span class="pg-mobile-label">{{ currentPage }} / {{ totalPages }}</span>
+
+    <!-- Next -->
+    <button class="pg-btn pg-nav" (click)="go(currentPage + 1)" [disabled]="currentPage === totalPages" aria-label="Página siguiente">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+        <path d="M9 18l6-6-6-6"/>
+      </svg>
+    </button>
+  </div>
+</div>

@@ -4,18 +4,22 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } 
 import { InfoGrupoService } from '../../../core/services/info-grupo.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { BlockEditorComponent, Block } from '../../../shared/block-editor/block-editor';
+import { PaginationComponent } from '../../../shared/pagination/pagination';
 import { LineaInvestigacion } from '../../../core/models/info-grupo.model';
 
 @Component({
   selector: 'app-admin-lineas',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, BlockEditorComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, BlockEditorComponent, PaginationComponent],
   templateUrl: './admin-lineas.html',
   styleUrls: ['./admin-lineas.css']
 })
 export class AdminLineasComponent implements OnInit {
   lineasAdmin: LineaInvestigacion[] = [];
   lineaEditando: LineaInvestigacion | null = null;
+
+  currentPage = 1;
+  readonly pageSize = 10;
   lineaForm!: FormGroup;
   lineaModoFlexible = false;
   lineaDescBlocks: Block[] = [];
@@ -131,6 +135,13 @@ export class AdminLineasComponent implements OnInit {
       },
       error: () => this.toastService.show('Error al guardar la línea.', 'error')
     });
+  }
+
+  onPageChange(page: number) { this.currentPage = page; }
+
+  pagedList(items: any[]): any[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return items.slice(start, start + this.pageSize);
   }
 
   eliminarLinea(linea: LineaInvestigacion) {

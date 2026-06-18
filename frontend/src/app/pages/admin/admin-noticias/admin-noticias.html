@@ -2,7 +2,7 @@
 
   <!-- Table List -->
   <div *ngIf="!showForm" class="flex flex-col gap-4">
-    <div class="flex justify-between items-center">
+    <div class="flex justify-between items-center flex-wrap gap-3">
       <h3 class="text-xl font-bold text-reasons-navy text-left mb-0">Noticias y Novedades</h3>
       <button (click)="nuevaNoticia()"
         class="px-5 py-2.5 bg-reasons-green hover:bg-[#327e2a] text-white text-xs font-bold rounded-xl shadow hover-premium flex items-center gap-1.5 cursor-pointer">
@@ -11,6 +11,25 @@
         </svg>
         Nueva Noticia
       </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="flex flex-wrap gap-3 items-center">
+      <select [(ngModel)]="filterCategoria" (change)="onFilterChange()"
+              class="form-input text-xs py-2 px-3 rounded-xl min-w-[140px] flex-1 sm:flex-none">
+        <option value="">Todas las categorías</option>
+        <option value="General">General</option>
+        <option value="Investigación">Investigación</option>
+        <option value="Evento">Evento</option>
+        <option value="Logro">Logro</option>
+        <option value="Convocatoria">Convocatoria</option>
+      </select>
+      <select [(ngModel)]="filterActivo" (change)="onFilterChange()"
+              class="form-input text-xs py-2 px-3 rounded-xl min-w-[130px] flex-1 sm:flex-none">
+        <option value="">Todos los estados</option>
+        <option value="true">Activas</option>
+        <option value="false">Borradores</option>
+      </select>
     </div>
 
     <div class="glass-card rounded-3xl overflow-hidden shadow-lg border border-slate-100 text-left bg-white">
@@ -27,7 +46,7 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 text-slate-600 font-light">
-            <tr *ngFor="let noticia of filtrarLista(noticias)" class="hover:bg-slate-50/50 transition-colors">
+            <tr *ngFor="let noticia of pagedList(noticias)" class="hover:bg-slate-50/50 transition-colors">
               <td class="p-4">
                 <div
                   class="w-12 h-8 rounded bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center">
@@ -81,6 +100,13 @@
           </tbody>
         </table>
       </div>
+      <app-pagination
+        [totalItems]="filtrarLista(noticias).length"
+        [pageSize]="pageSize"
+        [currentPage]="currentPage"
+        (pageChange)="onPageChange($event)"
+        class="px-4">
+      </app-pagination>
     </div>
   </div>
 

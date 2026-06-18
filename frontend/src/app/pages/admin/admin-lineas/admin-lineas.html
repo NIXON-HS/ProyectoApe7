@@ -16,7 +16,7 @@
 
     <!-- Lista de líneas -->
     <div *ngIf="!showLineaForm" class="flex flex-col gap-3">
-      <div *ngFor="let linea of lineasAdmin"
+      <div *ngFor="let linea of pagedList(lineasAdmin)"
            class="flex items-start justify-between gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-slate-200 transition-colors">
         <div class="flex flex-col gap-1.5 min-w-0 flex-1">
           <div class="flex items-center gap-2 flex-wrap">
@@ -54,6 +54,12 @@
       <p *ngIf="lineasAdmin.length === 0" class="text-slate-400 text-sm italic text-center py-6">
         No hay líneas registradas aún.
       </p>
+      <app-pagination
+        [totalItems]="lineasAdmin.length"
+        [pageSize]="pageSize"
+        [currentPage]="currentPage"
+        (pageChange)="onPageChange($event)">
+      </app-pagination>
     </div>
 
     <!-- Formulario nueva/editar línea -->

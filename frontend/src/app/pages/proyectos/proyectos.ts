@@ -8,11 +8,12 @@ import { BlockRendererComponent } from '../../shared/block-renderer/block-render
 import { InfoGrupoService } from '../../core/services/info-grupo.service';
 import { InfoGrupo } from '../../core/models/info-grupo.model';
 import { AdminBarComponent } from '../../shared/admin-bar/admin-bar';
+import { PaginationComponent } from '../../shared/pagination/pagination';
 
 @Component({
   selector: 'app-proyectos',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, BlockRendererComponent, AdminBarComponent],
+  imports: [CommonModule, FormsModule, RouterLink, BlockRendererComponent, AdminBarComponent, PaginationComponent],
   templateUrl: './proyectos.html',
   styleUrls: ['./proyectos.css']
 })
@@ -23,6 +24,18 @@ export class ProyectosComponent implements OnInit {
   info: InfoGrupo | null = null;
   editMode = false;
   draft: InfoGrupo = {};
+
+  searchQuery = '';
+  filterEstado = '';
+  filterLinea = 0;
+  currentPage = 1;
+  readonly pageSize = 6;
+
+  readonly lineas = [
+    { id: 1, abreviatura: 'DMP-IST' },
+    { id: 2, abreviatura: 'ST-ICD' },
+    { id: 3, abreviatura: 'ED-SGRN' }
+  ];
 
   constructor(
     private service: ProyectoService,
@@ -92,5 +105,28 @@ export class ProyectosComponent implements OnInit {
 
   toggleExpand(id: number) {
     this.expandedProjectId = this.expandedProjectId === id ? null : id;
+  }
+
+  onFilterChange() { this.currentPage = 1; }
+  onPageChange(page: number) { this.currentPage = page; }
+
+  filtrarProyectos(): Proyecto[] {
+    let result = this.proyectos;
+    if (this.filterEstado) result = result.filter(p => p.estado === this.filterEstado);
+    if (this.filterLinea) result = result.filter(p => p.linea_id === this.filterLinea);
+    if (this.searchQuery) {
+      const q = this.searchQuery.toLowerCase();
+      result = result.filter(p =>
+        p.titulo.toLowerCase().includes(q) ||
+        (p.descripcion && p.descripcion.toLowerCase().includes(q))
+      );
+    }
+    return result;
+  }
+
+  pagedProyectos(): Proyecto[] {
+    const filtered = this.filtrarProyectos();
+    const start = (this.currentPage - 1) * this.pageSize;
+    return filtered.slice(start, start + this.pageSize);
   }
 }

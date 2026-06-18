@@ -90,12 +90,26 @@
 
       <!-- 2. Sección Investigadores -->
       <div class="flex flex-col gap-10">
-        <h2 class="text-2xl font-bold text-reasons-navy flex items-center gap-3">
-          <span class="w-2.5 h-6 rounded bg-reasons-green"></span>
-          Investigadores Asociados
-        </h2>
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+          <h2 class="text-2xl font-bold text-reasons-navy flex items-center gap-3">
+            <span class="w-2.5 h-6 rounded bg-reasons-green"></span>
+            Investigadores Asociados
+          </h2>
+          <!-- Buscador -->
+          <div class="relative glass-card flex items-center gap-2 px-4 py-2 rounded-full border border-white/50 shadow-sm max-w-xs w-full sm:w-auto hover-premium focus-within:ring-4 focus-within:ring-reasons-blue/5 transition-all">
+            <svg class="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input type="text" [(ngModel)]="searchQuery" (input)="onSearchChange()"
+                   class="bg-transparent border-0 outline-none text-sm text-slate-700 placeholder-slate-400 w-full"
+                   placeholder="Buscar investigador..." />
+            <button *ngIf="searchQuery" (click)="searchQuery=''; onSearchChange()" class="text-slate-400 hover:text-slate-600">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+        </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div *ngFor="let member of investigadoresList" class="glowing-card glass-card p-6 rounded-3xl flex flex-col justify-between relative">
+          <div *ngFor="let member of pagedInvestigadores(investigadoresList)" class="glowing-card glass-card p-6 rounded-3xl flex flex-col justify-between relative">
             <div>
               <!-- Profile image wrapper -->
               <div class="flex justify-between items-start mb-6">
@@ -139,6 +153,15 @@
             </div>
           </div>
         </div>
+        <div *ngIf="filtrarInvestigadores(investigadoresList).length === 0" class="text-center py-12 text-slate-400 font-light">
+          No se encontraron investigadores que coincidan con la búsqueda.
+        </div>
+        <app-pagination
+          [totalItems]="filtrarInvestigadores(investigadoresList).length"
+          [pageSize]="pageSize"
+          [currentPage]="currentPage"
+          (pageChange)="onPageChange($event)">
+        </app-pagination>
       </div>
     </div>
   </div>

@@ -8,13 +8,14 @@ import { ToastService } from '../../../core/services/toast.service';
 import { ConfirmService } from '../../../core/services/confirm.service';
 import { BlockEditorComponent, Block } from '../../../shared/block-editor/block-editor';
 import { BlockRendererComponent } from '../../../shared/block-renderer/block-renderer';
+import { PaginationComponent } from '../../../shared/pagination/pagination';
 import { Publicacion } from '../../../core/models/publicacion.model';
 import { Investigador } from '../../../core/models/investigador.model';
 
 @Component({
   selector: 'app-admin-publicaciones',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, BlockEditorComponent, BlockRendererComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, BlockEditorComponent, BlockRendererComponent, PaginationComponent],
   templateUrl: './admin-publicaciones.html',
   styleUrls: ['./admin-publicaciones.css']
 })
@@ -31,6 +32,10 @@ export class AdminPublicacionesComponent implements OnInit {
   usuario: any = null;
   publicaciones: Publicacion[] = [];
   investigadores: Investigador[] = [];
+
+  filterLinea = 0;
+  currentPage = 1;
+  readonly pageSize = 10;
 
   showForm = false;
   editMode = false;
@@ -310,14 +315,26 @@ export class AdminPublicacionesComponent implements OnInit {
     return l ? l.abreviatura : 'N/A';
   }
 
+  onFilterChange() { this.currentPage = 1; }
+  onPageChange(page: number) { this.currentPage = page; }
+
   filtrarLista(items: any[]): any[] {
-    if (!this.searchQuery) return items;
-    const q = this.searchQuery.toLowerCase();
-    
-    return items.filter(item => {
-      return item.titulo.toLowerCase().includes(q) || 
-             (item.resumen && item.resumen.toLowerCase().includes(q)) ||
-             (item.cita && item.cita.toLowerCase().includes(q));
-    });
+    let result = items;
+    if (this.filterLinea) result = result.filter(i => i.linea_id === this.filterLinea);
+    if (this.searchQuery) {
+      const q = this.searchQuery.toLowerCase();
+      result = result.filter(i =>
+        i.titulo.toLowerCase().includes(q) ||
+        (i.resumen && i.resumen.toLowerCase().includes(q)) ||
+        (i.cita && i.cita.toLowerCase().includes(q))
+      );
+    }
+    return result;
+  }
+
+  pagedList(items: any[]): any[] {
+    const filtered = this.filtrarLista(items);
+    const start = (this.currentPage - 1) * this.pageSize;
+    return filtered.slice(start, start + this.pageSize);
   }
 }
