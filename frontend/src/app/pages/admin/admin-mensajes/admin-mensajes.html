@@ -18,7 +18,7 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 text-slate-600 font-light">
-              <tr *ngFor="let msg of filtrarLista(mensajes)" 
+              <tr *ngFor="let msg of pagedList(mensajes)"
                   (click)="verDetalleMensaje(msg)"
                   class="hover:bg-slate-50/50 transition-all duration-200 cursor-pointer"
                   [class.bg-reasons-blue/5]="selectedMessage?.id === msg.id">
@@ -42,6 +42,13 @@
             </tbody>
           </table>
         </div>
+        <app-pagination
+          [totalItems]="filtrarLista(mensajes).length"
+          [pageSize]="pageSize"
+          [currentPage]="currentPage"
+          (pageChange)="onPageChange($event)"
+          class="px-4">
+        </app-pagination>
       </div>
     </div>
 

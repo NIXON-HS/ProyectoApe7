@@ -4,18 +4,23 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } 
 import { InfoGrupoService } from '../../../core/services/info-grupo.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { BlockEditorComponent, Block } from '../../../shared/block-editor/block-editor';
+import { PaginationComponent } from '../../../shared/pagination/pagination';
 import { LineaInvestigacion } from '../../../core/models/info-grupo.model';
 
 @Component({
   selector: 'app-admin-lineas',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, BlockEditorComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, BlockEditorComponent, PaginationComponent],
   templateUrl: './admin-lineas.html',
   styleUrls: ['./admin-lineas.css']
 })
 export class AdminLineasComponent implements OnInit {
   lineasAdmin: LineaInvestigacion[] = [];
   lineaEditando: LineaInvestigacion | null = null;
+
+  searchQuery = '';
+  currentPage = 1;
+  readonly pageSize = 10;
   lineaForm!: FormGroup;
   lineaModoFlexible = false;
   lineaDescBlocks: Block[] = [];
@@ -131,6 +136,25 @@ export class AdminLineasComponent implements OnInit {
       },
       error: () => this.toastService.show('Error al guardar la línea.', 'error')
     });
+  }
+
+  onSearchChange() { this.currentPage = 1; }
+  onPageChange(page: number) { this.currentPage = page; }
+
+  filtrarLineas(): LineaInvestigacion[] {
+    if (!this.searchQuery) return this.lineasAdmin;
+    const q = this.searchQuery.toLowerCase();
+    return this.lineasAdmin.filter(l =>
+      l.nombre.toLowerCase().includes(q) ||
+      l.abreviatura.toLowerCase().includes(q) ||
+      (l.descripcion && l.descripcion.toLowerCase().includes(q))
+    );
+  }
+
+  pagedList(items: any[]): any[] {
+    const filtered = this.filtrarLineas();
+    const start = (this.currentPage - 1) * this.pageSize;
+    return filtered.slice(start, start + this.pageSize);
   }
 
   eliminarLinea(linea: LineaInvestigacion) {

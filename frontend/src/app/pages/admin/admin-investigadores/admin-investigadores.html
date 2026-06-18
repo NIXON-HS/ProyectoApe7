@@ -2,12 +2,40 @@
   
   <!-- Table List -->
   <div *ngIf="!showForm" class="flex flex-col gap-4">
-    <div class="flex justify-between items-center">
+    <div class="flex justify-between items-center flex-wrap gap-3">
       <h3 class="text-xl font-bold text-reasons-navy text-left">Lista del Equipo</h3>
       <button (click)="nuevoInvestigador()" class="px-5 py-2.5 bg-reasons-green hover:bg-[#327e2a] text-white text-xs font-bold rounded-xl shadow hover-premium flex items-center gap-1.5 cursor-pointer">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
         Nuevo Investigador
       </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="flex flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3 bg-slate-50 rounded-2xl border border-slate-100">
+      <!-- Chips posición -->
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Posición</span>
+        <ng-container *ngFor="let opt of [{v:'',l:'Todos'},{v:'Director',l:'Director'},{v:'Subdirector',l:'Subdirector'},{v:'Investigador',l:'Investigador'}]">
+          <button (click)="filterPosicion=opt.v; onFilterChange()"
+                  class="px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer transition-all"
+                  [ngClass]="filterPosicion===opt.v
+                    ? 'bg-reasons-navy text-white border-reasons-navy shadow-sm'
+                    : 'bg-white text-slate-600 border-slate-200 hover:border-reasons-blue/40 hover:text-reasons-blue hover:bg-reasons-blue/5'">
+            {{ opt.l }}
+          </button>
+        </ng-container>
+      </div>
+      <!-- Resultado + limpiar -->
+      <div class="flex items-center gap-3 ml-auto">
+        <span class="text-xs text-slate-400 font-medium whitespace-nowrap">
+          <strong class="text-slate-600">{{ filtrarLista(investigadores).length }}</strong> resultado(s)
+        </span>
+        <button *ngIf="filterPosicion" (click)="filterPosicion=''; onFilterChange()"
+                class="flex items-center gap-1 text-xs font-bold text-rose-400 hover:text-rose-600 cursor-pointer transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+          Limpiar
+        </button>
+      </div>
     </div>
 
     <div class="glass-card rounded-3xl overflow-hidden shadow-lg border border-slate-100">
@@ -24,10 +52,10 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 text-slate-600 font-light">
-            <tr *ngFor="let inv of filtrarLista(investigadores)" class="hover:bg-slate-50/50 transition-colors">
+            <tr *ngFor="let inv of pagedList(investigadores)" class="hover:bg-slate-50/50 transition-colors">
               <td class="p-4">
-                <img [src]="obtenerFotoUrl(inv.foto_url)" 
-                     (error)="inv.foto_url = defaultAvatar" 
+                <img [src]="obtenerFotoUrl(inv.foto_url)"
+                     (error)="inv.foto_url = defaultAvatar"
                      class="w-10 h-10 rounded-full object-cover border border-slate-200" alt="Foto" />
               </td>
               <td class="p-4 font-bold text-reasons-navy">{{ inv.nombres }}</td>
@@ -54,6 +82,13 @@
           </tbody>
         </table>
       </div>
+      <app-pagination
+        [totalItems]="filtrarLista(investigadores).length"
+        [pageSize]="pageSize"
+        [currentPage]="currentPage"
+        (pageChange)="onPageChange($event)"
+        class="px-4">
+      </app-pagination>
     </div>
   </div>
 

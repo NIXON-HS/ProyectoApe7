@@ -2,12 +2,46 @@
   
   <!-- Table List -->
   <div *ngIf="!showForm" class="flex flex-col gap-4">
-    <div class="flex justify-between items-center">
+    <div class="flex justify-between items-center flex-wrap gap-3">
       <h3 class="text-xl font-bold text-reasons-navy text-left">Publicaciones Científicas</h3>
       <button (click)="nuevaPublicacion()" class="px-5 py-2.5 bg-reasons-green hover:bg-[#327e2a] text-white text-xs font-bold rounded-xl shadow hover-premium flex items-center gap-1.5 cursor-pointer">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
         Nueva Publicación
       </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="flex flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3 bg-slate-50 rounded-2xl border border-slate-100">
+      <!-- Línea chips -->
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Línea</span>
+        <button (click)="filterLinea=0; onFilterChange()"
+                class="px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer transition-all"
+                [ngClass]="filterLinea===0
+                  ? 'bg-reasons-navy text-white border-reasons-navy shadow-sm'
+                  : 'bg-white text-slate-600 border-slate-200 hover:border-reasons-blue/40 hover:text-reasons-blue hover:bg-reasons-blue/5'">
+          Todas
+        </button>
+        <button *ngFor="let l of lineasDeInvestigacion" (click)="filterLinea=l.id; onFilterChange()"
+                [title]="l.nombre"
+                class="px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer transition-all"
+                [ngClass]="filterLinea===l.id
+                  ? 'bg-reasons-navy text-white border-reasons-navy shadow-sm'
+                  : 'bg-white text-slate-600 border-slate-200 hover:border-reasons-blue/40 hover:text-reasons-blue hover:bg-reasons-blue/5'">
+          {{ l.abreviatura }}
+        </button>
+      </div>
+      <!-- Resultado + limpiar -->
+      <div class="flex items-center gap-3 ml-auto">
+        <span class="text-xs text-slate-400 font-medium whitespace-nowrap">
+          <strong class="text-slate-600">{{ filtrarLista(publicaciones).length }}</strong> resultado(s)
+        </span>
+        <button *ngIf="filterLinea" (click)="filterLinea=0; onFilterChange()"
+                class="flex items-center gap-1 text-xs font-bold text-rose-400 hover:text-rose-600 cursor-pointer transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+          Limpiar
+        </button>
+      </div>
     </div>
 
     <div class="glass-card rounded-3xl overflow-hidden shadow-lg border border-slate-100 bg-white">
@@ -23,7 +57,7 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 text-slate-600 font-light">
-            <tr *ngFor="let pub of filtrarLista(publicaciones)" class="hover:bg-slate-50/50 transition-colors">
+            <tr *ngFor="let pub of pagedList(publicaciones)" class="hover:bg-slate-50/50 transition-colors">
               <td class="p-4 font-bold text-reasons-navy leading-normal">
                 {{ pub.titulo }}
               </td>
@@ -56,6 +90,13 @@
           </tbody>
         </table>
       </div>
+      <app-pagination
+        [totalItems]="filtrarLista(publicaciones).length"
+        [pageSize]="pageSize"
+        [currentPage]="currentPage"
+        (pageChange)="onPageChange($event)"
+        class="px-4">
+      </app-pagination>
     </div>
   </div>
 

@@ -8,24 +8,34 @@ import { BlockRendererComponent } from '../../shared/block-renderer/block-render
 import { InfoGrupoService } from '../../core/services/info-grupo.service';
 import { InfoGrupo } from '../../core/models/info-grupo.model';
 import { AdminBarComponent } from '../../shared/admin-bar/admin-bar';
+import { PaginationComponent } from '../../shared/pagination/pagination';
 
 @Component({
   selector: 'app-publicaciones',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, BlockRendererComponent, AdminBarComponent],
+  imports: [CommonModule, FormsModule, RouterLink, BlockRendererComponent, AdminBarComponent, PaginationComponent],
   templateUrl: './publicaciones.html',
   styleUrls: ['./publicaciones.css']
 })
 export class PublicacionesComponent implements OnInit {
   isLoading = true;
   publicaciones: Publicacion[] = [];
-  filteredPublicaciones: Publicacion[] = [];
   searchQuery = '';
+  filterLinea = 0;
   expandedPubId: number | null = null;
   editMode = false;
   draft: InfoGrupo = {};
   copyFeedbackId: number | null = null;
   info: InfoGrupo | null = null;
+
+  currentPage = 1;
+  readonly pageSize = 9;
+
+  readonly lineas = [
+    { id: 1, abreviatura: 'DMP-IST', nombre: 'Diseño, Materiales, Producción, Identidad, Sostenibilidad y Tecnologías aplicadas' },
+    { id: 2, abreviatura: 'ST-ICD', nombre: 'Software, Tecnologías de la Información y Ciencias de Datos' },
+    { id: 3, abreviatura: 'ED-SGRN', nombre: 'Energía, Desarrollo Sostenible y Gestión de Recursos Naturales' }
+  ];
 
   constructor(
     private service: PublicacionService,
@@ -59,7 +69,6 @@ export class PublicacionesComponent implements OnInit {
     this.service.getPublicaciones().subscribe({
       next: (data) => {
         this.publicaciones = data;
-        this.filteredPublicaciones = data;
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -71,26 +80,34 @@ export class PublicacionesComponent implements OnInit {
     });
   }
 
-  filterPublications() {
-    const query = this.searchQuery.toLowerCase().trim();
-    if (!query) {
-      this.filteredPublicaciones = this.publicaciones;
-      return;
-    }
+  onFilterChange() { this.currentPage = 1; }
+  onPageChange(page: number) { this.currentPage = page; }
 
-    this.filteredPublicaciones = this.publicaciones.filter(pub => {
-      const matchTitle = pub.titulo.toLowerCase().includes(query);
-      const matchAbstract = pub.resumen.toLowerCase().includes(query);
-      const matchAuthors = pub.investigadores?.some(author => 
-        author.nombres.toLowerCase().includes(query)
+  filtrarPublicaciones(): Publicacion[] {
+    let result = this.publicaciones;
+    if (this.filterLinea) result = result.filter(p => p.linea_id === this.filterLinea);
+    if (this.searchQuery) {
+      const q = this.searchQuery.toLowerCase().trim();
+      result = result.filter(pub =>
+        pub.titulo.toLowerCase().includes(q) ||
+        pub.resumen.toLowerCase().includes(q) ||
+        pub.investigadores?.some(a => a.nombres.toLowerCase().includes(q))
       );
-      return matchTitle || matchAbstract || !!matchAuthors;
-    });
+    }
+    return result;
   }
+
+  pagedPublicaciones(): Publicacion[] {
+    const filtered = this.filtrarPublicaciones();
+    const start = (this.currentPage - 1) * this.pageSize;
+    return filtered.slice(start, start + this.pageSize);
+  }
+
+  filterPublications() { this.onFilterChange(); }
 
   clearSearch() {
     this.searchQuery = '';
-    this.filteredPublicaciones = this.publicaciones;
+    this.onFilterChange();
   }
 
   toggleAbstract(id: number) {

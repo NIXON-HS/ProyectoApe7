@@ -2,7 +2,7 @@
 
   <!-- Table List -->
   <div *ngIf="!showForm" class="flex flex-col gap-4">
-    <div class="flex justify-between items-center">
+    <div class="flex justify-between items-center flex-wrap gap-3">
       <h3 class="text-xl font-bold text-reasons-navy text-left mb-0">Noticias y Novedades</h3>
       <button (click)="nuevaNoticia()"
         class="px-5 py-2.5 bg-reasons-green hover:bg-[#327e2a] text-white text-xs font-bold rounded-xl shadow hover-premium flex items-center gap-1.5 cursor-pointer">
@@ -11,6 +11,49 @@
         </svg>
         Nueva Noticia
       </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="flex flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3 bg-slate-50 rounded-2xl border border-slate-100">
+      <!-- Categoría chips -->
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Categoría</span>
+        <ng-container *ngFor="let opt of [{v:'',l:'Todas'},{v:'General',l:'General'},{v:'Investigación',l:'Investigación'},{v:'Evento',l:'Evento'},{v:'Logro',l:'Logro'},{v:'Convocatoria',l:'Convocatoria'}]">
+          <button (click)="filterCategoria=opt.v; onFilterChange()"
+                  class="px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer transition-all"
+                  [ngClass]="filterCategoria===opt.v
+                    ? 'bg-reasons-navy text-white border-reasons-navy shadow-sm'
+                    : 'bg-white text-slate-600 border-slate-200 hover:border-reasons-blue/40 hover:text-reasons-blue hover:bg-reasons-blue/5'">
+            {{ opt.l }}
+          </button>
+        </ng-container>
+      </div>
+      <!-- Divider -->
+      <div class="w-px h-6 bg-slate-200 hidden sm:block"></div>
+      <!-- Estado chips -->
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Estado</span>
+        <ng-container *ngFor="let opt of [{v:'',l:'Todos'},{v:'true',l:'Activas'},{v:'false',l:'Borradores'}]">
+          <button (click)="filterActivo=opt.v; onFilterChange()"
+                  class="px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer transition-all"
+                  [ngClass]="filterActivo===opt.v
+                    ? 'bg-reasons-navy text-white border-reasons-navy shadow-sm'
+                    : 'bg-white text-slate-600 border-slate-200 hover:border-reasons-blue/40 hover:text-reasons-blue hover:bg-reasons-blue/5'">
+            {{ opt.l }}
+          </button>
+        </ng-container>
+      </div>
+      <!-- Resultado + limpiar -->
+      <div class="flex items-center gap-3 ml-auto">
+        <span class="text-xs text-slate-400 font-medium whitespace-nowrap">
+          <strong class="text-slate-600">{{ filtrarLista(noticias).length }}</strong> resultado(s)
+        </span>
+        <button *ngIf="filterCategoria || filterActivo" (click)="filterCategoria=''; filterActivo=''; onFilterChange()"
+                class="flex items-center gap-1 text-xs font-bold text-rose-400 hover:text-rose-600 cursor-pointer transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+          Limpiar
+        </button>
+      </div>
     </div>
 
     <div class="glass-card rounded-3xl overflow-hidden shadow-lg border border-slate-100 text-left bg-white">
@@ -27,7 +70,7 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 text-slate-600 font-light">
-            <tr *ngFor="let noticia of filtrarLista(noticias)" class="hover:bg-slate-50/50 transition-colors">
+            <tr *ngFor="let noticia of pagedList(noticias)" class="hover:bg-slate-50/50 transition-colors">
               <td class="p-4">
                 <div
                   class="w-12 h-8 rounded bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center">
@@ -81,6 +124,13 @@
           </tbody>
         </table>
       </div>
+      <app-pagination
+        [totalItems]="filtrarLista(noticias).length"
+        [pageSize]="pageSize"
+        [currentPage]="currentPage"
+        (pageChange)="onPageChange($event)"
+        class="px-4">
+      </app-pagination>
     </div>
   </div>
 

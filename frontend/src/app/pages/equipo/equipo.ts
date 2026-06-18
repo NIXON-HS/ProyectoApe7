@@ -5,12 +5,13 @@ import { InvestigadorService } from '../../core/services/investigador.service';
 import { InfoGrupoService } from '../../core/services/info-grupo.service';
 import { InfoGrupo } from '../../core/models/info-grupo.model';
 import { AdminBarComponent } from '../../shared/admin-bar/admin-bar';
+import { PaginationComponent } from '../../shared/pagination/pagination';
 import { Investigador } from '../../core/models/investigador.model';
 
 @Component({
   selector: 'app-equipo',
   standalone: true,
-  imports: [CommonModule, FormsModule, AdminBarComponent],
+  imports: [CommonModule, FormsModule, AdminBarComponent, PaginationComponent],
   templateUrl: './equipo.html',
   styleUrls: ['./equipo.css']
 })
@@ -22,6 +23,10 @@ export class EquipoComponent implements OnInit {
   info: InfoGrupo | null = null;
   editMode = false;
   draft: InfoGrupo = {};
+
+  searchQuery = '';
+  currentPage = 1;
+  readonly pageSize = 8;
 
   constructor(
     private service: InvestigadorService,
@@ -54,6 +59,25 @@ export class EquipoComponent implements OnInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  onSearchChange() { this.currentPage = 1; }
+  onPageChange(page: number) { this.currentPage = page; }
+
+  filtrarInvestigadores(items: Investigador[]): Investigador[] {
+    if (!this.searchQuery) return items;
+    const q = this.searchQuery.toLowerCase();
+    return items.filter(i =>
+      i.nombres.toLowerCase().includes(q) ||
+      (i.biografia && i.biografia.toLowerCase().includes(q)) ||
+      (i.orcid && i.orcid.toLowerCase().includes(q))
+    );
+  }
+
+  pagedInvestigadores(items: Investigador[]): Investigador[] {
+    const filtered = this.filtrarInvestigadores(items);
+    const start = (this.currentPage - 1) * this.pageSize;
+    return filtered.slice(start, start + this.pageSize);
   }
 
   getInitials(name: string): string {
