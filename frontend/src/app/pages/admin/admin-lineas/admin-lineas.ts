@@ -18,6 +18,7 @@ export class AdminLineasComponent implements OnInit {
   lineasAdmin: LineaInvestigacion[] = [];
   lineaEditando: LineaInvestigacion | null = null;
 
+  searchQuery = '';
   currentPage = 1;
   readonly pageSize = 10;
   lineaForm!: FormGroup;
@@ -137,11 +138,23 @@ export class AdminLineasComponent implements OnInit {
     });
   }
 
+  onSearchChange() { this.currentPage = 1; }
   onPageChange(page: number) { this.currentPage = page; }
 
+  filtrarLineas(): LineaInvestigacion[] {
+    if (!this.searchQuery) return this.lineasAdmin;
+    const q = this.searchQuery.toLowerCase();
+    return this.lineasAdmin.filter(l =>
+      l.nombre.toLowerCase().includes(q) ||
+      l.abreviatura.toLowerCase().includes(q) ||
+      (l.descripcion && l.descripcion.toLowerCase().includes(q))
+    );
+  }
+
   pagedList(items: any[]): any[] {
+    const filtered = this.filtrarLineas();
     const start = (this.currentPage - 1) * this.pageSize;
-    return items.slice(start, start + this.pageSize);
+    return filtered.slice(start, start + this.pageSize);
   }
 
   eliminarLinea(linea: LineaInvestigacion) {
