@@ -96,15 +96,16 @@
             Investigadores Asociados
           </h2>
           <!-- Buscador -->
-          <div class="relative glass-card flex items-center gap-2 px-4 py-2 rounded-full border border-white/50 shadow-sm max-w-xs w-full sm:w-auto hover-premium focus-within:ring-4 focus-within:ring-reasons-blue/5 transition-all">
+          <div class="glass-card flex items-center gap-2.5 px-4 py-2.5 rounded-full border border-white/60 shadow-sm max-w-sm w-full sm:w-auto hover-premium focus-within:ring-4 focus-within:ring-reasons-blue/8 focus-within:border-reasons-blue/30 transition-all duration-300">
             <svg class="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
             <input type="text" [(ngModel)]="searchQuery" (input)="onSearchChange()"
-                   class="bg-transparent border-0 outline-none text-sm text-slate-700 placeholder-slate-400 w-full"
-                   placeholder="Buscar investigador..." />
-            <button *ngIf="searchQuery" (click)="searchQuery=''; onSearchChange()" class="text-slate-400 hover:text-slate-600">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                   class="bg-transparent border-0 outline-none text-sm text-slate-700 placeholder-slate-400 w-full min-w-[160px]"
+                   placeholder="Buscar por nombre o área..." />
+            <button *ngIf="searchQuery" (click)="searchQuery=''; onSearchChange()"
+                    class="w-6 h-6 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-600 flex items-center justify-center flex-shrink-0 transition-all">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
           </div>
         </div>

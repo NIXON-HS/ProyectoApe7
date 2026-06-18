@@ -47,33 +47,68 @@
     </div>
 
     <!-- Filtros y buscador -->
-    <div *ngIf="!isLoading" class="max-w-4xl mx-auto flex flex-wrap gap-3 mb-8 animate-fade-in">
+    <div *ngIf="!isLoading" class="max-w-4xl mx-auto flex flex-col gap-4 mb-10 animate-fade-in">
       <!-- Buscador -->
-      <div class="relative glass-card flex items-center gap-2 px-4 py-2.5 rounded-full border border-white/50 shadow-sm flex-1 min-w-[180px] hover-premium focus-within:ring-4 focus-within:ring-reasons-blue/5 transition-all">
-        <svg class="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="glass-card flex items-center gap-3 px-5 py-3 rounded-2xl border border-white/60 shadow-sm hover-premium focus-within:ring-4 focus-within:ring-reasons-blue/8 focus-within:border-reasons-blue/30 transition-all duration-300">
+        <svg class="w-5 h-5 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
         </svg>
         <input type="text" [(ngModel)]="searchQuery" (input)="onFilterChange()"
-               class="bg-transparent border-0 outline-none text-sm text-slate-700 placeholder-slate-400 w-full"
-               placeholder="Buscar proyectos..." />
-        <button *ngIf="searchQuery" (click)="searchQuery=''; onFilterChange()" class="text-slate-400 hover:text-slate-600">
+               class="flex-1 bg-transparent border-0 outline-none text-slate-700 text-sm placeholder-slate-400"
+               placeholder="Buscar por título o descripción..." />
+        <button *ngIf="searchQuery" (click)="searchQuery=''; onFilterChange()"
+                class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-all">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
-      <!-- Estado -->
-      <select [(ngModel)]="filterEstado" (change)="onFilterChange()"
-              class="glass-card border border-white/50 shadow-sm rounded-full px-4 py-2.5 text-sm text-slate-700 bg-transparent outline-none cursor-pointer">
-        <option value="">Todos los estados</option>
-        <option value="Activo">Activo</option>
-        <option value="Finalizado">Finalizado</option>
-        <option value="En Pausa">En Pausa</option>
-      </select>
-      <!-- Línea -->
-      <select [(ngModel)]="filterLinea" (change)="onFilterChange()"
-              class="glass-card border border-white/50 shadow-sm rounded-full px-4 py-2.5 text-sm text-slate-700 bg-transparent outline-none cursor-pointer">
-        <option [value]="0">Todas las líneas</option>
-        <option *ngFor="let l of lineas" [value]="l.id">{{ l.abreviatura }}</option>
-      </select>
+
+      <!-- Chips row -->
+      <div class="flex flex-wrap items-start gap-x-6 gap-y-3">
+        <!-- Estado -->
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Estado</span>
+          <ng-container *ngFor="let opt of [{v:'',l:'Todos'},{v:'Activo',l:'Activo'},{v:'Finalizado',l:'Finalizado'},{v:'En Pausa',l:'En Pausa'}]">
+            <button (click)="filterEstado=opt.v; onFilterChange()"
+                    class="px-4 py-1.5 rounded-full text-xs font-bold border cursor-pointer transition-all"
+                    [ngClass]="filterEstado===opt.v
+                      ? 'bg-reasons-navy text-white border-reasons-navy shadow-md'
+                      : 'glass-card text-slate-600 border-slate-200/80 hover:border-reasons-blue/40 hover:text-reasons-blue hover:bg-reasons-blue/5 shadow-sm'">
+              {{ opt.l }}
+            </button>
+          </ng-container>
+        </div>
+        <!-- Línea -->
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Línea</span>
+          <button (click)="filterLinea=0; onFilterChange()"
+                  class="px-4 py-1.5 rounded-full text-xs font-bold border cursor-pointer transition-all"
+                  [ngClass]="filterLinea===0
+                    ? 'bg-reasons-navy text-white border-reasons-navy shadow-md'
+                    : 'glass-card text-slate-600 border-slate-200/80 hover:border-reasons-blue/40 hover:text-reasons-blue hover:bg-reasons-blue/5 shadow-sm'">
+            Todas
+          </button>
+          <button *ngFor="let l of lineas" (click)="filterLinea=l.id; onFilterChange()"
+                  [title]="l.nombre"
+                  class="px-4 py-1.5 rounded-full text-xs font-bold border cursor-pointer transition-all"
+                  [ngClass]="filterLinea===l.id
+                    ? 'bg-reasons-navy text-white border-reasons-navy shadow-md'
+                    : 'glass-card text-slate-600 border-slate-200/80 hover:border-reasons-blue/40 hover:text-reasons-blue hover:bg-reasons-blue/5 shadow-sm'">
+            {{ l.abreviatura }}
+          </button>
+        </div>
+        <!-- Limpiar + count -->
+        <div class="flex items-center gap-3 ml-auto self-center">
+          <span class="text-xs text-slate-400 font-medium whitespace-nowrap">
+            <strong class="text-slate-600">{{ filtrarProyectos().length }}</strong> de {{ proyectos.length }} proyectos
+          </span>
+          <button *ngIf="filterEstado || filterLinea || searchQuery"
+                  (click)="filterEstado=''; filterLinea=0; searchQuery=''; onFilterChange()"
+                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-rose-500 bg-rose-50 border border-rose-200/50 hover:bg-rose-100 cursor-pointer transition-all">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+            Limpiar filtros
+          </button>
+        </div>
+      </div>
     </div>
 
     <div *ngIf="!isLoading" class="max-w-4xl mx-auto flex flex-col gap-8 animate-fade-in">

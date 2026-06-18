@@ -32,9 +32,9 @@ export class ProyectosComponent implements OnInit {
   readonly pageSize = 6;
 
   readonly lineas = [
-    { id: 1, abreviatura: 'DMP-IST' },
-    { id: 2, abreviatura: 'ST-ICD' },
-    { id: 3, abreviatura: 'ED-SGRN' }
+    { id: 1, abreviatura: 'DMP-IST', nombre: 'Diseño, Materiales, Producción, Identidad, Sostenibilidad y Tecnologías aplicadas' },
+    { id: 2, abreviatura: 'ST-ICD', nombre: 'Software, Tecnologías de la Información y Ciencias de Datos' },
+    { id: 3, abreviatura: 'ED-SGRN', nombre: 'Energía, Desarrollo Sostenible y Gestión de Recursos Naturales' }
   ];
 
   constructor(
