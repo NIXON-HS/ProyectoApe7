@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -6,6 +6,9 @@ import { ContactoService } from '../../../core/services/contacto.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { SplashScreenComponent } from '../../../shared/splash-screen/splash-screen';
+import { SolicitudService } from '../../../core/services/solicitud.service';
+import { forkJoin, Subject, timer } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 // Tabs Components
 import { AdminResumenComponent } from '../admin-resumen/admin-resumen';
@@ -43,7 +46,7 @@ import { AdminCarouselComponent } from '../admin-carousel/admin-carousel';
   templateUrl: './admin-dashboard.html',
   styleUrls: ['./admin-dashboard.css']
 })
-export class AdminDashboardComponent implements OnInit {
+export class AdminDashboardComponent implements OnInit, OnDestroy {
   @Input() usuario: any = null;
   @Output() logout = new EventEmitter<void>();
 
@@ -61,8 +64,11 @@ export class AdminDashboardComponent implements OnInit {
   proyectosAction = '';
   publicacionesAction = '';
 
+  private destroy$ = new Subject<void>();
+
   constructor(
     private contactoService: ContactoService,
+    private solicitudService: SolicitudService,
     private cdr: ChangeDetectorRef,
     private router: Router,
     private authService: AuthService,
@@ -70,14 +76,43 @@ export class AdminDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.cargarMensajesCount();
+    // Poll every 10 seconds to keep the count updated in real-time
+    timer(0, 10000)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.cargarMensajesCount();
+      });
+
+    this.solicitudService.refreshCount$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.cargarMensajesCount();
+      });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   cargarMensajesCount() {
     if (this.usuario?.rol === 'admin') {
-      this.contactoService.getContactos().subscribe({
+      forkJoin({
+        contactos: this.contactoService.getContactos(),
+        solicitudes: this.solicitudService.getSolicitudes()
+      }).subscribe({
+        next: ({ contactos, solicitudes }) => {
+          const contactCount = contactos ? contactos.length : 0;
+          const pendingSols = solicitudes ? solicitudes.filter(s => s.estado === 'pendiente').length : 0;
+          this.mensajesCount = contactCount + pendingSols;
+          this.cdr.detectChanges();
+        },
+        error: (err) => console.error('Error loading admin counts', err)
+      });
+    } else if (this.usuario?.rol === 'investigador') {
+      this.solicitudService.getSolicitudes().subscribe({
         next: (res) => {
-          this.mensajesCount = res ? res.length : 0;
+          this.mensajesCount = res ? res.filter(s => s.estado === 'pendiente').length : 0;
           this.cdr.detectChanges();
         }
       });

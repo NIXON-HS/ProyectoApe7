@@ -5,6 +5,7 @@
 -- ==========================================
 
 -- 1. Eliminación de tablas previas en orden inverso de dependencias (para desarrollo limpio)
+DROP TABLE IF EXISTS solicitudes CASCADE;
 DROP TABLE IF EXISTS publicacion_investigador CASCADE;
 DROP TABLE IF EXISTS proyecto_investigador CASCADE;
 DROP TABLE IF EXISTS contactos CASCADE;
@@ -172,3 +173,22 @@ CREATE INDEX idx_proyectos_linea_id ON proyectos(linea_id);
 CREATE INDEX idx_publicaciones_linea_id ON publicaciones(linea_id);
 CREATE INDEX idx_pi_investigador_id ON proyecto_investigador(investigador_id);
 CREATE INDEX idx_pubi_investigador_id ON publicacion_investigador(investigador_id);
+
+-- Tabla: solicitudes (Flujo de aprobación para investigadores)
+CREATE TABLE solicitudes (
+    id SERIAL PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    tipo VARCHAR(50) NOT NULL, -- 'proyecto' | 'publicacion'
+    accion VARCHAR(50) NOT NULL, -- 'crear' | 'editar'
+    registro_id INT, -- ID de proyecto/publicacion si se edita
+    datos_nuevos TEXT NOT NULL, -- JSON con los campos enviados
+    estado VARCHAR(50) NOT NULL DEFAULT 'pendiente', -- 'pendiente' | 'aprobado' | 'rechazado'
+    motivo_rechazo TEXT,
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    procesado_en TIMESTAMP,
+    CONSTRAINT fk_solicitudes_usuarios FOREIGN KEY (usuario_id)
+        REFERENCES usuarios(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+

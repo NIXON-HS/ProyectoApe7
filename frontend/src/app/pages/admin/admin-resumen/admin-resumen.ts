@@ -5,6 +5,8 @@ import { InvestigadorService } from '../../../core/services/investigador.service
 import { ProyectoService } from '../../../core/services/proyecto.service';
 import { PublicacionService } from '../../../core/services/publicacion.service';
 import { ContactoService } from '../../../core/services/contacto.service';
+import { SolicitudService } from '../../../core/services/solicitud.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-admin-resumen',
@@ -28,6 +30,7 @@ export class AdminResumenComponent implements OnInit {
     private proySvc: ProyectoService,
     private pubSvc: PublicacionService,
     private msgSvc: ContactoService,
+    private solicitudSvc: SolicitudService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -61,9 +64,22 @@ export class AdminResumenComponent implements OnInit {
     });
 
     if (this.usuario?.rol === 'admin') {
-      this.msgSvc.getContactos().subscribe({
+      forkJoin({
+        contactos: this.msgSvc.getContactos(),
+        solicitudes: this.solicitudSvc.getSolicitudes()
+      }).subscribe({
+        next: ({ contactos, solicitudes }) => {
+          const contactCount = contactos ? contactos.length : 0;
+          const pendingSols = solicitudes ? solicitudes.filter(s => s.estado === 'pendiente').length : 0;
+          this.mensajesCount = contactCount + pendingSols;
+          this.cdr.detectChanges();
+        },
+        error: (err) => console.error('Error loading admin counts', err)
+      });
+    } else if (this.usuario?.rol === 'investigador') {
+      this.solicitudSvc.getSolicitudes().subscribe({
         next: (res) => {
-          this.mensajesCount = res ? res.length : 0;
+          this.mensajesCount = res ? res.filter(s => s.estado === 'pendiente').length : 0;
           this.cdr.detectChanges();
         }
       });

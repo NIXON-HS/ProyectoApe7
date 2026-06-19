@@ -159,9 +159,9 @@
           </div>
         </div>
 
-        <button *ngIf="usuario?.rol === 'admin'" (click)="switchTab('mensajes')" class="sidebar-item" [class.active-sidebar-item]="activeTab === 'mensajes'">
+        <button (click)="switchTab('mensajes')" class="sidebar-item" [class.active-sidebar-item]="activeTab === 'mensajes'">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-          <span>Mensajes Recibidos</span>
+          <span>Notificaciones</span>
           <span *ngIf="mensajesCount > 0" class="ml-auto bg-reasons-green text-white font-bold text-xs px-2 py-0.5 rounded-full">
             {{ mensajesCount }}
           </span>
@@ -195,7 +195,7 @@
         <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Panel Administrativo</span>
         <h2 class="text-3xl font-extrabold text-reasons-navy capitalize mb-0">
           <ng-container [ngSwitch]="activeTab">
-            <ng-container *ngSwitchCase="'mensajes'">Mensajes de Contacto</ng-container>
+            <ng-container *ngSwitchCase="'mensajes'">Notificaciones</ng-container>
             <ng-container *ngSwitchCase="'perfil'">Mi Perfil Público</ng-container>
             <ng-container *ngSwitchCase="'lineas'">Líneas de Investigación</ng-container>
             <ng-container *ngSwitchCase="'noticias'">Noticias y Eventos</ng-container>
@@ -263,7 +263,7 @@
       </ng-container>
       <app-admin-lineas *ngIf="activeTab === 'lineas'"></app-admin-lineas>
       <app-admin-noticias *ngIf="activeTab === 'noticias'" [searchQuery]="searchQuery"></app-admin-noticias>
-      <app-admin-mensajes *ngIf="activeTab === 'mensajes'" [searchQuery]="searchQuery"></app-admin-mensajes>
+      <app-admin-mensajes *ngIf="activeTab === 'mensajes'" [searchQuery]="searchQuery" [usuario]="usuario"></app-admin-mensajes>
       <app-admin-analytics *ngIf="activeTab === 'analytics'"></app-admin-analytics>
     </div>
   </main>

@@ -1,4 +1,4 @@
-const { Proyecto, Investigador, LineaInvestigacion } = require('../models/index');
+const { Proyecto, Investigador, LineaInvestigacion, Solicitud } = require('../models/index');
 
 exports.getProyectos = async (req, res, next) => {
   try {
@@ -50,6 +50,23 @@ exports.getProyectoById = async (req, res, next) => {
 exports.crearProyecto = async (req, res, next) => {
   try {
     const { titulo, descripcion, objetivos, resultados, descripcion_json, objetivos_json, resultados_json, estado, linea_id, investigadores } = req.body;
+    
+    if (req.usuario && req.usuario.rol === 'investigador') {
+      const solicitud = await Solicitud.create({
+        usuario_id: req.usuario.id,
+        tipo: 'proyecto',
+        accion: 'crear',
+        datos_nuevos: JSON.stringify(req.body),
+        estado: 'pendiente'
+      });
+      return res.status(202).json({
+        success: true,
+        message: 'Tu solicitud de creación de proyecto ha sido enviada al administrador para su aprobación.',
+        data: solicitud,
+        isPendingApproval: true
+      });
+    }
+
     const newItem = await Proyecto.create({ titulo, descripcion, objetivos, resultados, descripcion_json, objetivos_json, resultados_json, estado, linea_id });
     
     if (investigadores && Array.isArray(investigadores)) {
@@ -66,6 +83,23 @@ exports.actualizarProyecto = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { titulo, descripcion, objetivos, resultados, descripcion_json, objetivos_json, resultados_json, estado, linea_id, investigadores } = req.body;
+
+    if (req.usuario && req.usuario.rol === 'investigador') {
+      const solicitud = await Solicitud.create({
+        usuario_id: req.usuario.id,
+        tipo: 'proyecto',
+        accion: 'editar',
+        registro_id: id,
+        datos_nuevos: JSON.stringify(req.body),
+        estado: 'pendiente'
+      });
+      return res.status(202).json({
+        success: true,
+        message: 'Tu solicitud de modificación de proyecto ha sido enviada al administrador para su aprobación.',
+        data: solicitud,
+        isPendingApproval: true
+      });
+    }
 
     const [updated] = await Proyecto.update(
       { titulo, descripcion, objetivos, resultados, descripcion_json, objetivos_json, resultados_json, estado, linea_id },

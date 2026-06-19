@@ -11,6 +11,7 @@ import { BlockRendererComponent } from '../../../shared/block-renderer/block-ren
 import { PaginationComponent } from '../../../shared/pagination/pagination';
 import { Publicacion } from '../../../core/models/publicacion.model';
 import { Investigador } from '../../../core/models/investigador.model';
+import { SolicitudService } from '../../../core/services/solicitud.service';
 
 @Component({
   selector: 'app-admin-publicaciones',
@@ -66,7 +67,8 @@ export class AdminPublicacionesComponent implements OnInit {
     private toastService: ToastService,
     private confirmService: ConfirmService,
     private cdr: ChangeDetectorRef,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private solicitudService: SolicitudService
   ) {}
 
   ngOnInit() {
@@ -256,6 +258,7 @@ export class AdminPublicacionesComponent implements OnInit {
           this.toastService.show('Publicación científica actualizada.', 'success');
           this.cargarTodo();
           this.cancelForm();
+          this.solicitudService.triggerRefreshCount();
         },
         error: () => {
           this.isSubmitting = false;
@@ -269,6 +272,7 @@ export class AdminPublicacionesComponent implements OnInit {
           this.toastService.show('Publicación científica registrada.', 'success');
           this.cargarTodo();
           this.cancelForm();
+          this.solicitudService.triggerRefreshCount();
         },
         error: () => {
           this.isSubmitting = false;
