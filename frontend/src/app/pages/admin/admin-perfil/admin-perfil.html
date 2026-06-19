@@ -1,4 +1,4 @@
-<div class="animate-fade-in flex flex-col gap-6 text-left">
+<div class="animate-fade-in flex flex-col gap-8 text-left">
   
   <!-- If profile is not found (fallback) -->
   <div *ngIf="!miPerfil" class="glass-card p-8 rounded-3xl border border-slate-100 text-center flex flex-col items-center justify-center gap-4 py-16 bg-white">
@@ -227,4 +227,207 @@
       </form>
     </div>
   </div>
+
+  <!-- CAMBIAR CONTRASEÑA — disponible para cualquier rol -->
+  <div class="glass-card rounded-3xl border border-slate-100 shadow-xl bg-white overflow-hidden">
+
+    <!-- Header / toggle -->
+    <button type="button" (click)="showPasswordForm = !showPasswordForm; cdr.detectChanges()"
+            class="w-full flex items-center justify-between px-6 md:px-8 py-5 text-left hover:bg-slate-50/80 transition-all duration-200 cursor-pointer group">
+      <div class="flex items-center gap-3.5">
+        <!-- Shield-check icon con gradiente de la app -->
+        <div class="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm transition-transform duration-200 group-hover:scale-105"
+             style="background: linear-gradient(135deg, #0a3246 0%, #00283c 100%)">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <span class="text-sm font-bold text-reasons-navy">Seguridad de la Cuenta</span>
+          <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Cambiar contraseña de acceso</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-[10px] font-bold text-reasons-blue opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          {{ showPasswordForm ? 'Cerrar' : 'Cambiar' }}
+        </span>
+        <svg class="w-5 h-5 text-slate-400 transition-transform duration-300" [class.rotate-180]="showPasswordForm"
+             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </div>
+    </button>
+
+    <!-- Form expandible -->
+    <div *ngIf="showPasswordForm" class="border-t border-slate-100 animate-fade-in">
+
+      <form [formGroup]="passwordForm" (ngSubmit)="cambiarPassword()" class="flex flex-col gap-5 px-6 md:px-8 py-6">
+
+        <!-- ─── Contraseña Actual ─── -->
+        <div class="flex flex-col gap-1.5">
+          <label class="form-label flex items-center gap-1">
+            Contraseña Actual
+            <span class="text-red-500 font-black">*</span>
+          </label>
+          <div class="relative">
+            <input [type]="showPasswordActual ? 'text' : 'password'"
+                   formControlName="passwordActual"
+                   class="form-input pr-11"
+                   [class.input-error]="isFieldInvalid('passwordActual')"
+                   [class.input-success]="isFieldValid('passwordActual')"
+                   placeholder="Ingresa tu contraseña actual"
+                   autocomplete="current-password" />
+            <button type="button" (click)="showPasswordActual = !showPasswordActual"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-slate-400 hover:text-reasons-blue hover:bg-slate-50 transition-all cursor-pointer">
+              <svg *ngIf="!showPasswordActual" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+              <svg *ngIf="showPasswordActual" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+              </svg>
+            </button>
+          </div>
+          <div class="px-0.5 min-h-[16px]">
+            <span *ngIf="isFieldInvalid('passwordActual') && passwordForm.get('passwordActual')?.hasError('required')"
+                  class="text-[11px] text-red-500 font-medium flex items-center gap-1">
+              <svg class="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+              Este campo es obligatorio
+            </span>
+            <span *ngIf="!isFieldInvalid('passwordActual')" class="text-[11px] text-slate-400">
+              La contraseña con la que inicias sesión actualmente
+            </span>
+          </div>
+        </div>
+
+        <!-- ─── Nueva Contraseña ─── -->
+        <div class="flex flex-col gap-1.5">
+          <label class="form-label flex items-center gap-1">
+            Nueva Contraseña
+            <span class="text-red-500 font-black">*</span>
+          </label>
+          <div class="relative">
+            <input [type]="showPasswordNuevo ? 'text' : 'password'"
+                   formControlName="passwordNuevo"
+                   class="form-input pr-11"
+                   [class.input-error]="isFieldInvalid('passwordNuevo')"
+                   [class.input-success]="isFieldValid('passwordNuevo')"
+                   placeholder="Mínimo 6 caracteres"
+                   autocomplete="new-password" />
+            <button type="button" (click)="showPasswordNuevo = !showPasswordNuevo"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-slate-400 hover:text-reasons-blue hover:bg-slate-50 transition-all cursor-pointer">
+              <svg *ngIf="!showPasswordNuevo" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+              <svg *ngIf="showPasswordNuevo" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Indicador de fortaleza -->
+          <div *ngIf="passwordForm.get('passwordNuevo')?.value" class="flex flex-col gap-2 mt-0.5 px-0.5">
+            <div class="flex gap-1.5">
+              <div class="strength-bar-segment" [style.background-color]="getSegmentColor(1)"></div>
+              <div class="strength-bar-segment" [style.background-color]="getSegmentColor(2)"></div>
+              <div class="strength-bar-segment" [style.background-color]="getSegmentColor(3)"></div>
+              <div class="strength-bar-segment" [style.background-color]="getSegmentColor(4)"></div>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold" [style.color]="getStrengthColor()">
+                {{ passwordStrength.label }}
+              </span>
+              <span class="text-[10px] text-slate-400 italic">{{ passwordStrength.hint }}</span>
+            </div>
+          </div>
+
+          <div class="px-0.5 min-h-[16px]">
+            <span *ngIf="isFieldInvalid('passwordNuevo') && passwordForm.get('passwordNuevo')?.hasError('required')"
+                  class="text-[11px] text-red-500 font-medium flex items-center gap-1">
+              <svg class="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+              Este campo es obligatorio
+            </span>
+            <span *ngIf="isFieldInvalid('passwordNuevo') && passwordForm.get('passwordNuevo')?.hasError('minlength')"
+                  class="text-[11px] text-red-500 font-medium flex items-center gap-1">
+              <svg class="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+              Mínimo 6 caracteres
+            </span>
+            <span *ngIf="!isFieldInvalid('passwordNuevo') && !passwordForm.get('passwordNuevo')?.value"
+                  class="text-[11px] text-slate-400">
+              Usa mayúsculas, números y símbolos para mayor seguridad
+            </span>
+          </div>
+        </div>
+
+        <!-- ─── Confirmar Contraseña ─── -->
+        <div class="flex flex-col gap-1.5">
+          <label class="form-label flex items-center gap-1">
+            Confirmar Nueva Contraseña
+            <span class="text-red-500 font-black">*</span>
+          </label>
+          <div class="relative">
+            <input [type]="showPasswordConfirmar ? 'text' : 'password'"
+                   formControlName="passwordConfirmar"
+                   class="form-input pr-11"
+                   [class.input-error]="isFieldInvalid('passwordConfirmar') || (passwordForm.get('passwordConfirmar')?.dirty && passwordForm.hasError('noCoinciden'))"
+                   [class.input-success]="passwordForm.get('passwordConfirmar')?.valid && passwordForm.get('passwordConfirmar')?.dirty && !passwordForm.hasError('noCoinciden')"
+                   placeholder="Repite la nueva contraseña"
+                   autocomplete="new-password" />
+            <button type="button" (click)="showPasswordConfirmar = !showPasswordConfirmar"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-slate-400 hover:text-reasons-blue hover:bg-slate-50 transition-all cursor-pointer">
+              <svg *ngIf="!showPasswordConfirmar" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+              <svg *ngIf="showPasswordConfirmar" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+              </svg>
+            </button>
+          </div>
+          <div class="px-0.5 min-h-[16px]">
+            <span *ngIf="isFieldInvalid('passwordConfirmar') && passwordForm.get('passwordConfirmar')?.hasError('required')"
+                  class="text-[11px] text-red-500 font-medium flex items-center gap-1">
+              <svg class="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+              Este campo es obligatorio
+            </span>
+            <span *ngIf="passwordForm.get('passwordConfirmar')?.dirty && passwordForm.hasError('noCoinciden')"
+                  class="text-[11px] text-red-500 font-medium flex items-center gap-1">
+              <svg class="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+              Las contraseñas no coinciden
+            </span>
+            <span *ngIf="!isFieldInvalid('passwordConfirmar') && !passwordForm.get('passwordConfirmar')?.dirty"
+                  class="text-[11px] text-slate-400">
+              Debe ser idéntica a la contraseña ingresada arriba
+            </span>
+            <span *ngIf="passwordForm.get('passwordConfirmar')?.valid && passwordForm.get('passwordConfirmar')?.dirty && !passwordForm.hasError('noCoinciden')"
+                  class="text-[11px] font-medium flex items-center gap-1" style="color:#3c9632">
+              <svg class="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+              Las contraseñas coinciden
+            </span>
+          </div>
+        </div>
+
+        <!-- ─── Botones ─── -->
+        <div class="flex items-center gap-3 pt-3 border-t border-slate-100">
+          <button type="button" (click)="cancelPasswordForm()"
+                  class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl text-xs transition-all cursor-pointer">
+            Cancelar
+          </button>
+          <button type="submit" [disabled]="isSubmittingPassword"
+                  class="px-6 py-2.5 text-white font-bold rounded-xl text-xs shadow-md transition-all cursor-pointer flex items-center gap-2 disabled:opacity-60"
+                  style="background: linear-gradient(135deg, #0a3246 0%, #00283c 100%)">
+            <span *ngIf="isSubmittingPassword" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+            <svg *ngIf="!isSubmittingPassword" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+            {{ isSubmittingPassword ? 'Actualizando...' : 'Actualizar Contraseña' }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
 </div>

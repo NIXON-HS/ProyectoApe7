@@ -1,1 +1,15 @@
 @import "../../login/login.css";
+
+.input-error {
+  border-color: #fca5a5 !important;
+  background-color: #fff5f5 !important;
+}
+.input-success {
+  border-color: #3c9632 !important;
+}
+.strength-bar-segment {
+  height: 6px;
+  border-radius: 9999px;
+  flex: 1;
+  transition: background-color 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}

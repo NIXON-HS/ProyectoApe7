@@ -90,6 +90,12 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
+  cambiarPassword(passwordActual: string, passwordNuevo: string): Observable<any> {
+    const token = this.getToken();
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    return this.http.put<any>(`${this.apiUrl}/change-password`, { passwordActual, passwordNuevo }, { headers });
+  }
+
   isLoggedIn(): boolean {
     return this.getToken() !== null;
   }
