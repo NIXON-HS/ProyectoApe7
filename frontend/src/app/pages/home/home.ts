@@ -37,6 +37,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   slides: CarouselSlide[] = [];
   currentSlideIndex = 0;
   private slideIntervalId: any;
+  private touchStartX = 0;
 
   // Noticias state
   noticias: Noticia[] = [];
@@ -222,6 +223,20 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.currentSlideIndex = index;
     this.cdr.detectChanges();
     this.startSlideRotation();
+  }
+
+  onTouchStart(e: TouchEvent) {
+    this.touchStartX = e.touches[0].clientX;
+    this.stopSlideRotation();
+  }
+
+  onTouchEnd(e: TouchEvent) {
+    const diff = this.touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) {
+      diff > 0 ? this.nextSlide() : this.prevSlide();
+    } else {
+      this.startSlideRotation();
+    }
   }
 
   lineaIconBg(i: number): string {
