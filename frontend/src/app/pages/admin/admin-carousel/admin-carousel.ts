@@ -35,7 +35,14 @@ export class AdminCarouselComponent implements OnInit {
   ngOnInit() { this.cargar(); }
 
   emptyForm(): Partial<CarouselSlide> {
-    return { titulo: '', subtitulo: '', imagen_url: '', enlace: '', orden: 0, activo: true };
+    return {
+      tipo: 'standard',
+      titulo: '', subtitulo: '', descripcion: '',
+      imagen_url: '', enlace: '',
+      boton1_texto: 'Ver más', boton2_texto: '', boton2_url: '',
+      color_overlay: '', alineacion: 'left', texto_oscuro: false,
+      orden: 0, activo: true
+    };
   }
 
   cargar() {

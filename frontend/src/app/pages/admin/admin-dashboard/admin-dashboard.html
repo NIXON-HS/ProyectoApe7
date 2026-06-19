@@ -148,6 +148,14 @@
               <span>Contacto</span>
             </button>
 
+            <button (click)="openInfoPage('noticias')" class="sidebar-sub-item"
+                    [class.active-sidebar-sub-item]="activeTab === 'info' && infoSubPage === 'noticias'">
+              <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15"/>
+              </svg>
+              <span>Noticias</span>
+            </button>
+
           </div>
         </div>
 
@@ -193,7 +201,12 @@
             <ng-container *ngSwitchCase="'noticias'">Noticias y Eventos</ng-container>
             <ng-container *ngSwitchCase="'analytics'">Analíticas del Sitio</ng-container>
             <ng-container *ngSwitchCase="'info'">
-              Página — {{ infoSubPage === 'inicio' ? 'Inicio' : infoSubPage === 'proyectos' ? 'Proyectos' : infoSubPage === 'publicaciones' ? 'Publicaciones' : 'Contacto' }}
+              Página —
+              {{ infoSubPage === 'inicio' ? 'Inicio' :
+                 infoSubPage === 'proyectos' ? 'Proyectos' :
+                 infoSubPage === 'publicaciones' ? 'Publicaciones' :
+                 infoSubPage === 'noticias' ? 'Noticias' :
+                 'Contacto' }}
             </ng-container>
             <ng-container *ngSwitchDefault>{{ activeTab }}</ng-container>
           </ng-container>

@@ -39,7 +39,7 @@
                 <div class="flex flex-col gap-1.5">
                   <span class="font-bold text-reasons-navy text-xs uppercase tracking-wider">Dirección Principal</span>
                   <span *ngIf="!editMode" class="leading-relaxed">{{ info?.contacto_direccion || 'Facultad de Ingeniería en Sistemas, Electrónica e Industrial. Av. de Los Chasquis y Av. Río Payamino. Universidad Técnica de Ambato. Ambato – Ecuador.' }}</span>
-                  <textarea *ngIf="editMode" [(ngModel)]="draft.contacto_direccion" rows="3" class="form-input text-sm w-full" placeholder="Dirección..."></textarea>
+                  <textarea *ngIf="editMode" [(ngModel)]="draft.contacto_direccion" rows="3" class="ie-textarea" placeholder="Dirección..."></textarea>
                 </div>
               </div>
 
@@ -53,7 +53,7 @@
                 <div class="flex flex-col gap-1.5">
                   <span class="font-bold text-reasons-navy text-xs uppercase tracking-wider">Correo Electrónico</span>
                   <a *ngIf="!editMode" [href]="'mailto:' + (info?.contacto_email || 'reasons@uta.edu.ec')" class="text-reasons-blue hover:text-reasons-green transition-colors font-medium text-sm leading-relaxed">{{ info?.contacto_email || 'reasons&#64;uta.edu.ec' }}</a>
-                  <input *ngIf="editMode" [(ngModel)]="draft.contacto_email" type="email" class="form-input text-sm" placeholder="Email..." />
+                  <input *ngIf="editMode" [(ngModel)]="draft.contacto_email" type="email" class="ie-input" placeholder="Email..." />
                 </div>
               </div>
             </div>

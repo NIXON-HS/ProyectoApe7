@@ -5,6 +5,7 @@ import { ProyectosComponent } from './pages/proyectos/proyectos';
 import { ProyectoDetalleComponent } from './pages/proyectos/proyecto-detalle/proyecto-detalle';
 import { PublicacionesComponent } from './pages/publicaciones/publicaciones';
 import { PublicacionDetalleComponent } from './pages/publicaciones/publicacion-detalle/publicacion-detalle';
+import { NoticiasComponent } from './pages/noticias/noticias';
 import { ContactoComponent } from './pages/contacto/contacto';
 import { LoginComponent } from './pages/login/login';
 import { NotFoundComponent } from './pages/not-found/not-found';
@@ -17,6 +18,7 @@ export const routes: Routes = [
   { path: 'proyectos/:id',   component: ProyectoDetalleComponent },
   { path: 'publicaciones',   component: PublicacionesComponent,   pathMatch: 'full' },
   { path: 'publicaciones/:id', component: PublicacionDetalleComponent },
+  { path: 'noticias',        component: NoticiasComponent },
   { path: 'contacto', component: ContactoComponent },
   { path: 'login', component: LoginComponent },
   { path: '**', component: NotFoundComponent }

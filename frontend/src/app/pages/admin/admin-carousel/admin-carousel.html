@@ -58,6 +58,18 @@
       </div>
     </div>
 
+    <!-- Tipo de slide -->
+    <div class="flex flex-col gap-1.5">
+      <label class="form-label">Tipo de slide</label>
+      <select [(ngModel)]="form.tipo" class="form-input">
+        <option value="standard">Estándar (una columna, texto sobre imagen)</option>
+        <option value="brand">Brand / Hero (dos columnas: texto + tarjeta con logo)</option>
+      </select>
+      <p *ngIf="form.tipo === 'brand'" class="text-[10px] text-reasons-green font-semibold">
+        El slide Brand muestra el layout de portada principal con logo del grupo a la derecha. El campo "Subtítulo" se usa como badge/etiqueta encima del título.
+      </p>
+    </div>
+
     <!-- Título + subtítulo -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="flex flex-col gap-1.5">
@@ -65,21 +77,73 @@
         <input type="text" [(ngModel)]="form.titulo" class="form-input" placeholder="Ej: Investigación de excelencia" />
       </div>
       <div class="flex flex-col gap-1.5">
-        <label class="form-label">Subtítulo / descripción</label>
-        <input type="text" [(ngModel)]="form.subtitulo" class="form-input" placeholder="Ej: Facultad de Ingeniería — UTA" />
+        <label class="form-label">{{ form.tipo === 'brand' ? 'Badge/Etiqueta (encima del título)' : 'Subtítulo' }}</label>
+        <input type="text" [(ngModel)]="form.subtitulo" class="form-input"
+               [placeholder]="form.tipo === 'brand' ? 'Ej: Universidad Técnica de Ambato' : 'Ej: Facultad de Ingeniería — UTA'" />
       </div>
     </div>
 
-    <!-- Enlace + orden + activo -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      <div class="flex flex-col gap-1.5 sm:col-span-2">
-        <label class="form-label">Enlace (botón CTA, opcional)</label>
+    <!-- Descripción -->
+    <div class="flex flex-col gap-1.5">
+      <label class="form-label">Descripción (párrafo debajo del subtítulo, opcional)</label>
+      <textarea [(ngModel)]="form.descripcion" rows="2" class="form-input resize-none"
+                placeholder="Texto adicional que se muestra debajo del subtítulo..."></textarea>
+    </div>
+
+    <!-- Botones -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">Texto del botón 1 (CTA principal)</label>
+        <input type="text" [(ngModel)]="form.boton1_texto" class="form-input" placeholder="Ver más" />
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">Enlace del botón 1</label>
         <input type="text" [(ngModel)]="form.enlace" class="form-input" placeholder="https:// o /ruta interna" />
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">Texto del botón 2 (opcional)</label>
+        <input type="text" [(ngModel)]="form.boton2_texto" class="form-input" placeholder="Ej: Conocer más" />
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">Enlace del botón 2</label>
+        <input type="text" [(ngModel)]="form.boton2_url" class="form-input" placeholder="https:// o /ruta interna" />
+      </div>
+    </div>
+
+    <!-- Alineación + overlay + orden -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">Alineación del texto</label>
+        <select [(ngModel)]="form.alineacion" class="form-input">
+          <option value="left">Izquierda</option>
+          <option value="center">Centro</option>
+          <option value="right">Derecha</option>
+        </select>
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">Overlay de color (CSS, opcional)</label>
+        <input type="text" [(ngModel)]="form.color_overlay" class="form-input text-xs"
+               placeholder="rgba(0,40,60,0.6) o linear-gradient(...)" />
       </div>
       <div class="flex flex-col gap-1.5">
         <label class="form-label">Orden</label>
         <input type="number" [(ngModel)]="form.orden" class="form-input" min="0" />
       </div>
+    </div>
+
+    <!-- Texto oscuro + Activo -->
+    <div class="flex flex-wrap gap-6 items-center">
+      <label class="flex items-center gap-3 cursor-pointer">
+        <div (click)="form.texto_oscuro = !form.texto_oscuro"
+             class="w-11 h-6 rounded-full transition-colors duration-200 flex items-center px-1 cursor-pointer"
+             [class.bg-reasons-blue]="form.texto_oscuro"
+             [class.bg-slate-300]="!form.texto_oscuro">
+          <div class="w-4 h-4 rounded-full bg-white shadow transition-transform duration-200"
+               [class.translate-x-5]="form.texto_oscuro"
+               [class.translate-x-0]="!form.texto_oscuro"></div>
+        </div>
+        <span class="text-sm font-semibold text-reasons-navy">Texto oscuro <span class="text-slate-400 font-light">(para fondos claros)</span></span>
+      </label>
     </div>
 
     <!-- Activo -->

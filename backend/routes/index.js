@@ -11,8 +11,25 @@ const lineaRoutes = require('./linea.routes');
 const noticiaRoutes = require('./noticia.routes');
 const visitaRoutes = require('./visita.routes');
 const carouselRoutes = require('./carousel.routes');
+const { Investigador, Proyecto, Publicacion, Visita } = require('../models/index');
 
 const router = express.Router();
+
+// Stats públicos del sitio
+router.get('/stats', async (req, res) => {
+  try {
+    const [investigadores, proyectos, publicaciones, visitas] = await Promise.all([
+      Investigador.count(),
+      Proyecto.count(),
+      Publicacion.count(),
+      Visita.count()
+    ]);
+    res.json({ success: true, data: { investigadores, proyectos, publicaciones, visitas } });
+  } catch (e) {
+    console.error('Stats error:', e);
+    res.status(500).json({ success: false, message: 'Error al obtener estadísticas.' });
+  }
+});
 
 // Rutas agrupadas bajo el prefijo /api/
 router.use('/auth', authRoutes);

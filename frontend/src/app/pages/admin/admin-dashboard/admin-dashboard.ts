@@ -49,7 +49,7 @@ export class AdminDashboardComponent implements OnInit {
 
   activeTab: 'resumen' | 'investigadores' | 'proyectos' | 'publicaciones' | 'mensajes' | 'perfil' | 'info' | 'lineas' | 'noticias' | 'analytics' = 'resumen';
   infoExpanded = false;
-  infoSubPage: 'inicio' | 'proyectos' | 'publicaciones' | 'contacto' = 'inicio';
+  infoSubPage: 'inicio' | 'proyectos' | 'publicaciones' | 'contacto' | 'noticias' = 'inicio';
 
   isMobileSidebarOpen = false;
   searchQuery = '';
@@ -102,7 +102,7 @@ export class AdminDashboardComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  openInfoPage(sub: 'inicio' | 'proyectos' | 'publicaciones' | 'contacto') {
+  openInfoPage(sub: 'inicio' | 'proyectos' | 'publicaciones' | 'contacto' | 'noticias') {
     this.activeTab = 'info';
     this.infoSubPage = sub;
     this.infoExpanded = true;

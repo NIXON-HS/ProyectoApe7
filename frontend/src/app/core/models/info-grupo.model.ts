@@ -36,6 +36,10 @@ export interface InfoGrupo {
   contacto_telefono?:    string | null;
   contacto_direccion?:   string | null;
 
+  noticias_badge?:       string | null;
+  noticias_titulo?:      string | null;
+  noticias_descripcion?: string | null;
+
   equipo_badge?:        string | null;
   equipo_titulo?:       string | null;
   equipo_descripcion?:  string | null;
