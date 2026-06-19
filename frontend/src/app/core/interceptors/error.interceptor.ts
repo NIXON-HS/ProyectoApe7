@@ -16,10 +16,10 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
         errorMessage = `Error del Cliente: ${error.error.message}`;
       } else {
         // Error del lado del servidor
-        if (error.status === 429) {
-          errorMessage = 'Demasiados intentos. Por favor, intente de nuevo en 15 minutos.';
-        } else if (error.error && error.error.message) {
+        if (error.error && error.error.message) {
           errorMessage = error.error.message;
+        } else if (error.status === 429) {
+          errorMessage = 'Demasiados intentos. Por favor, intente de nuevo en unos minutos.';
         } else {
           errorMessage = `Error de comunicación (Código: ${error.status})`;
         }

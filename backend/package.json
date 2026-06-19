@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "seed": "node seeders/initialSeed.js"
+    "seed": "node seeders/initialSeed.js",
+    "migrate:reset-password": "node migrate_reset_password.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
@@ -17,6 +18,7 @@
     "express-validator": "^7.0.1",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.3",
+    "nodemailer": "^9.0.1",
     "pg": "^8.11.5",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.3"

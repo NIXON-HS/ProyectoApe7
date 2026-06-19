@@ -37,6 +37,11 @@ export class LoginCardComponent implements OnInit {
     this.showPassword = !this.showPassword;
   }
 
+  get forgotPasswordQueryParams() {
+    const correo = this.loginForm?.get('correo')?.value?.trim();
+    return correo ? { correo } : {};
+  }
+
   copyCredential(rol: 'admin' | 'investigador') {
     const email = rol === 'admin' ? 'admin@reasons.uta.edu.ec' : 'investigador@reasons.uta.edu.ec';
     const pass = rol === 'admin' ? 'admin123' : 'user123';
