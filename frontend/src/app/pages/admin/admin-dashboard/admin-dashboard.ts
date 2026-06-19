@@ -22,6 +22,7 @@ import { AdminNoticiasComponent } from '../admin-noticias/admin-noticias';
 import { AdminMensajesComponent } from '../admin-mensajes/admin-mensajes';
 import { AdminAnalyticsComponent } from '../admin-analytics/admin-analytics';
 import { AdminCarouselComponent } from '../admin-carousel/admin-carousel';
+import { AdminUsuariosComponent } from '../admin-usuarios/admin-usuarios';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -41,7 +42,8 @@ import { AdminCarouselComponent } from '../admin-carousel/admin-carousel';
     AdminNoticiasComponent,
     AdminMensajesComponent,
     AdminAnalyticsComponent,
-    AdminCarouselComponent
+    AdminCarouselComponent,
+    AdminUsuariosComponent
   ],
   templateUrl: './admin-dashboard.html',
   styleUrls: ['./admin-dashboard.css']
@@ -50,7 +52,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   @Input() usuario: any = null;
   @Output() logout = new EventEmitter<void>();
 
-  activeTab: 'resumen' | 'investigadores' | 'proyectos' | 'publicaciones' | 'mensajes' | 'perfil' | 'info' | 'lineas' | 'noticias' | 'analytics' = 'resumen';
+  activeTab: 'resumen' | 'investigadores' | 'proyectos' | 'publicaciones' | 'mensajes' | 'perfil' | 'info' | 'lineas' | 'noticias' | 'analytics' | 'usuarios' = 'resumen';
   infoExpanded = false;
   infoSubPage: 'inicio' | 'proyectos' | 'publicaciones' | 'contacto' | 'noticias' = 'inicio';
 
@@ -119,7 +121,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  switchTab(tab: 'resumen' | 'investigadores' | 'proyectos' | 'publicaciones' | 'mensajes' | 'perfil' | 'info' | 'lineas' | 'noticias' | 'analytics') {
+  switchTab(tab: 'resumen' | 'investigadores' | 'proyectos' | 'publicaciones' | 'mensajes' | 'perfil' | 'info' | 'lineas' | 'noticias' | 'analytics' | 'usuarios') {
     this.activeTab = tab;
     this.searchQuery = '';
     this.isMobileSidebarOpen = false;

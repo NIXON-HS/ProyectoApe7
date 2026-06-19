@@ -1,0 +1,192 @@
+<div class="animate-fade-in flex flex-col gap-6 text-left">
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h2 class="text-2xl font-bold text-reasons-navy mb-0">Gestión de Usuarios</h2>
+      <p class="text-sm text-slate-400 font-light mt-0.5">Los nuevos usuarios recibirán un correo para activar su cuenta.</p>
+    </div>
+    <button *ngIf="!showForm" (click)="nuevoUsuario()"
+            class="flex items-center gap-2 px-5 py-2.5 bg-reasons-blue hover:bg-reasons-navy text-white font-bold rounded-xl text-sm shadow-md transition-all cursor-pointer flex-shrink-0">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      Nuevo Usuario
+    </button>
+  </div>
+
+  <!-- Formulario crear/editar -->
+  <div *ngIf="showForm" class="glass-card bg-white rounded-3xl border border-slate-100 shadow-xl p-6 md:p-8 animate-fade-in">
+    <h3 class="text-lg font-bold text-reasons-navy mb-5">
+      {{ editMode ? 'Editar Usuario' : 'Crear Nuevo Usuario' }}
+    </h3>
+
+    <!-- Info banner -->
+    <div *ngIf="!editMode" class="flex items-start gap-3 p-3.5 rounded-2xl border mb-6"
+         style="background: rgba(10,50,70,0.04); border-color: rgba(10,50,70,0.12)">
+      <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20" style="color:#0a3246">
+        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+      </svg>
+      <p class="text-[11px] leading-relaxed font-medium mb-0" style="color:#0a3246">
+        No se asigna contraseña. El usuario recibirá un correo para <strong>crear su propia contraseña</strong> y activar su acceso al sistema.
+      </p>
+    </div>
+
+    <form [formGroup]="usuarioForm" (ngSubmit)="guardar()" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+      <!-- Nombres -->
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label flex items-center gap-1">Nombres Completos <span class="text-red-500 font-black">*</span></label>
+        <input type="text" formControlName="nombres" class="form-input" placeholder="ej. Juan Pérez Rodríguez" />
+        <span *ngIf="usuarioForm.get('nombres')?.touched && usuarioForm.get('nombres')?.invalid"
+              class="text-[11px] text-red-500 font-medium">Mínimo 3 caracteres.</span>
+      </div>
+
+      <!-- Correo -->
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label flex items-center gap-1">
+          Correo Electrónico <span class="text-red-500 font-black">*</span>
+          <span *ngIf="editMode" class="ml-1 text-[9px] font-bold text-slate-400 uppercase tracking-wide">(No editable)</span>
+        </label>
+        <input type="email" formControlName="correo" class="form-input"
+               [class.bg-slate-50]="editMode" [class.cursor-not-allowed]="editMode"
+               [class.text-slate-400]="editMode"
+               placeholder="correo@uta.edu.ec" />
+        <span *ngIf="usuarioForm.get('correo')?.touched && usuarioForm.get('correo')?.hasError('email')"
+              class="text-[11px] text-red-500 font-medium">Ingresa un correo válido.</span>
+      </div>
+
+      <!-- Rol -->
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label flex items-center gap-1">Rol en el Sistema <span class="text-red-500 font-black">*</span></label>
+        <select formControlName="rol" class="form-input">
+          <option *ngFor="let r of ROLES" [value]="r.value">{{ r.label }}</option>
+        </select>
+        <span class="text-[11px] text-slate-400">
+          <strong>Investigador</strong>: acceso a sus proyectos y perfil.
+          <strong>Administrador</strong>: acceso total al panel.
+        </span>
+      </div>
+
+      <!-- Botones -->
+      <div class="md:col-span-2 flex items-center gap-3 pt-2 border-t border-slate-100 mt-2">
+        <button type="button" (click)="cancelar()"
+                class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-all cursor-pointer">
+          Cancelar
+        </button>
+        <button type="submit" [disabled]="usuarioForm.invalid || isSubmitting"
+                class="px-6 py-2.5 text-white font-bold rounded-xl text-xs shadow-md transition-all cursor-pointer flex items-center gap-2 disabled:opacity-60"
+                style="background: linear-gradient(135deg, #0a3246 0%, #00283c 100%)">
+          <span *ngIf="isSubmitting" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+          <svg *ngIf="!isSubmitting && !editMode" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+          {{ isSubmitting ? 'Guardando...' : (editMode ? 'Guardar Cambios' : 'Crear y Enviar Correo') }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tabla de usuarios -->
+  <div class="glass-card bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+
+    <!-- Empty state -->
+    <div *ngIf="usuarios.length === 0" class="flex flex-col items-center justify-center gap-3 py-16 text-center">
+      <div class="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center">
+        <svg class="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/>
+        </svg>
+      </div>
+      <p class="text-sm font-semibold text-slate-500">No hay usuarios registrados.</p>
+    </div>
+
+    <!-- Lista -->
+    <div *ngIf="usuarios.length > 0" class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-slate-100 bg-slate-50/60">
+            <th class="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider">Usuario</th>
+            <th class="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider hidden sm:table-cell">Correo</th>
+            <th class="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rol</th>
+            <th class="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider hidden md:table-cell">Estado</th>
+            <th class="px-6 py-4 text-right text-[10px] font-bold text-slate-400 uppercase tracking-wider">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of usuarios" class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+            <!-- Avatar + Nombre -->
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm flex-shrink-0 shadow-sm"
+                     [style.background]="u.rol === 'admin' ? 'linear-gradient(135deg,#0a3246,#00283c)' : 'linear-gradient(135deg,#3c9632,#327e2a)'"
+                     style="color:white">
+                  {{ u.nombres.charAt(0).toUpperCase() }}
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span class="font-semibold text-reasons-navy truncate text-sm">{{ u.nombres }}</span>
+                  <span class="text-[11px] text-slate-400 sm:hidden truncate">{{ u.correo }}</span>
+                </div>
+              </div>
+            </td>
+            <!-- Correo -->
+            <td class="px-6 py-4 hidden sm:table-cell">
+              <span class="text-slate-500 text-sm">{{ u.correo }}</span>
+            </td>
+            <!-- Rol badge -->
+            <td class="px-6 py-4">
+              <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider"
+                    [class.badge-gold]="u.rol === 'admin'"
+                    [class.badge-slate]="u.rol !== 'admin'">
+                {{ rolLabel(u.rol) }}
+              </span>
+            </td>
+            <!-- Estado activación -->
+            <td class="px-6 py-4 hidden md:table-cell">
+              <span *ngIf="pendienteActivacion(u)"
+                    class="flex items-center gap-1.5 text-[11px] font-semibold text-amber-600">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                Pendiente activación
+              </span>
+              <span *ngIf="!pendienteActivacion(u)"
+                    class="flex items-center gap-1.5 text-[11px] font-semibold text-reasons-green">
+                <span class="w-1.5 h-1.5 rounded-full bg-reasons-green"></span>
+                Activo
+              </span>
+            </td>
+            <!-- Acciones -->
+            <td class="px-6 py-4">
+              <div class="flex items-center justify-end gap-2">
+                <!-- Reenviar activación -->
+                <button *ngIf="pendienteActivacion(u)"
+                        (click)="reenviarActivacion(u)"
+                        [disabled]="isResending === u.id"
+                        title="Reenviar correo de activación"
+                        class="p-2 rounded-xl bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors cursor-pointer disabled:opacity-50">
+                  <span *ngIf="isResending === u.id" class="w-4 h-4 border-2 border-amber-500 border-t-transparent rounded-full animate-spin block"></span>
+                  <svg *ngIf="isResending !== u.id" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                  </svg>
+                </button>
+                <!-- Editar -->
+                <button (click)="editarUsuario(u)" title="Editar usuario"
+                        class="p-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-reasons-blue hover:text-white transition-colors cursor-pointer">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                  </svg>
+                </button>
+                <!-- Eliminar -->
+                <button (click)="eliminarUsuario(u)" title="Eliminar usuario"
+                        class="p-2 rounded-xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-colors cursor-pointer">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
