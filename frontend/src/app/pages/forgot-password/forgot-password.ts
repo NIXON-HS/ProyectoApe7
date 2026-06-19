@@ -53,8 +53,9 @@ export class ForgotPasswordComponent implements OnInit {
         this.toastService.show(res.message, 'info');
         this.cdr.detectChanges();
       },
-      error: () => {
+      error: (err) => {
         this.isSubmitting = false;
+        this.toastService.show(err?.error?.message || 'No se pudo enviar el correo. Intenta nuevamente.', 'error');
         this.cdr.detectChanges();
       }
     });

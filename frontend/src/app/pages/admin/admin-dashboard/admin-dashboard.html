@@ -159,6 +159,13 @@
           </div>
         </div>
 
+        <button *ngIf="usuario?.rol === 'admin'" (click)="switchTab('usuarios')" class="sidebar-item" [class.active-sidebar-item]="activeTab === 'usuarios'">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+          </svg>
+          <span>Usuarios del Sistema</span>
+        </button>
+
         <button (click)="switchTab('mensajes')" class="sidebar-item" [class.active-sidebar-item]="activeTab === 'mensajes'">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
           <span>Notificaciones</span>
@@ -200,6 +207,7 @@
             <ng-container *ngSwitchCase="'lineas'">Líneas de Investigación</ng-container>
             <ng-container *ngSwitchCase="'noticias'">Noticias y Eventos</ng-container>
             <ng-container *ngSwitchCase="'analytics'">Analíticas del Sitio</ng-container>
+            <ng-container *ngSwitchCase="'usuarios'">Gestión de Usuarios</ng-container>
             <ng-container *ngSwitchCase="'info'">
               Página —
               {{ infoSubPage === 'inicio' ? 'Inicio' :
@@ -214,7 +222,7 @@
       </div>
 
       <!-- Search bar when listing items -->
-      <div *ngIf="activeTab !== 'resumen' && activeTab !== 'perfil' && activeTab !== 'info' && activeTab !== 'lineas' && activeTab !== 'analytics'" class="relative w-full md:w-80">
+      <div *ngIf="activeTab !== 'resumen' && activeTab !== 'perfil' && activeTab !== 'info' && activeTab !== 'lineas' && activeTab !== 'analytics' && activeTab !== 'usuarios'" class="relative w-full md:w-80">
         <input type="text" [(ngModel)]="searchQuery" class="search-input" placeholder="Buscar..." />
         <svg class="absolute right-3.5 top-3.5 text-slate-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
       </div>
@@ -265,6 +273,7 @@
       <app-admin-noticias *ngIf="activeTab === 'noticias'" [searchQuery]="searchQuery"></app-admin-noticias>
       <app-admin-mensajes *ngIf="activeTab === 'mensajes'" [searchQuery]="searchQuery" [usuario]="usuario"></app-admin-mensajes>
       <app-admin-analytics *ngIf="activeTab === 'analytics'"></app-admin-analytics>
+      <app-admin-usuarios *ngIf="activeTab === 'usuarios'"></app-admin-usuarios>
     </div>
   </main>
 </div>
