@@ -30,6 +30,36 @@ export interface AnalyticsData {
   dispositivos: { tipo: string; count: string }[];
 }
 
+export interface AnalyticsAvanzado {
+  comparacionPeriodos: {
+    semanaActual: number;
+    semanaAnterior: number;
+    mesActual: number;
+    mesAnterior: number;
+    semanaCrecimiento: number;
+    mesCrecimiento: number;
+  };
+  calendario: { fecha: string; total: string }[];
+  mejoresDias: { fecha: string; total: string }[];
+  peoresDias: { fecha: string; total: string }[];
+}
+
+export interface MapaLocation {
+  lat: number;
+  lon: number;
+  city: string;
+  country: string;
+  country_code: string;
+  total: number;
+}
+
+export interface MapaData {
+  locations: MapaLocation[];
+  paises: { nombre: string; total: number }[];
+  totalConUbicacion: number;
+  totalIPs: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -58,6 +88,18 @@ export class VisitaService {
 
   obtenerStats(): Observable<SiteStats> {
     return this.http.get<{ success: boolean; data: SiteStats }>(`${environment.apiUrl}/stats`).pipe(
+      map(response => response.data)
+    );
+  }
+
+  obtenerAnalyticsAvanzado(): Observable<AnalyticsAvanzado> {
+    return this.http.get<{ success: boolean; data: AnalyticsAvanzado }>(`${this.apiUrl}/analytics/advanced`).pipe(
+      map(response => response.data)
+    );
+  }
+
+  obtenerMapaVisitas(): Observable<MapaData> {
+    return this.http.get<{ success: boolean; data: MapaData }>(`${this.apiUrl}/analytics/map`).pipe(
       map(response => response.data)
     );
   }
