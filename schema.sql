@@ -100,6 +100,8 @@ CREATE TABLE usuarios (
     nombres VARCHAR(150) NOT NULL,
     correo VARCHAR(150) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
+    reset_password_token VARCHAR(255) DEFAULT NULL,
+    reset_password_expires TIMESTAMP DEFAULT NULL,
     rol VARCHAR(50) DEFAULT 'admin' NOT NULL
 );
 

@@ -8,6 +8,8 @@ import { PublicacionDetalleComponent } from './pages/publicaciones/publicacion-d
 import { NoticiasComponent } from './pages/noticias/noticias';
 import { ContactoComponent } from './pages/contacto/contacto';
 import { LoginComponent } from './pages/login/login';
+import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password';
+import { ResetPasswordComponent } from './pages/reset-password/reset-password';
 import { NotFoundComponent } from './pages/not-found/not-found';
 
 export const routes: Routes = [
@@ -21,5 +23,7 @@ export const routes: Routes = [
   { path: 'noticias',        component: NoticiasComponent },
   { path: 'contacto', component: ContactoComponent },
   { path: 'login', component: LoginComponent },
+  { path: 'forgot-password', component: ForgotPasswordComponent },
+  { path: 'reset-password', component: ResetPasswordComponent },
   { path: '**', component: NotFoundComponent }
 ];

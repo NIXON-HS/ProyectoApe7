@@ -18,6 +18,11 @@ interface LoginResponse {
   };
 }
 
+interface MessageResponse {
+  success: boolean;
+  message: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -53,6 +58,18 @@ export class AuthService {
         }
       })
     );
+  }
+
+  forgotPassword(correo: string): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(`${this.apiUrl}/forgot-password`, { correo });
+  }
+
+  validateResetToken(correo: string, token: string): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(`${this.apiUrl}/validate-reset-token`, { correo, token });
+  }
+
+  resetPassword(correo: string, token: string, password: string): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(`${this.apiUrl}/reset-password`, { correo, token, password });
   }
 
   /** Verifica el JWT almacenado sin bcrypt — instantáneo, para reloads */

@@ -12,9 +12,7 @@
 
 # Environment variables (Crucial for backend security)
 /backend/.env
-/backend/.env.*
 .env
-.env.*
 
 # IDEs and Editors
 .idea/
