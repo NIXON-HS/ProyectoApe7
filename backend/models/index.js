@@ -11,6 +11,7 @@ const PublicacionInvestigador = require('./publicacion_investigador');
 const Visita = require('./visita');
 const CarouselSlide = require('./carousel_slide');
 const GeolocationCache = require('./geolocation_cache');
+const Solicitud = require('./solicitud');
 
 // ==========================================
 // CONFIGURACIÓN DE RELACIONES (ASOCIACIONES)
@@ -93,6 +94,7 @@ module.exports = {
   PublicacionInvestigador,
   Visita,
   CarouselSlide,
-  GeolocationCache
+  GeolocationCache,
+  Solicitud
 };
 
