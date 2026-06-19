@@ -119,6 +119,12 @@
             <span *ngIf="isSubmitting" class="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block"></span>
             {{ isSubmitting ? 'Iniciando Sesión...' : 'Ingresar al Portal' }}
           </button>
+
+          <div class="flex justify-end">
+            <a routerLink="/forgot-password" [queryParams]="forgotPasswordQueryParams" class="text-xs font-semibold text-[#3c9632] hover:text-[#00283c] transition-colors">
+              ¿Olvidaste tu contraseña?
+            </a>
+          </div>
         </form>
 
         <!-- Asistente de Credenciales de Demostración -->
