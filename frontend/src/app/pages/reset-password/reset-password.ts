@@ -89,9 +89,10 @@ export class ResetPasswordComponent implements OnInit {
         this.router.navigate(['/login']);
         this.cdr.detectChanges();
       },
-      error: () => {
+      error: (err) => {
         this.isSubmitting = false;
         this.isTokenValid = false;
+        this.toastService.show(err?.error?.message || 'No se pudo actualizar la contraseña. El enlace puede haber expirado.', 'error');
         this.cdr.detectChanges();
       }
     });

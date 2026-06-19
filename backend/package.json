@@ -8,7 +8,8 @@
     "dev": "nodemon server.js",
     "seed": "node seeders/initialSeed.js",
     "migrate:reset-password": "node migrate_reset_password.js",
-    "migrate:carousel": "node migrate_carousel.js"
+    "migrate:carousel": "node migrate_carousel.js",
+    "migrate:investigadores-usuarios": "node migrate_investigadores_usuarios.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
