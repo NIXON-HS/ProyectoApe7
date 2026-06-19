@@ -4,6 +4,13 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
+export interface SiteStats {
+  visitas: number;
+  investigadores: number;
+  proyectos: number;
+  publicaciones: number;
+}
+
 export interface AnalyticsData {
   totalVisitas: number;
   visitasHoy: number;
@@ -18,7 +25,7 @@ export interface AnalyticsData {
   bounceRate: number;
   paginasMasVistas: { page: string; count: string }[];
   visitasPorDia: { fecha: string; total: string }[];
-  ultimasVisitas: { id: number; session_id: string; ip_address: string; page: string; createdAt: string }[];
+  ultimasVisitas: { id: number; session_id: string | null; ip_address: string | null; page: string; created_at: string }[];
   navegadores: { browser: string; count: string }[];
   dispositivos: { tipo: string; count: string }[];
 }
@@ -45,6 +52,12 @@ export class VisitaService {
 
   obtenerAnalytics(): Observable<AnalyticsData> {
     return this.http.get<{ success: boolean; data: AnalyticsData }>(`${this.apiUrl}/analytics`).pipe(
+      map(response => response.data)
+    );
+  }
+
+  obtenerStats(): Observable<SiteStats> {
+    return this.http.get<{ success: boolean; data: SiteStats }>(`${environment.apiUrl}/stats`).pipe(
       map(response => response.data)
     );
   }

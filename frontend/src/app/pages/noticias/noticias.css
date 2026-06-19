@@ -1,0 +1,46 @@
+/* ── Inline edit styles ─────────────────────────────── */
+.ie-badge {
+  display: block; width: 100%;
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em;
+  color: #3c9632; background: transparent;
+  border: none; border-bottom: 2px dashed #3c9632;
+  text-align: center; outline: none; padding: 2px 4px;
+}
+.ie-badge-green::placeholder { color: #a7f3d0; }
+
+.ie-title {
+  display: block; width: 100%;
+  font-size: 2.25rem; font-weight: 800;
+  color: #00283c; background: rgba(10,50,70,.04);
+  border: 2px dashed #0a3246; border-radius: 12px;
+  text-align: center; outline: none; padding: 8px 12px;
+}
+
+.ie-desc {
+  display: block; width: 100%;
+  font-weight: 300; color: #64748b;
+  background: rgba(0,0,0,.02);
+  border: 2px dashed #cbd5e1; border-radius: 10px;
+  outline: none; padding: 8px 12px;
+  resize: vertical; line-height: 1.6; text-align: center;
+}
+
+/* ── Animations ─────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+.animate-fade-in { animation: fadeIn .35s cubic-bezier(.4,0,.2,1) forwards; }
+
+.noticia-backdrop { animation: backdropFadeIn 0.3s ease forwards; }
+@keyframes backdropFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.noticia-modal { animation: modalSpringIn 0.45s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+@keyframes modalSpringIn {
+  from { opacity: 0; transform: scale(0.92) translateY(32px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}

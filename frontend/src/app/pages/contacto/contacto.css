@@ -1,3 +1,53 @@
+/* ── Inline edit styles ─────────────────────────────── */
+.ie-badge {
+  display: block; width: 100%;
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em;
+  color: #3c9632; background: transparent;
+  border: none; border-bottom: 2px dashed #3c9632;
+  text-align: center; outline: none; padding: 2px 4px;
+}
+.ie-badge-green::placeholder { color: #a7f3d0; }
+
+.ie-title {
+  display: block; width: 100%;
+  font-size: 2.25rem; font-weight: 800;
+  color: #00283c; background: rgba(10,50,70,.04);
+  border: 2px dashed #0a3246; border-radius: 12px;
+  text-align: center; outline: none; padding: 8px 12px;
+}
+
+.ie-desc {
+  display: block; width: 100%;
+  font-weight: 300; color: #64748b;
+  background: rgba(0,0,0,.02);
+  border: 2px dashed #cbd5e1; border-radius: 10px;
+  outline: none; padding: 8px 12px;
+  resize: vertical; line-height: 1.6; text-align: center;
+}
+
+.ie-input {
+  display: block; width: 100%;
+  font-size: .875rem; font-weight: 400; color: #374151;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px dashed rgba(100,116,139,0.5);
+  border-radius: 10px; outline: none;
+  padding: 6px 10px; transition: border .2s;
+  line-height: 1.5;
+}
+.ie-input:focus { border-color: #3c9632; background: rgba(60,150,50,.04); }
+
+.ie-textarea {
+  display: block; width: 100%;
+  font-size: .875rem; font-weight: 300; color: #374151;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px dashed rgba(100,116,139,0.5);
+  border-radius: 10px; outline: none;
+  padding: 6px 10px; resize: vertical; line-height: 1.6; transition: border .2s;
+}
+.ie-textarea:focus { border-color: #3c9632; background: rgba(60,150,50,.04); }
+
+/* ── Contact form input ───────────────────────────── */
 .input-field {
   width: 100%;
   padding: 0.8rem 1.1rem;

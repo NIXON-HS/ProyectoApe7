@@ -14,7 +14,7 @@ exports.getProyectos = async (req, res, next) => {
           as: 'linea' 
         }
       ],
-      order: [['id', 'ASC']]
+      order: [['id', 'DESC']]
     });
     res.status(200).json({ success: true, data: list });
   } catch (error) {

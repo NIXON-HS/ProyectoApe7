@@ -1,0 +1,251 @@
+<div class="animate-fade-in flex flex-col gap-6 text-left">
+
+  <!-- Header actions -->
+  <div class="flex items-center justify-between flex-wrap gap-3">
+    <p class="text-sm text-slate-500 font-light">Administra las imágenes del carrusel que aparecen en la portada del sitio.</p>
+    <button *ngIf="!showForm" (click)="abrirNuevo()" class="save-btn">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+      Nuevo slide
+    </button>
+  </div>
+
+  <!-- Form: crear / editar -->
+  <div *ngIf="showForm" class="glass-card p-6 md:p-8 rounded-3xl border border-reasons-green/30 shadow-xl flex flex-col gap-5 bg-white">
+    <div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-100">
+      <h3 class="text-lg font-bold text-reasons-navy mb-0">
+        {{ editingId ? 'Editar slide' : 'Nuevo slide' }}
+      </h3>
+      <div class="flex gap-2">
+        <button type="button" (click)="cancelarForm()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer">
+          Cancelar
+        </button>
+        <button type="button" (click)="guardar()" class="save-btn">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+          Guardar
+        </button>
+      </div>
+    </div>
+
+    <!-- Image upload + preview -->
+    <div class="flex flex-col gap-3">
+      <label class="form-label">Imagen del slide</label>
+      <div class="flex flex-col md:flex-row gap-4 items-start">
+        <!-- Preview -->
+        <div class="w-full md:w-64 h-36 rounded-2xl bg-slate-100 border-2 border-dashed border-slate-200 overflow-hidden flex items-center justify-center flex-shrink-0 relative">
+          <img *ngIf="form.imagen_url" [src]="resolveUrl(form.imagen_url)"
+               class="w-full h-full object-cover absolute inset-0" alt="preview" />
+          <div *ngIf="!form.imagen_url" class="flex flex-col items-center gap-2 text-slate-400">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <span class="text-xs font-medium">Sin imagen</span>
+          </div>
+        </div>
+        <!-- Upload + URL -->
+        <div class="flex flex-col gap-2 flex-1">
+          <div class="flex gap-2">
+            <input type="file" #imgInput accept="image/*" class="hidden" (change)="onImagenFileSelected($event)" />
+            <button type="button" (click)="imgInput.click()" [disabled]="isUploading"
+                    class="px-4 py-2 bg-reasons-blue hover:bg-reasons-navy text-white text-xs font-bold rounded-xl shadow-sm cursor-pointer transition-colors flex items-center gap-1.5 disabled:opacity-50">
+              <span *ngIf="isUploading" class="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+              <svg *ngIf="!isUploading" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+              {{ isUploading ? 'Subiendo...' : 'Subir imagen' }}
+            </button>
+          </div>
+          <span class="text-[9px] text-slate-400 font-semibold uppercase tracking-wider">o ingresa una URL:</span>
+          <input type="text" [(ngModel)]="form.imagen_url" class="form-input text-xs"
+                 placeholder="https://ejemplo.com/imagen.jpg o assets/..." />
+          <p class="text-[10px] text-slate-400">Recomendado: 1920×1080px, JPG/WEBP, máximo 8 MB.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tipo de slide -->
+    <div class="flex flex-col gap-1.5">
+      <label class="form-label">Tipo de slide</label>
+      <select [(ngModel)]="form.tipo" class="form-input">
+        <option value="standard">Estándar (una columna, texto sobre imagen)</option>
+        <option value="brand">Brand / Hero (dos columnas: texto + tarjeta con logo)</option>
+      </select>
+      <p *ngIf="form.tipo === 'brand'" class="text-[10px] text-reasons-green font-semibold">
+        El slide Brand muestra el layout de portada principal con logo del grupo a la derecha. El campo "Subtítulo" se usa como badge/etiqueta encima del título.
+      </p>
+    </div>
+
+    <!-- Título + subtítulo -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">Título del slide</label>
+        <input type="text" [(ngModel)]="form.titulo" class="form-input" placeholder="Ej: Investigación de excelencia" />
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">{{ form.tipo === 'brand' ? 'Badge/Etiqueta (encima del título)' : 'Subtítulo' }}</label>
+        <input type="text" [(ngModel)]="form.subtitulo" class="form-input"
+               [placeholder]="form.tipo === 'brand' ? 'Ej: Universidad Técnica de Ambato' : 'Ej: Facultad de Ingeniería — UTA'" />
+      </div>
+    </div>
+
+    <!-- Descripción -->
+    <div class="flex flex-col gap-1.5">
+      <label class="form-label">Descripción (párrafo debajo del subtítulo, opcional)</label>
+      <textarea [(ngModel)]="form.descripcion" rows="2" class="form-input resize-none"
+                placeholder="Texto adicional que se muestra debajo del subtítulo..."></textarea>
+    </div>
+
+    <!-- Botones -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">Texto del botón 1 (CTA principal)</label>
+        <input type="text" [(ngModel)]="form.boton1_texto" class="form-input" placeholder="Ver más" />
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">Enlace del botón 1</label>
+        <input type="text" [(ngModel)]="form.enlace" class="form-input" placeholder="https:// o /ruta interna" />
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">Texto del botón 2 (opcional)</label>
+        <input type="text" [(ngModel)]="form.boton2_texto" class="form-input" placeholder="Ej: Conocer más" />
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">Enlace del botón 2</label>
+        <input type="text" [(ngModel)]="form.boton2_url" class="form-input" placeholder="https:// o /ruta interna" />
+      </div>
+    </div>
+
+    <!-- Alineación + overlay + orden -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">Alineación del texto</label>
+        <select [(ngModel)]="form.alineacion" class="form-input">
+          <option value="left">Izquierda</option>
+          <option value="center">Centro</option>
+          <option value="right">Derecha</option>
+        </select>
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">Overlay de color (CSS, opcional)</label>
+        <input type="text" [(ngModel)]="form.color_overlay" class="form-input text-xs"
+               placeholder="rgba(0,40,60,0.6) o linear-gradient(...)" />
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">Orden</label>
+        <input type="number" [(ngModel)]="form.orden" class="form-input" min="0" />
+      </div>
+    </div>
+
+    <!-- Texto oscuro + Activo -->
+    <div class="flex flex-wrap gap-6 items-center">
+      <label class="flex items-center gap-3 cursor-pointer">
+        <div (click)="form.texto_oscuro = !form.texto_oscuro"
+             class="w-11 h-6 rounded-full transition-colors duration-200 flex items-center px-1 cursor-pointer"
+             [class.bg-reasons-blue]="form.texto_oscuro"
+             [class.bg-slate-300]="!form.texto_oscuro">
+          <div class="w-4 h-4 rounded-full bg-white shadow transition-transform duration-200"
+               [class.translate-x-5]="form.texto_oscuro"
+               [class.translate-x-0]="!form.texto_oscuro"></div>
+        </div>
+        <span class="text-sm font-semibold text-reasons-navy">Texto oscuro <span class="text-slate-400 font-light">(para fondos claros)</span></span>
+      </label>
+    </div>
+
+    <!-- Activo -->
+    <label class="flex items-center gap-3 cursor-pointer w-fit">
+      <div (click)="form.activo = !form.activo"
+           class="w-11 h-6 rounded-full transition-colors duration-200 flex items-center px-1 cursor-pointer"
+           [class.bg-reasons-green]="form.activo"
+           [class.bg-slate-300]="!form.activo">
+        <div class="w-4 h-4 rounded-full bg-white shadow transition-transform duration-200"
+             [class.translate-x-5]="form.activo"
+             [class.translate-x-0]="!form.activo"></div>
+      </div>
+      <span class="text-sm font-semibold text-reasons-navy">{{ form.activo ? 'Visible en el sitio' : 'Oculto' }}</span>
+    </label>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-16 gap-4">
+    <div class="w-10 h-10 border-4 border-reasons-green border-t-transparent rounded-full animate-spin"></div>
+    <span class="text-sm font-semibold text-reasons-blue">Cargando slides...</span>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!isLoading && slides.length === 0 && !showForm"
+       class="glass-card p-10 rounded-3xl flex flex-col items-center gap-4 text-center border border-slate-100">
+    <svg class="w-14 h-14 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+    <p class="text-slate-500 font-light text-sm">No hay slides aún. Crea el primero.</p>
+    <button (click)="abrirNuevo()" class="save-btn">Crear primer slide</button>
+  </div>
+
+  <!-- Slides list -->
+  <div *ngIf="!isLoading && slides.length > 0" class="flex flex-col gap-3">
+    <div *ngFor="let slide of slides; let i = index"
+         class="glass-card rounded-2xl border border-slate-100 bg-white overflow-hidden hover:border-reasons-green/30 transition-colors">
+      <div class="flex items-center gap-4 p-4">
+        <!-- Thumbnail -->
+        <div class="w-24 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-slate-100 relative">
+          <img *ngIf="slide.imagen_url" [src]="resolveUrl(slide.imagen_url)"
+               class="w-full h-full object-cover" [alt]="slide.titulo || ''" />
+          <div *ngIf="!slide.imagen_url" class="w-full h-full flex items-center justify-center">
+            <svg class="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          </div>
+          <!-- Order badge -->
+          <span class="absolute top-1 left-1 w-5 h-5 rounded-full bg-reasons-navy text-white text-[9px] font-bold flex items-center justify-center">{{ i + 1 }}</span>
+        </div>
+
+        <!-- Info -->
+        <div class="flex-1 min-w-0">
+          <p class="font-bold text-reasons-navy text-sm truncate">{{ slide.titulo || '(sin título)' }}</p>
+          <p class="text-xs text-slate-400 font-light truncate mt-0.5">{{ slide.subtitulo || '—' }}</p>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <!-- Reorder -->
+          <div class="flex flex-col gap-0.5">
+            <button (click)="moverArriba(i)" [disabled]="i === 0"
+                    class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center disabled:opacity-30 cursor-pointer transition-colors">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+            </button>
+            <button (click)="moverAbajo(i)" [disabled]="i === slides.length - 1"
+                    class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center disabled:opacity-30 cursor-pointer transition-colors">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+          </div>
+
+          <!-- Toggle activo -->
+          <button (click)="toggleActivo(slide)" title="{{ slide.activo ? 'Ocultar' : 'Mostrar' }}"
+                  class="w-8 h-8 rounded-xl flex items-center justify-center transition-colors cursor-pointer"
+                  [class.bg-reasons-green]="slide.activo"
+                  [class.text-white]="slide.activo"
+                  [class.bg-slate-100]="!slide.activo"
+                  [class.text-slate-400]="!slide.activo">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path *ngIf="slide.activo" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              <path *ngIf="!slide.activo" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+            </svg>
+          </button>
+
+          <!-- Editar -->
+          <button (click)="abrirEditar(slide)"
+                  class="w-8 h-8 rounded-xl bg-reasons-blue/10 hover:bg-reasons-blue text-reasons-blue hover:text-white flex items-center justify-center transition-colors cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+          </button>
+
+          <!-- Eliminar -->
+          <ng-container *ngIf="pendingDelete !== slide.id">
+            <button (click)="confirmarEliminar(slide.id!)"
+                    class="w-8 h-8 rounded-xl bg-rose-50 hover:bg-rose-500 text-rose-500 hover:text-white flex items-center justify-center transition-colors cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          </ng-container>
+          <ng-container *ngIf="pendingDelete === slide.id">
+            <span class="text-xs text-rose-600 font-bold">¿Eliminar?</span>
+            <button (click)="eliminar(slide.id!)"
+                    class="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white text-[10px] font-bold rounded-lg cursor-pointer transition-colors">Sí</button>
+            <button (click)="cancelarEliminar()"
+                    class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-[10px] font-bold rounded-lg cursor-pointer transition-colors">No</button>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

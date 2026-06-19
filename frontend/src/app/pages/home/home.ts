@@ -8,6 +8,9 @@ import { BlockRendererComponent } from '../../shared/block-renderer/block-render
 import { AdminBarComponent } from '../../shared/admin-bar/admin-bar';
 import { NoticiaService } from '../../core/services/noticia.service';
 import { Noticia } from '../../core/models/noticia.model';
+import { CarouselService } from '../../core/services/carousel.service';
+import { CarouselSlide } from '../../core/models/carousel-slide.model';
+import { VisitaService } from '../../core/services/visita.service';
 import { environment } from '../../../environments/environment';
 
 // Fallback constants (used while API loads or if no data saved yet)
@@ -30,10 +33,21 @@ export class HomeComponent implements OnInit, OnDestroy {
   editMode = false;
   draft: InfoGrupo = {};
 
+  // Carousel state
+  slides: CarouselSlide[] = [];
+  currentSlideIndex = 0;
+  private slideIntervalId: any;
+
   // Noticias state
   noticias: Noticia[] = [];
-  selectedNoticia: Noticia | null = null;
   currentNewsIndex = 0;
+  selectedNoticia: Noticia | null = null;
+
+  // Stats counters
+  statsTarget = { visitas: 0, investigadores: 0, proyectos: 0, publicaciones: 0 };
+  statsDisplay = { visitas: 0, investigadores: 0, proyectos: 0, publicaciones: 0 };
+  private statsAnimated = false;
+  private statsObserver?: IntersectionObserver;
 
   // Expose defaults to template
   DEFAULT_MISION     = DEFAULT_MISION;
@@ -48,13 +62,17 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(
     private cdr: ChangeDetectorRef,
     private infoSvc: InfoGrupoService,
-    private noticiaSvc: NoticiaService
+    private noticiaSvc: NoticiaService,
+    private carouselSvc: CarouselService,
+    private visitaSvc: VisitaService
   ) {}
 
   ngOnInit() {
     this.startRotation();
     this.cargarInfo();
     this.cargarNoticias();
+    this.cargarSlides();
+    this.cargarStats();
     this.infoSvc.contentUpdated$.subscribe(() => {
       this.cargarInfo();
       this.cargarNoticias();
@@ -64,7 +82,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.stopRotation();
     this.stopNewsRotation();
+    this.stopSlideRotation();
+    this.statsObserver?.disconnect();
   }
+
+  get latestNoticias(): Noticia[] { return this.noticias.slice(0, 3); }
 
   cargarInfo() {
     this.infoSvc.getInfoGrupo().subscribe({
@@ -75,6 +97,52 @@ export class HomeComponent implements OnInit, OnDestroy {
       next: (data) => { this.lineas = data; this.cdr.detectChanges(); },
       error: () => {}
     });
+  }
+
+  cargarStats() {
+    this.visitaSvc.obtenerStats().subscribe({
+      next: (s) => {
+        this.statsTarget = { visitas: s.visitas, investigadores: s.investigadores, proyectos: s.proyectos, publicaciones: s.publicaciones };
+        this.cdr.detectChanges();
+        this.setupStatsObserver();
+      },
+      error: () => {}
+    });
+  }
+
+  private setupStatsObserver() {
+    const el = document.getElementById('home-stats-section');
+    if (!el) { this.startCounters(); return; }
+    if (!('IntersectionObserver' in window)) { this.startCounters(); return; }
+    this.statsObserver = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && !this.statsAnimated) {
+        this.statsAnimated = true;
+        this.startCounters();
+        this.statsObserver?.disconnect();
+      }
+    }, { threshold: 0.2 });
+    this.statsObserver.observe(el);
+  }
+
+  private startCounters() {
+    (Object.keys(this.statsTarget) as Array<keyof typeof this.statsTarget>).forEach(key => {
+      this.animateValue(this.statsTarget[key], val => {
+        this.statsDisplay[key] = val;
+        this.cdr.detectChanges();
+      });
+    });
+  }
+
+  private animateValue(target: number, setter: (v: number) => void, duration = 2000) {
+    if (target === 0) { setter(0); return; }
+    const start = performance.now();
+    const step = (now: number) => {
+      const t = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setter(Math.round(eased * target));
+      if (t < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
   }
 
   startRotation() {
@@ -96,40 +164,64 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   startEdit() {
     this.draft = { ...this.info };
-    // Pre-fill hero fields with their on-screen fallbacks so the user
-    // only needs to edit what they want to change, not retype everything.
-    if (!this.draft.hero_badge)        this.draft.hero_badge        = 'Universidad Técnica de Ambato';
-    if (!this.draft.hero_titulo)       this.draft.hero_titulo       = 'Research in Engineering and Advanced Sustainable Operations,';
-    if (!this.draft.hero_nombre)       this.draft.hero_nombre       = 'Nature, and Society';
-    if (!this.draft.hero_subtitulo)    this.draft.hero_subtitulo    = this.info?.descripcion
-      ?? 'Investigación innovadora desde la Facultad de Ingeniería en Sistemas, Electrónica e Industrial orientada a un futuro industrial verde y sostenible.';
-    if (!this.draft.hero_cita)         this.draft.hero_cita         = 'Investigación innovadora desde la Facultad de Ingeniería en Sistemas, Electrónica e Industrial orientada a un futuro industrial verde y sostenible.';
-    if (!this.draft.hero_card_nombre)  this.draft.hero_card_nombre  = 'REASONS';
-    if (!this.draft.hero_card_grupo)   this.draft.hero_card_grupo   = 'Grupo de Investigación UTA';
-    if (!this.draft.mision)              this.draft.mision              = this.info?.mision              ?? DEFAULT_MISION;
-    if (!this.draft.objetivo_general)    this.draft.objetivo_general    = this.info?.objetivo_general    ?? DEFAULT_OBJETIVO;
+    if (!this.draft.mision)                this.draft.mision                = this.info?.mision                ?? DEFAULT_MISION;
+    if (!this.draft.objetivo_general)      this.draft.objetivo_general      = this.info?.objetivo_general      ?? DEFAULT_OBJETIVO;
     if (!this.draft.objetivos_especificos) this.draft.objetivos_especificos = this.info?.objetivos_especificos ?? DEFAULT_OBJETIVOS_ESP;
-    if (!this.draft.dominio)             this.draft.dominio             = this.info?.dominio             ?? DEFAULT_DOMINIO;
+    if (!this.draft.dominio)               this.draft.dominio               = this.info?.dominio               ?? DEFAULT_DOMINIO;
     this.editMode = true;
   }
   cancelEdit() { this.editMode = false; this.draft = {}; }
   saveEdit() {
     this.infoSvc.actualizarInfoGrupo({
-      // Hero
-      hero_badge:              this.draft.hero_badge,
-      hero_titulo:             this.draft.hero_titulo,
-      hero_nombre:             this.draft.hero_nombre,
-      hero_subtitulo:          this.draft.hero_subtitulo,
-      hero_cita:               this.draft.hero_cita,
-      hero_card_nombre:        this.draft.hero_card_nombre,
-      hero_card_grupo:         this.draft.hero_card_grupo,
-      // Misión / Objetivos / Dominio
       descripcion:             this.draft.descripcion,
       mision:                  this.draft.mision,
       objetivo_general:        this.draft.objetivo_general,
       objetivos_especificos:   this.draft.objetivos_especificos,
       dominio:                 this.draft.dominio,
     }).subscribe({ next: () => { this.editMode = false; this.infoSvc.notifyUpdate(); this.cargarInfo(); } });
+  }
+
+  // ── Carousel ────────────────────────────────────────────────────────────────
+  cargarSlides() {
+    this.carouselSvc.getSlides().subscribe({
+      next: (data) => {
+        this.slides = data;
+        this.currentSlideIndex = 0;
+        this.cdr.detectChanges();
+        this.startSlideRotation();
+      },
+      error: () => {}
+    });
+  }
+
+  startSlideRotation() {
+    this.stopSlideRotation();
+    if (this.slides.length <= 1) return;
+    this.slideIntervalId = setInterval(() => { this.nextSlide(); }, 6000);
+  }
+
+  stopSlideRotation() {
+    if (this.slideIntervalId) clearInterval(this.slideIntervalId);
+  }
+
+  prevSlide() {
+    const n = this.slides.length;
+    this.currentSlideIndex = (this.currentSlideIndex - 1 + n) % n;
+    this.cdr.detectChanges();
+    this.startSlideRotation();
+  }
+
+  nextSlide() {
+    const n = this.slides.length;
+    this.currentSlideIndex = (this.currentSlideIndex + 1) % n;
+    this.cdr.detectChanges();
+    this.startSlideRotation();
+  }
+
+  selectSlide(index: number) {
+    this.currentSlideIndex = index;
+    this.cdr.detectChanges();
+    this.startSlideRotation();
   }
 
   lineaIconBg(i: number): string {
@@ -183,17 +275,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.startNewsRotation();
   }
 
-  verNoticia(noticia: Noticia) {
-    this.selectedNoticia = noticia;
-    this.stopNewsRotation();
-    this.cdr.detectChanges();
-  }
-
-  cerrarNoticia() {
-    this.selectedNoticia = null;
-    this.startNewsRotation();
-    this.cdr.detectChanges();
-  }
 
   resolveUrl(url: string | null | undefined): string {
     if (!url) return '';

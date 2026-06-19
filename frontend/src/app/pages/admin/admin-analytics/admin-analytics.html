@@ -1,282 +1,466 @@
-<div *ngIf="isLoading" class="flex flex-col gap-6">
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-    <div class="h-28 rounded-3xl skeleton-shimmer"></div>
-    <div class="h-28 rounded-3xl skeleton-shimmer" style="animation-delay: 0.1s"></div>
-    <div class="h-28 rounded-3xl skeleton-shimmer" style="animation-delay: 0.2s"></div>
-    <div class="h-28 rounded-3xl skeleton-shimmer" style="animation-delay: 0.3s"></div>
-  </div>
-  <div class="h-80 rounded-3xl skeleton-shimmer" style="animation-delay: 0.4s"></div>
-  <p class="text-center text-sm text-slate-400 font-medium">Cargando datos de tráfico...</p>
-</div>
+<div class="min-h-screen bg-slate-100 p-4 md:p-6">
 
-<div *ngIf="!isLoading && data" class="flex flex-col gap-6">
-
-  <!-- KPI Cards Row -->
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-
-    <div class="analytics-card kpi-card bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col gap-2 cursor-default">
-      <div class="flex items-center gap-2 text-slate-500 text-xs font-bold uppercase tracking-wider">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-        Total Visitas
-      </div>
-      <span class="text-3xl font-extrabold text-reasons-navy font-mono tabular-nums counter-pop">{{ data.totalVisitas | number }}</span>
-      <span class="text-[11px] text-slate-400">Últimos 30 días</span>
+  <!-- ── Header ─────────────────────────────────────────────────── -->
+  <div class="flex items-center justify-between mb-5">
+    <div>
+      <h1 class="text-xl font-bold text-[#00283c]">Analytics de Visitas</h1>
+      <p class="text-xs text-slate-400 mt-0.5">Comportamiento de tráfico del sitio web</p>
     </div>
-
-    <div class="analytics-card kpi-card bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col gap-2 cursor-default">
-      <div class="flex items-center gap-2 text-slate-500 text-xs font-bold uppercase tracking-wider">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-        Hoy
-      </div>
-      <span class="text-3xl font-extrabold text-reasons-green font-mono tabular-nums counter-pop">{{ data.visitasHoy | number }}</span>
-      <span class="text-[11px] text-slate-400">Ayer: {{ data.visitasAyer | number }}</span>
-    </div>
-
-    <div class="analytics-card kpi-card bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col gap-2 cursor-default">
-      <div class="flex items-center gap-2 text-slate-500 text-xs font-bold uppercase tracking-wider">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-        Usuarios Únicos
-      </div>
-      <span class="text-3xl font-extrabold text-reasons-navy font-mono tabular-nums counter-pop">{{ data.usuariosUnicos | number }}</span>
-      <span class="text-[11px] text-slate-400">Hoy: {{ data.usuariosUnicosHoy }}</span>
-    </div>
-
-    <div class="analytics-card kpi-card bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col gap-2 cursor-default">
-      <div class="flex items-center gap-2 text-slate-500 text-xs font-bold uppercase tracking-wider">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-        Promedio Diario
-      </div>
-      <span class="text-3xl font-extrabold text-reasons-navy font-mono tabular-nums counter-pop">{{ data.promedioDiario | number }}</span>
-      <span class="text-[11px] text-slate-400">Visitas por día</span>
-    </div>
+    <button (click)="cargar()"
+      class="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 hover:border-[#3c9632] hover:text-[#3c9632] transition-all shadow-sm">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+      </svg>
+      Actualizar
+    </button>
   </div>
 
-  <!-- Traffic Chart + Engagement Panel -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- ── Skeleton ────────────────────────────────────────────────── -->
+  <ng-container *ngIf="isLoading">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+      <div *ngFor="let i of [1,2,3,4]" class="bg-white rounded-2xl h-24 skeleton-shimmer"></div>
+    </div>
+    <div class="bg-white rounded-2xl h-64 skeleton-shimmer mb-4"></div>
+  </ng-container>
 
-    <!-- Traffic Overview Chart -->
-    <div class="panel-section lg:col-span-2 bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
-      <div class="flex items-center justify-between mb-6">
-        <div class="flex items-center gap-3">
-          <h3 class="text-lg font-extrabold text-reasons-navy">Tráfico del Sitio</h3>
-          <div class="flex items-center gap-1.5">
-            <span class="live-dot"></span>
-            <span class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">En vivo</span>
+  <ng-container *ngIf="!isLoading && data">
+
+    <!-- ── KPI Cards ───────────────────────────────────────────────── -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+
+      <div class="analytics-card bg-white rounded-2xl p-4 shadow-sm border-l-4 border-[#3c9632]">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-xs text-slate-400 font-medium uppercase tracking-wide">Total Visitas</p>
+            <p class="text-3xl font-black text-[#00283c] mt-1">{{ data.totalVisitas }}</p>
+            <p class="text-xs text-slate-400 mt-1">Desde el inicio</p>
+          </div>
+          <div class="w-9 h-9 rounded-xl bg-[#3c9632]/10 flex items-center justify-center">
+            <svg class="w-5 h-5 text-[#3c9632]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
           </div>
         </div>
-        <span class="text-xs bg-reasons-green/10 text-reasons-green font-bold px-3 py-1 rounded-full">{{ data.visitasMes | number }} visitas</span>
       </div>
-      <p class="text-xs text-slate-400 -mt-4 mb-5">Visitas diarias en los últimos 30 días</p>
 
-      <!-- CSS Bar Chart -->
-      <div class="relative">
-        <div class="flex items-end gap-[3px] overflow-x-auto pb-2" style="height: {{ maxBarHeight + 40 }}px;">
-          <div *ngFor="let v of data.visitasPorDia; let i = index"
-               class="chart-bar-wrapper flex flex-col items-center justify-end min-w-[14px] group relative"
-               [style.animation-delay.ms]="300 + (i * 30)"
-               style="height: {{ maxBarHeight + 40 }}px;">
-            <div class="text-[9px] text-slate-500 font-mono mb-1 opacity-0 group-hover:opacity-100 transition-opacity font-bold">{{ v.total }}</div>
-            <div class="chart-bar w-full rounded-t-lg bg-gradient-to-t from-reasons-green to-emerald-400 cursor-pointer"
-                 [style.height.px]="getBarHeight(v.total)"
-                 [style.animation-delay.ms]="400 + (i * 40)">
+      <div class="analytics-card bg-white rounded-2xl p-4 shadow-sm border-l-4 border-[#0a3246]">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-xs text-slate-400 font-medium uppercase tracking-wide">Hoy</p>
+            <div class="flex items-baseline gap-2 mt-1">
+              <p class="text-3xl font-black text-[#00283c]">{{ data.visitasHoy }}</p>
+              <span *ngIf="getTrend() !== 0"
+                [class]="getTrend() > 0 ? 'text-[#3c9632] bg-[#3c9632]/10' : 'text-red-500 bg-red-50'"
+                class="text-xs font-bold px-1.5 py-0.5 rounded-full">
+                {{ getTrend() > 0 ? '▲' : '▼' }}{{ getTrend() | number:'1.0-0' }}%
+              </span>
             </div>
-            <span class="text-[8px] text-slate-400 mt-1 font-medium">{{ formatDate(v.fecha) }}</span>
+            <p class="text-xs text-slate-400 mt-1">Ayer: {{ data.visitasAyer }}</p>
+          </div>
+          <div class="w-9 h-9 rounded-xl bg-[#0a3246]/10 flex items-center justify-center">
+            <svg class="w-5 h-5 text-[#0a3246]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
           </div>
         </div>
-        <!-- Y-axis labels -->
-        <div class="absolute -left-1 top-0 flex flex-col justify-between text-[9px] text-slate-400 font-mono" style="height: {{ maxBarHeight }}px;">
-          <span>{{ chartMax }}</span>
-          <span>{{ (chartMax / 2) | number:'1.0-0' }}</span>
-          <span>0</span>
+      </div>
+
+      <div class="analytics-card bg-white rounded-2xl p-4 shadow-sm border-l-4 border-[#3c9632]/60">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-xs text-slate-400 font-medium uppercase tracking-wide">Esta Semana</p>
+            <p class="text-3xl font-black text-[#00283c] mt-1">{{ data.visitasSemana }}</p>
+            <p class="text-xs text-slate-400 mt-1">Últimos 7 días</p>
+          </div>
+          <div class="w-9 h-9 rounded-xl bg-[#3c9632]/10 flex items-center justify-center">
+            <svg class="w-5 h-5 text-[#3c9632]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+          </div>
         </div>
+      </div>
+
+      <div class="analytics-card bg-white rounded-2xl p-4 shadow-sm border-l-4 border-[#0a3246]/60">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-xs text-slate-400 font-medium uppercase tracking-wide">Este Mes</p>
+            <p class="text-3xl font-black text-[#00283c] mt-1">{{ data.visitasMes }}</p>
+            <p class="text-xs text-slate-400 mt-1">Últimos 30 días</p>
+          </div>
+          <div class="w-9 h-9 rounded-xl bg-[#0a3246]/10 flex items-center justify-center">
+            <svg class="w-5 h-5 text-[#0a3246]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Traffic Chart ───────────────────────────────────────────── -->
+    <div class="panel-section bg-white rounded-2xl shadow-sm overflow-hidden mb-4">
+
+      <!-- Chart header — dark brand bar -->
+      <div class="bg-[#0a3246] px-5 py-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-white font-bold text-base leading-tight">Tráfico de Visitas</h2>
+            <p class="text-[#8ab0c0] text-xs mt-0.5">{{ getChartSubtitle() }}</p>
+          </div>
+          <div class="text-right">
+            <p class="text-3xl font-black text-white">{{ getChartTotal() }}</p>
+            <p class="text-[#8ab0c0] text-xs">visitas en período</p>
+          </div>
+        </div>
+        <!-- Period selector inside header -->
+        <div class="flex items-center gap-1.5 mt-3">
+          <button (click)="setChartPeriod('7d')"
+            [class]="chartPeriod === '7d' ? 'bg-[#3c9632] text-white' : 'bg-white/10 text-[#8ab0c0] hover:bg-white/20 hover:text-white'"
+            class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all">
+            7 días
+          </button>
+          <button (click)="setChartPeriod('30d')"
+            [class]="chartPeriod === '30d' ? 'bg-[#3c9632] text-white' : 'bg-white/10 text-[#8ab0c0] hover:bg-white/20 hover:text-white'"
+            class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all">
+            30 días
+          </button>
+          <button (click)="setChartPeriod('semanas')"
+            [class]="chartPeriod === 'semanas' ? 'bg-[#3c9632] text-white' : 'bg-white/10 text-[#8ab0c0] hover:bg-white/20 hover:text-white'"
+            class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all">
+            Por semana
+          </button>
+        </div>
+      </div>
+
+      <!-- Chart body -->
+      <div class="px-5 pt-4 pb-5">
+
+        <ng-container *ngIf="chartData.length >= 2; else noChartData">
+
+          <!-- BAR CHART — 7 días -->
+          <ng-container *ngIf="chartPeriod === '7d'">
+            <svg [attr.viewBox]="'0 0 ' + SVG_W + ' ' + (SVG_H + 10)"
+                 class="w-full" style="height:170px">
+              <!-- Horizontal grid -->
+              <line x1="0" [attr.y1]="(SVG_H+10)*0.25" [attr.x2]="SVG_W" [attr.y2]="(SVG_H+10)*0.25" stroke="#f1f5f9" stroke-width="1"/>
+              <line x1="0" [attr.y1]="(SVG_H+10)*0.5"  [attr.x2]="SVG_W" [attr.y2]="(SVG_H+10)*0.5"  stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4,3"/>
+              <line x1="0" [attr.y1]="(SVG_H+10)*0.75" [attr.x2]="SVG_W" [attr.y2]="(SVG_H+10)*0.75" stroke="#f1f5f9" stroke-width="1"/>
+              <ng-container *ngFor="let bar of getBarRects()">
+                <rect [attr.x]="bar.x" [attr.y]="bar.y" [attr.width]="bar.w" [attr.height]="bar.h"
+                      [attr.fill]="bar.isToday ? '#3c9632' : '#b8dfb3'"
+                      rx="4" ry="4"/>
+                <text *ngIf="bar.total !== '0'"
+                      [attr.x]="bar.x + bar.w/2" [attr.y]="bar.y - 5"
+                      text-anchor="middle" font-size="11" font-weight="700"
+                      [attr.fill]="bar.isToday ? '#3c9632' : '#64748b'" font-family="system-ui">
+                  {{ bar.total }}
+                </text>
+                <text [attr.x]="bar.x + bar.w/2" [attr.y]="SVG_H + 8"
+                      text-anchor="middle" font-size="11" fill="#94a3b8" font-family="system-ui">
+                  {{ bar.label }}
+                </text>
+              </ng-container>
+            </svg>
+          </ng-container>
+
+          <!-- AREA CHART — 30d / semanas -->
+          <ng-container *ngIf="chartPeriod !== '7d'">
+            <div class="relative">
+              <svg [attr.viewBox]="'0 0 ' + SVG_W + ' ' + SVG_H"
+                   class="w-full" style="height:160px">
+                <defs>
+                  <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%"   stop-color="#3c9632" stop-opacity="0.2"/>
+                    <stop offset="100%" stop-color="#3c9632" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <!-- Grid -->
+                <line x1="0" [attr.y1]="SVG_H*0.25" [attr.x2]="SVG_W" [attr.y2]="SVG_H*0.25" stroke="#f1f5f9" stroke-width="1"/>
+                <line x1="0" [attr.y1]="SVG_H*0.5"  [attr.x2]="SVG_W" [attr.y2]="SVG_H*0.5"  stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4,3"/>
+                <line x1="0" [attr.y1]="SVG_H*0.75" [attr.x2]="SVG_W" [attr.y2]="SVG_H*0.75" stroke="#f1f5f9" stroke-width="1"/>
+                <!-- Average line -->
+                <path *ngIf="getSvgAvgLine()" [attr.d]="getSvgAvgLine()"
+                      fill="none" stroke="#0a3246" stroke-width="1.5" stroke-dasharray="5,4" opacity="0.5"/>
+                <!-- Area -->
+                <path [attr.d]="getSvgArea()" fill="url(#areaGrad)"/>
+                <!-- Line -->
+                <path [attr.d]="getSvgLine()" fill="none" stroke="#3c9632" stroke-width="2.5"
+                      stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <!-- X labels -->
+              <div class="relative h-5 mt-1">
+                <span *ngFor="let lbl of getXLabels()"
+                      [style.left.%]="lbl.pct"
+                      class="absolute -translate-x-1/2 text-xs text-slate-400 whitespace-nowrap font-medium">
+                  {{ lbl.label }}
+                </span>
+              </div>
+            </div>
+          </ng-container>
+
+        </ng-container>
+        <ng-template #noChartData>
+          <div class="flex flex-col items-center justify-center h-36 text-slate-300">
+            <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10"/>
+            </svg>
+            <p class="text-sm">Sin datos para este período</p>
+          </div>
+        </ng-template>
+
+        <!-- Stats bar below chart -->
+        <div class="flex items-stretch mt-4 pt-4 border-t border-slate-100 text-center divide-x divide-slate-100">
+          <div class="flex-1 px-3">
+            <p class="text-lg font-black text-[#0a3246]">{{ getChartAvg() }}</p>
+            <p class="text-xs text-slate-400 mt-0.5">Prom. diario</p>
+          </div>
+          <div class="flex-1 px-3">
+            <p class="text-lg font-black text-[#3c9632]">{{ getPeakDay().total }}</p>
+            <p class="text-xs text-slate-400 mt-0.5">Pico · {{ getPeakDay().label }}</p>
+          </div>
+          <div class="flex-1 px-3">
+            <p class="text-lg font-black text-[#0a3246]">{{ data.sesionesUnicas }}</p>
+            <p class="text-xs text-slate-400 mt-0.5">Sesiones únicas</p>
+          </div>
+        </div>
+
       </div>
     </div>
 
-    <!-- Engagement Panel -->
-    <div class="flex flex-col gap-4">
-      <div class="panel-section bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex-1">
-        <h3 class="text-lg font-extrabold text-reasons-navy mb-5">Interacción</h3>
+    <!-- ── Engagement + Devices + Browsers ───────────────────────── -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
 
-        <div class="flex flex-col gap-5">
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-500 font-medium">Total Visitas</span>
-            <span class="text-lg font-extrabold text-reasons-navy font-mono tabular-nums counter-pop">{{ data.totalVisitas | number }}</span>
+      <!-- Engagement -->
+      <div class="panel-section bg-white rounded-2xl shadow-sm p-5">
+        <h3 class="text-sm font-bold text-[#00283c] mb-4 flex items-center gap-2">
+          <span class="w-1.5 h-4 rounded-full bg-[#3c9632] inline-block"></span>
+          Alcance
+        </h3>
+        <div class="space-y-4">
+          <div>
+            <div class="flex justify-between items-end mb-1.5">
+              <span class="text-xs text-slate-500">Usuarios únicos</span>
+              <span class="font-bold text-[#0a3246]">{{ data.usuariosUnicos }}</span>
+            </div>
+            <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+              <div class="h-full bg-[#3c9632] rounded-full progress-fill"
+                   [style.width.%]="data.totalVisitas > 0 ? (data.usuariosUnicos / data.totalVisitas) * 100 : 0"></div>
+            </div>
+            <p class="text-xs text-slate-300 mt-0.5">de {{ data.totalVisitas }} visitas totales</p>
           </div>
-
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-500 font-medium">Esta Semana</span>
-            <span class="text-lg font-extrabold text-reasons-green font-mono tabular-nums counter-pop">{{ data.visitasSemana | number }}</span>
+          <div>
+            <div class="flex justify-between items-end mb-1.5">
+              <span class="text-xs text-slate-500">Promedio diario</span>
+              <span class="font-bold text-[#0a3246]">{{ data.promedioDiario }}<span class="text-xs font-normal text-slate-400">/día</span></span>
+            </div>
+            <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+              <div class="h-full bg-[#0a3246] rounded-full progress-fill"
+                   [style.width.%]="data.promedioDiario > 0 ? (data.visitasHoy / (data.promedioDiario * 2)) * 100 > 100 ? 100 : (data.visitasHoy / (data.promedioDiario * 2)) * 100 : 0"></div>
+            </div>
+            <p class="text-xs text-slate-300 mt-0.5">Hoy: {{ data.visitasHoy }} visitas</p>
           </div>
-
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-500 font-medium">Sesiones Únicas</span>
-            <span class="text-lg font-extrabold text-reasons-navy font-mono tabular-nums counter-pop">{{ data.sesionesUnicas | number }}</span>
-          </div>
-
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-500 font-medium">Duración Prom.</span>
-            <span class="text-lg font-extrabold text-reasons-navy font-mono tabular-nums counter-pop">{{ formatDuration(data.avgDuration) }}</span>
-          </div>
-
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-500 font-medium">Tasa de Rebote</span>
-            <span class="text-lg font-extrabold text-reasons-navy font-mono tabular-nums counter-pop">{{ data.bounceRate }}%</span>
+          <div>
+            <div class="flex justify-between items-end mb-1.5">
+              <span class="text-xs text-slate-500">Sesiones únicas</span>
+              <span class="font-bold text-[#0a3246]">{{ data.sesionesUnicas }}</span>
+            </div>
+            <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+              <div class="h-full bg-[#3c9632]/60 rounded-full progress-fill"
+                   [style.width.%]="data.visitasMes > 0 ? (data.sesionesUnicas / data.visitasMes) * 100 : 0"></div>
+            </div>
+            <p class="text-xs text-slate-300 mt-0.5">de {{ data.visitasMes }} visitas del mes</p>
           </div>
         </div>
       </div>
 
       <!-- Devices -->
-      <div class="panel-section bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
-        <h3 class="text-sm font-extrabold text-reasons-navy mb-4 uppercase tracking-wider">Dispositivos</h3>
-        <div *ngFor="let d of data.dispositivos" class="flex items-center gap-3 mb-3 last:mb-0">
-          <span class="text-sm text-slate-600 font-medium flex-1">{{ d.tipo }}</span>
-          <div class="w-24 h-2 rounded-full bg-slate-100 overflow-hidden">
-            <div class="h-full rounded-full bg-reasons-green progress-fill"
-                 [style.width.%]="(parseNum(d.count) / data.totalVisitas) * 100"></div>
-          </div>
-          <span class="text-xs text-slate-500 font-mono font-bold w-10 text-right">{{ d.count }}</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bottom Row: Browsers + Pages + Recent Visits -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-    <!-- Browsers -->
-    <div class="bottom-section bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
-      <h3 class="text-sm font-extrabold text-reasons-navy mb-5 uppercase tracking-wider">Navegadores</h3>
-      <div class="flex flex-col gap-3">
-        <div *ngFor="let b of data.navegadores" class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-               [class.bg-slate-800]="b.browser === 'Chrome'"
-               [class.bg-orange-100]="b.browser === 'Firefox'"
-               [class.bg-blue-100]="b.browser === 'Safari'"
-               [class.bg-cyan-100]="b.browser === 'Edge'"
-               [class.bg-slate-100]="b.browser !== 'Chrome' && b.browser !== 'Firefox' && b.browser !== 'Safari' && b.browser !== 'Edge'">
-            <!-- Chrome -->
-            <svg *ngIf="b.browser === 'Chrome'" class="w-5 h-5" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" fill="#4285F4"/>
-              <circle cx="12" cy="12" r="4" fill="white"/>
-              <path d="M12 8L20.5 8A8 8 0 0112 20" fill="#34A853"/>
-              <path d="M12 8L3.5 8A8 8 0 0012 20" fill="#FBBC05"/>
-              <path d="M8 16L12 8L4 8" fill="#EA4335"/>
-              <circle cx="12" cy="12" r="4" fill="white"/>
-            </svg>
-            <!-- Firefox -->
-            <svg *ngIf="b.browser === 'Firefox'" class="w-5 h-5" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" fill="#FF7139"/>
-              <circle cx="12" cy="12" r="5" fill="#FFBD4F"/>
-              <circle cx="12" cy="12" r="3" fill="#399EFF"/>
-            </svg>
-            <!-- Safari -->
-            <svg *ngIf="b.browser === 'Safari'" class="w-5 h-5" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" fill="#006CFF"/>
-              <polygon points="12,5 14,11 12,10 10,11" fill="white"/>
-              <polygon points="12,19 10,13 12,14 14,13" fill="white" opacity="0.5"/>
-            </svg>
-            <!-- Edge -->
-            <svg *ngIf="b.browser === 'Edge'" class="w-5 h-5" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" fill="#0078D7"/>
-              <path d="M8 16C8 16 9 10 15 8C15 8 11 9 10 14C10 14 13 10 17 10C17 10 13 11 12 16" stroke="white" stroke-width="1.5" fill="none"/>
-            </svg>
-            <!-- Other -->
-            <svg *ngIf="b.browser !== 'Chrome' && b.browser !== 'Firefox' && b.browser !== 'Safari' && b.browser !== 'Edge'" class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
-            </svg>
-          </div>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center justify-between mb-1">
-              <span class="text-sm text-slate-700 font-bold">{{ b.browser }}</span>
-              <span class="text-sm font-extrabold text-reasons-navy font-mono">{{ b.count }}</span>
+      <div class="panel-section bg-white rounded-2xl shadow-sm p-5">
+        <h3 class="text-sm font-bold text-[#00283c] mb-4 flex items-center gap-2">
+          <span class="w-1.5 h-4 rounded-full bg-[#0a3246] inline-block"></span>
+          Dispositivos
+        </h3>
+        <div *ngIf="data.dispositivos.length; else noDevices">
+          <div *ngFor="let dev of data.dispositivos.slice(0, 4)" class="mb-3 last:mb-0">
+            <div class="flex justify-between items-center mb-1">
+              <div class="flex items-center gap-2">
+                <!-- Device icon -->
+                <svg *ngIf="(dev.tipo || '') === 'Escritorio'" class="w-4 h-4 text-[#0a3246]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                <svg *ngIf="(dev.tipo || '') === 'Móvil'" class="w-4 h-4 text-[#3c9632]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                </svg>
+                <svg *ngIf="!['Escritorio','Móvil'].includes(dev.tipo || '')" class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                <span class="text-xs text-slate-600 font-medium">{{ dev.tipo || 'Otro' }}</span>
+              </div>
+              <span class="text-xs font-bold text-[#00283c]">{{ dev.count }}</span>
             </div>
-            <div class="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
+            <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
               <div class="h-full rounded-full progress-fill"
-                   [class.bg-slate-800]="b.browser === 'Chrome'"
-                   [class.bg-orange-400]="b.browser === 'Firefox'"
-                   [class.bg-blue-500]="b.browser === 'Safari'"
-                   [class.bg-cyan-500]="b.browser === 'Edge'"
-                   [class.bg-slate-400]="b.browser !== 'Chrome' && b.browser !== 'Firefox' && b.browser !== 'Safari' && b.browser !== 'Edge'"
-                   [style.width.%]="(parseNum(b.count) / data.totalVisitas) * 100"></div>
+                   [class]="(dev.tipo || '') === 'Móvil' ? 'bg-[#3c9632]' : 'bg-[#0a3246]'"
+                   [style.width.%]="getPercent(dev.count)"></div>
             </div>
-            <span class="text-[10px] text-slate-400 font-mono mt-0.5 inline-block">{{ getPercent(b.count) }}% del tráfico</span>
           </div>
         </div>
+        <ng-template #noDevices>
+          <p class="text-xs text-slate-300 text-center py-6">Sin datos de dispositivos</p>
+        </ng-template>
       </div>
+
+      <!-- Browsers -->
+      <div class="panel-section bg-white rounded-2xl shadow-sm p-5">
+        <h3 class="text-sm font-bold text-[#00283c] mb-4 flex items-center gap-2">
+          <span class="w-1.5 h-4 rounded-full bg-[#3c9632]/70 inline-block"></span>
+          Navegadores
+        </h3>
+        <div *ngIf="data.navegadores.length; else noBrowsers">
+          <div *ngFor="let nav of data.navegadores.slice(0, 4)" class="mb-3 last:mb-0">
+            <div class="flex items-center gap-2 mb-1">
+              <!-- Browser logo -->
+              <span class="flex-shrink-0 w-5 h-5">
+                <svg *ngIf="(nav.browser || '') === 'Chrome'" viewBox="0 0 24 24" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" fill="#fff" stroke="#e5e7eb" stroke-width="0.5"/>
+                  <path d="M12 8h8.5A10 10 0 0 0 3.52 9.5L7.8 17A4 4 0 0 0 12 16V8z" fill="#DB4437"/>
+                  <path d="M12 8h8.5a10 10 0 0 1-1.28 8.97L15.22 12A4 4 0 0 0 12 8z" fill="#F4B400"/>
+                  <path d="M7.8 17l-4.28-7.5A10 10 0 0 0 12 22a10 10 0 0 0 7.22-5.03L15.22 12A4 4 0 0 1 8 14.27L7.8 17z" fill="#0F9D58"/>
+                  <circle cx="12" cy="12" r="4" fill="#4285F4"/>
+                  <circle cx="12" cy="12" r="2.5" fill="#fff"/>
+                </svg>
+                <svg *ngIf="(nav.browser || '') === 'Firefox'" viewBox="0 0 24 24" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" fill="#FF7139"/>
+                  <path d="M17 7.5c-1-1-2.3-1.7-3.7-1.9 1 .8 1.6 2 1.6 3.4 0 2.3-1.9 4.2-4.2 4.2-1.1 0-2.1-.4-2.8-1.1.2 3 2.7 5.4 5.7 5.4 3.2 0 5.7-2.6 5.7-5.7 0-1.7-.7-3.2-2.3-4.3z" fill="#FF980E"/>
+                </svg>
+                <svg *ngIf="(nav.browser || '') === 'Safari'" viewBox="0 0 24 24" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" fill="#1C9CEA"/>
+                  <polygon points="12,5 13.2,10.8 19,12 13.2,13.2 12,19 10.8,13.2 5,12 10.8,10.8" fill="white"/>
+                </svg>
+                <svg *ngIf="(nav.browser || '') === 'Edge'" viewBox="0 0 24 24" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" fill="#0078D4"/>
+                  <path d="M6 14a6 6 0 0 0 6 6c2.2 0 4.2-1.2 5.3-3H10a4 4 0 0 1-4-4c0-.8.2-1.5.6-2.1A6 6 0 0 1 6 14z" fill="white"/>
+                  <path d="M12 6a6 6 0 0 1 5.9 5H10a2 2 0 0 0-1.7 3h9.4A6 6 0 1 0 12 6z" fill="white" opacity="0.7"/>
+                </svg>
+                <svg *ngIf="!['Chrome','Firefox','Safari','Edge'].includes(nav.browser || '')"
+                     viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="#94a3b8" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="9" stroke-width="1.5"/>
+                  <path d="M12 3a9 9 0 0 1 0 18M12 3a9 9 0 0 0 0 18M3 12h18" stroke-width="1.5"/>
+                </svg>
+              </span>
+              <span class="text-xs text-slate-600 font-medium flex-1">{{ nav.browser || 'Otro' }}</span>
+              <span class="text-xs font-bold text-[#00283c]">{{ nav.count }}</span>
+            </div>
+            <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+              <div class="h-full bg-[#3c9632] rounded-full progress-fill"
+                   [style.width.%]="getPercent(nav.count)"></div>
+            </div>
+          </div>
+        </div>
+        <ng-template #noBrowsers>
+          <p class="text-xs text-slate-300 text-center py-6">Sin datos de navegadores</p>
+        </ng-template>
+      </div>
+
     </div>
 
-    <!-- Top Pages -->
-    <div class="bottom-section bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
-      <h3 class="text-sm font-extrabold text-reasons-navy mb-5 uppercase tracking-wider">Páginas Más Vistas</h3>
-      <div class="flex flex-col gap-2">
-        <div *ngFor="let p of data.paginasMasVistas; let i = index"
-             class="page-item flex items-center gap-3.5"
-             [style.animation-delay.ms]="600 + (i * 50)">
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-               [class.bg-reasons-green/10]="getPageInfo(p.page).color === 'green'"
-               [class.bg-blue-50]="getPageInfo(p.page).color === 'blue'"
-               [class.bg-amber-50]="getPageInfo(p.page).color === 'amber'"
-               [class.bg-violet-50]="getPageInfo(p.page).color === 'violet'"
-               [class.bg-rose-50]="getPageInfo(p.page).color === 'rose'"
-               [class.bg-slate-100]="getPageInfo(p.page).color === 'slate'">
-            <span [innerHTML]="getPageInfo(p.page).icon"></span>
-          </div>
-          <div class="flex flex-col flex-1 min-w-0">
-            <span class="text-sm text-slate-700 font-bold leading-tight">{{ getPageInfo(p.page).name }}</span>
-            <span class="text-[11px] text-slate-400 mt-0.5">{{ getPageInfo(p.page).desc }}</span>
-          </div>
-          <div class="flex items-center gap-1.5">
-            <span class="text-lg font-extrabold text-reasons-navy font-mono tabular-nums">{{ p.count }}</span>
-            <span class="text-[10px] text-slate-400 font-medium">visitas</span>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- ── Top Pages + Recent Visits ──────────────────────────────── -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
 
-    <!-- Recent Visits -->
-    <div class="bottom-section bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
-      <div class="flex items-center justify-between mb-5">
-        <h3 class="text-sm font-extrabold text-reasons-navy uppercase tracking-wider">Últimas Visitas</h3>
-        <div class="flex items-center gap-1.5">
-          <span class="live-dot"></span>
-          <span class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">En vivo</span>
-        </div>
-      </div>
-      <div class="grid grid-cols-1 gap-2.5 max-h-80 overflow-y-auto pr-1">
-        <div *ngFor="let v of data.ultimasVisitas; let i = index"
-             class="visit-item bg-slate-50/80 hover:bg-slate-100/80 rounded-2xl p-3.5 border border-slate-100 transition-all hover:shadow-sm cursor-default"
-             [style.animation-delay.ms]="700 + (i * 40)">
-          <div class="flex items-start gap-3">
-            <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold"
-                 [class.bg-emerald-100]="v.page === '/'"
-                 [class.bg-blue-100]="v.page === '/equipo'"
-                 [class.bg-amber-100]="v.page?.startsWith('/proyectos')"
-                 [class.bg-violet-100]="v.page?.startsWith('/publicaciones')"
-                 [class.bg-rose-100]="v.page === '/contacto'"
-                 [class.bg-slate-200]="v.page !== '/' && v.page !== '/equipo' && !v.page?.startsWith('/proyectos') && !v.page?.startsWith('/publicaciones') && v.page !== '/contacto'"
-                 [class.text-emerald-600]="v.page === '/'"
-                 [class.text-blue-600]="v.page === '/equipo'"
-                 [class.text-amber-600]="v.page?.startsWith('/proyectos')"
-                 [class.text-violet-600]="v.page?.startsWith('/publicaciones')"
-                 [class.text-rose-600]="v.page === '/contacto'"
-                 [class.text-slate-500]="v.page !== '/' && v.page !== '/equipo' && !v.page?.startsWith('/proyectos') && !v.page?.startsWith('/publicaciones') && v.page !== '/contacto'">
-              {{ v.page.charAt(1).toUpperCase() || '/' }}
-            </div>
+      <!-- Top Pages -->
+      <div class="bottom-section bg-white rounded-2xl shadow-sm p-5">
+        <h3 class="text-sm font-bold text-[#00283c] mb-4 flex items-center gap-2">
+          <span class="w-1.5 h-4 rounded-full bg-[#0a3246] inline-block"></span>
+          Páginas más visitadas
+        </h3>
+        <div *ngIf="data.paginasMasVistas.length; else noPages" class="space-y-2">
+          <div *ngFor="let p of data.paginasMasVistas.slice(0, 8); let i = index"
+               class="page-item flex items-center gap-3 group">
+            <span class="w-6 h-6 rounded-lg bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-400 flex-shrink-0">
+              {{ i + 1 }}
+            </span>
             <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between">
-                <span class="text-sm text-slate-700 font-bold truncate">{{ getPageInfo(v.page).name }}</span>
-                <span class="text-[10px] text-slate-400 font-mono whitespace-nowrap ml-2">{{ getTimeAgo(v.createdAt) }}</span>
+              <div class="flex items-center justify-between mb-1">
+                <p class="text-xs font-semibold text-slate-700 truncate">{{ getPageInfo(p.page).name }}</p>
+                <span class="text-xs font-bold text-[#0a3246] ml-2 flex-shrink-0">{{ p.count }}</span>
               </div>
-              <div class="flex items-center gap-2 mt-1">
-                <span class="text-[11px] text-slate-400 truncate">{{ maskIp(v.ip_address) }}</span>
-                <span class="text-[11px] text-slate-300">•</span>
-                <span class="text-[11px] text-slate-400 truncate">{{ v.page }}</span>
+              <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                <div class="h-full bg-[#0a3246] rounded-full progress-fill transition-all"
+                     [style.width.%]="getPercent(p.count)"></div>
               </div>
             </div>
+            <span class="text-xs text-slate-300 flex-shrink-0 w-8 text-right">{{ getPercent(p.count) }}%</span>
           </div>
         </div>
+        <ng-template #noPages>
+          <p class="text-xs text-slate-300 text-center py-6">Sin datos</p>
+        </ng-template>
       </div>
+
+      <!-- Recent Visits -->
+      <div class="bottom-section bg-white rounded-2xl shadow-sm p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-sm font-bold text-[#00283c] flex items-center gap-2">
+            <span class="live-dot"></span>
+            Visitas recientes
+          </h3>
+          <div class="relative">
+            <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none"
+                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+            </svg>
+            <input [(ngModel)]="recentFilter" placeholder="Buscar página..."
+              class="pl-7 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-slate-50 text-slate-600 placeholder-slate-300 focus:outline-none focus:ring-1 focus:ring-[#3c9632] focus:border-[#3c9632] w-32"/>
+          </div>
+        </div>
+
+        <div class="space-y-1 max-h-72 overflow-y-auto pr-1">
+          <ng-container *ngIf="getFilteredRecentVisits().length; else noVisits">
+            <div *ngFor="let v of getFilteredRecentVisits().slice(0, 15)"
+                 class="visit-item flex items-center gap-3 py-2.5 px-2 -mx-2 hover:bg-slate-50 rounded-xl transition-colors">
+              <!-- Page badge -->
+              <div class="w-8 h-8 rounded-xl bg-[#0a3246] flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
+                {{ getPageInfo(v.page).name.charAt(0).toUpperCase() }}
+              </div>
+              <!-- Info -->
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-semibold text-slate-700 truncate">{{ getPageInfo(v.page).name }}</p>
+                <p class="text-xs text-slate-400 font-mono">{{ getVisitorCode(v.session_id) }}</p>
+              </div>
+              <!-- Time -->
+              <div class="flex-shrink-0 text-right">
+                <p class="text-xs font-semibold text-[#3c9632]">{{ getTimeAgo(v.created_at) }}</p>
+              </div>
+            </div>
+          </ng-container>
+          <ng-template #noVisits>
+            <p class="text-xs text-slate-300 text-center py-8">
+              {{ recentFilter ? 'Sin resultados para "' + recentFilter + '"' : 'Sin visitas recientes' }}
+            </p>
+          </ng-template>
+        </div>
+      </div>
+
     </div>
-  </div>
+
+  </ng-container>
+
+  <!-- ── Empty state ─────────────────────────────────────────────── -->
+  <ng-container *ngIf="!isLoading && !data">
+    <div class="flex flex-col items-center justify-center py-24 text-slate-300">
+      <svg class="w-14 h-14 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10"/>
+      </svg>
+      <p class="text-base font-semibold">Sin datos disponibles</p>
+      <button (click)="cargar()" class="mt-4 px-4 py-2 bg-[#3c9632] text-white text-sm rounded-xl font-semibold hover:bg-[#2e7526] transition-colors">
+        Reintentar
+      </button>
+    </div>
+  </ng-container>
 
 </div>

@@ -8,13 +8,14 @@ import { ToastService } from '../../../core/services/toast.service';
 import { ConfirmService } from '../../../core/services/confirm.service';
 import { BlockEditorComponent, Block } from '../../../shared/block-editor/block-editor';
 import { BlockRendererComponent } from '../../../shared/block-renderer/block-renderer';
+import { PaginationComponent } from '../../../shared/pagination/pagination';
 import { Proyecto } from '../../../core/models/proyecto.model';
 import { Investigador } from '../../../core/models/investigador.model';
 
 @Component({
   selector: 'app-admin-proyectos',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, BlockEditorComponent, BlockRendererComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, BlockEditorComponent, BlockRendererComponent, PaginationComponent],
   templateUrl: './admin-proyectos.html',
   styleUrls: ['./admin-proyectos.css']
 })
@@ -31,7 +32,12 @@ export class AdminProyectosComponent implements OnInit {
   usuario: any = null;
   proyectos: Proyecto[] = [];
   investigadores: Investigador[] = [];
-  
+
+  filterEstado = '';
+  filterLinea = 0;
+  currentPage = 1;
+  readonly pageSize = 10;
+
   showForm = false;
   editMode = false;
   activeRecordId: number | null = null;
@@ -282,14 +288,27 @@ export class AdminProyectosComponent implements OnInit {
     return l ? l.abreviatura : 'N/A';
   }
 
+  onFilterChange() { this.currentPage = 1; }
+  onPageChange(page: number) { this.currentPage = page; }
+
   filtrarLista(items: any[]): any[] {
-    if (!this.searchQuery) return items;
-    const q = this.searchQuery.toLowerCase();
-    
-    return items.filter(item => {
-      return item.titulo.toLowerCase().includes(q) || 
-             (item.descripcion && item.descripcion.toLowerCase().includes(q)) || 
-             (item.resultados && item.resultados.toLowerCase().includes(q));
-    });
+    let result = items;
+    if (this.filterEstado) result = result.filter(i => i.estado === this.filterEstado);
+    if (this.filterLinea) result = result.filter(i => i.linea_id === this.filterLinea);
+    if (this.searchQuery) {
+      const q = this.searchQuery.toLowerCase();
+      result = result.filter(i =>
+        i.titulo.toLowerCase().includes(q) ||
+        (i.descripcion && i.descripcion.toLowerCase().includes(q)) ||
+        (i.resultados && i.resultados.toLowerCase().includes(q))
+      );
+    }
+    return result;
+  }
+
+  pagedList(items: any[]): any[] {
+    const filtered = this.filtrarLista(items);
+    const start = (this.currentPage - 1) * this.pageSize;
+    return filtered.slice(start, start + this.pageSize);
   }
 }

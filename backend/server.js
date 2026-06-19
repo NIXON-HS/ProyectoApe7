@@ -10,8 +10,8 @@ async function startServer() {
     await sequelize.authenticate();
     console.log('✅ Conexión establecida exitosamente con la base de datos PostgreSQL.');
 
-    // Sincroniza los modelos con la base de datos (force: false evita recrear y borrar datos)
-    await sequelize.sync({ force: false });
+    // alter: true agrega columnas nuevas sin borrar datos existentes
+    await sequelize.sync({ alter: true });
     console.log('✅ Modelos Sequelize sincronizados exitosamente.');
 
     app.listen(PORT, () => {

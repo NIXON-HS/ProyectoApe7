@@ -4,86 +4,180 @@
   (editSave)="saveEdit()"
   (editCancel)="cancelEdit()">
 </app-admin-bar>
-<!-- Hero Section -->
-<section class="relative min-h-[90vh] flex items-center justify-center pt-24 pb-16 bg-gradient-to-br from-reasons-navy via-[#0a3246] to-reasons-green overflow-hidden">
-  <div class="absolute inset-0 opacity-15">
-    <div class="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-reasons-green filter blur-3xl"></div>
-    <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-reasons-blue filter blur-3xl"></div>
+<!-- ══════════════════════════════════════
+     CARRUSEL PRINCIPAL
+     ══════════════════════════════════════ -->
+<section *ngIf="slides.length > 0"
+         class="carousel-section relative w-full overflow-hidden"
+         (mouseenter)="stopSlideRotation()"
+         (mouseleave)="startSlideRotation()">
+
+  <!-- Slides (crossfade) -->
+  <div *ngFor="let slide of slides; let i = index"
+       class="carousel-slide absolute inset-0"
+       [class.slide-active]="i === currentSlideIndex"
+       [class.slide-inactive]="i !== currentSlideIndex">
+
+    <!-- ══ BRAND SLIDE: hero de dos columnas ══ -->
+    <ng-container *ngIf="slide.tipo === 'brand'">
+      <!-- Fondo: imagen si la tiene, si no gradiente brand -->
+      <img *ngIf="slide.imagen_url"
+           [src]="resolveUrl(slide.imagen_url)"
+           [alt]="slide.titulo || ''"
+           class="absolute inset-0 w-full h-full object-cover" />
+      <div *ngIf="!slide.imagen_url"
+           class="absolute inset-0 bg-gradient-to-br from-reasons-navy via-[#0a3246] to-reasons-green"></div>
+
+      <!-- Overlay oscuro izquierda→transparente (para imagen) -->
+      <div *ngIf="slide.imagen_url"
+           class="absolute inset-0"
+           [style.background]="slide.color_overlay || 'linear-gradient(90deg,rgba(0,28,46,0.85) 0%,rgba(0,28,46,0.6) 45%,rgba(0,28,46,0.25) 100%)'">
+      </div>
+      <!-- Overlay gradiente brand (sin imagen) -->
+      <div *ngIf="!slide.imagen_url"
+           class="absolute inset-0 opacity-20 pointer-events-none">
+        <div class="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-reasons-green filter blur-3xl"></div>
+        <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-reasons-blue filter blur-3xl"></div>
+      </div>
+      <!-- Gradiente inferior -->
+      <div class="absolute inset-0 bg-gradient-to-t from-[#00141f]/60 via-transparent to-transparent"></div>
+
+      <!-- Contenido: dos columnas -->
+      <div class="absolute inset-0 flex items-center z-10">
+        <div class="max-w-7xl mx-auto px-6 lg:px-16 w-full">
+          <div class="carousel-text" style="max-width:none;width:100%"
+               [class.content-active]="i === currentSlideIndex">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+
+              <!-- Izquierda: texto -->
+              <div class="lg:col-span-7 flex flex-col gap-5">
+                <span class="inline-flex px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold uppercase tracking-wider text-[#7dd87a] w-fit">
+                  {{ slide.subtitulo || 'Universidad Técnica de Ambato' }}
+                </span>
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
+                  {{ slide.titulo }}
+                </h1>
+                <p class="text-lg text-slate-200 font-light leading-relaxed max-w-2xl">
+                  {{ slide.descripcion }}
+                </p>
+                <div class="flex flex-wrap gap-4 mt-2">
+                  <a *ngIf="slide.enlace" [href]="slide.enlace"
+                     class="px-7 py-3.5 bg-reasons-green hover:bg-[#327e2a] text-white font-semibold rounded-full shadow-lg transition-all">
+                    {{ slide.boton1_texto || 'Ver más' }}
+                  </a>
+                  <a *ngIf="slide.boton2_url && slide.boton2_texto" [href]="slide.boton2_url"
+                     class="px-7 py-3.5 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-full border border-white/20 shadow-md backdrop-blur-md transition-all">
+                    {{ slide.boton2_texto }}
+                  </a>
+                </div>
+              </div>
+
+              <!-- Derecha: Logo Card -->
+              <div class="lg:col-span-5 flex justify-center">
+                <div class="glass-dark-card p-8 rounded-3xl flex flex-col items-center gap-6 max-w-sm w-full text-center hover-premium glowing-card animate-float">
+                  <div class="w-28 h-28 rounded-full bg-white p-3 flex items-center justify-center shadow-xl">
+                    <img [src]="info?.logo_url || '/logo.svg'" alt="REASONS Logo"
+                         class="h-20 w-auto object-contain"
+                         (error)="$any($event.target).src='/logo.svg'" />
+                  </div>
+                  <div class="flex flex-col gap-2 items-center w-full">
+                    <h2 class="text-2xl font-bold text-white tracking-wide">
+                      {{ info?.hero_card_nombre || 'REASONS' }}
+                    </h2>
+                    <span class="text-xs text-[#7dd87a] font-semibold uppercase tracking-widest">
+                      {{ info?.hero_card_grupo || 'Grupo de Investigación UTA' }}
+                    </span>
+                  </div>
+                  <div class="w-full border-t border-white/10"></div>
+                  <p class="text-slate-300 text-sm font-light leading-relaxed">
+                    "{{ info?.hero_cita || 'Investigación innovadora desde la Facultad de Ingeniería en Sistemas, Electrónica e Industrial.' }}"
+                  </p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container><!-- /brand -->
+
+    <!-- ══ STANDARD SLIDE: layout normal ══ -->
+    <ng-container *ngIf="slide.tipo !== 'brand'">
+      <img *ngIf="slide.imagen_url"
+           [src]="resolveUrl(slide.imagen_url)"
+           [alt]="slide.titulo || ''"
+           class="absolute inset-0 w-full h-full object-cover" />
+      <div *ngIf="!slide.imagen_url"
+           class="absolute inset-0 bg-gradient-to-br from-reasons-navy via-[#0a3246] to-reasons-green"></div>
+
+      <div class="absolute inset-0"
+           [style.background]="slide.color_overlay || 'linear-gradient(90deg,rgba(0,40,60,0.72) 0%,rgba(0,40,60,0.42) 50%,transparent 100%)'">
+      </div>
+      <div class="absolute inset-0 bg-gradient-to-t from-[#00141f]/50 via-transparent to-transparent"></div>
+
+      <div class="absolute inset-0 flex items-center z-10">
+        <div class="w-full max-w-7xl mx-auto px-8 lg:px-16">
+          <div class="carousel-text"
+               [class.content-active]="i === currentSlideIndex"
+               [class.text-center]="slide.alineacion === 'center'"
+               [class.items-center]="slide.alineacion === 'center'"
+               [class.text-right]="slide.alineacion === 'right'"
+               [class.items-end]="slide.alineacion === 'right'">
+            <h2 *ngIf="slide.titulo" class="carousel-titulo"
+                [class.text-slate-900]="slide.texto_oscuro">{{ slide.titulo }}</h2>
+            <p *ngIf="slide.subtitulo" class="carousel-subtitulo"
+               [class.text-slate-700]="slide.texto_oscuro">{{ slide.subtitulo }}</p>
+            <p *ngIf="slide.descripcion"
+               class="text-base text-white/80 font-light leading-relaxed max-w-xl mt-0"
+               [class.text-slate-600]="slide.texto_oscuro">{{ slide.descripcion }}</p>
+            <div *ngIf="slide.enlace || (slide.boton2_url && slide.boton2_texto)"
+                 class="flex flex-wrap gap-3 mt-2">
+              <a *ngIf="slide.enlace" [href]="slide.enlace"
+                 class="inline-flex px-7 py-3 bg-reasons-green hover:bg-[#327e2a] text-white font-semibold rounded-full shadow-lg transition-all">
+                {{ slide.boton1_texto || 'Ver más' }}
+              </a>
+              <a *ngIf="slide.boton2_url && slide.boton2_texto" [href]="slide.boton2_url"
+                 class="inline-flex px-7 py-3 bg-white/15 hover:bg-white/25 text-white font-semibold rounded-full border border-white/30 backdrop-blur-sm transition-all">
+                {{ slide.boton2_texto }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container><!-- /standard -->
+
+  </div><!-- /carousel-slide -->
+
+  <!-- Prev / Next -->
+  <button *ngIf="slides.length > 1" (click)="prevSlide()"
+          class="carousel-arrow left-4 md:left-8" aria-label="Anterior">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+    </svg>
+  </button>
+  <button *ngIf="slides.length > 1" (click)="nextSlide()"
+          class="carousel-arrow right-4 md:right-8" aria-label="Siguiente">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+    </svg>
+  </button>
+
+  <!-- Dots -->
+  <div *ngIf="slides.length > 1" class="carousel-dots">
+    <button *ngFor="let s of slides; let di = index"
+            (click)="selectSlide(di)"
+            class="carousel-dot"
+            [class.dot-active]="di === currentSlideIndex"
+            [attr.aria-label]="'Slide ' + (di + 1)">
+    </button>
   </div>
 
-  <div class="relative max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-    <div class="lg:col-span-7 flex flex-col gap-6 text-left">
-      <!-- Hero badge -->
-      <span *ngIf="!editMode" class="inline-flex px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold uppercase tracking-wider text-[#7dd87a] w-fit">
-        {{ info?.hero_badge || 'Universidad Técnica de Ambato' }}
-      </span>
-      <input *ngIf="editMode" [(ngModel)]="draft.hero_badge"
-             class="hero-ie-badge"
-             placeholder="Etiqueta del hero (ej: Universidad Técnica de Ambato)" />
-
-      <!-- Hero título h1 -->
-      <h1 *ngIf="!editMode" class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
-        {{ info?.hero_titulo || 'Research in Engineering and Advanced Sustainable Operations,' }}
-        <span class="text-gradient-gold">{{ info?.hero_nombre || 'Nature, and Society' }}</span>
-      </h1>
-      <div *ngIf="editMode" class="flex flex-col gap-2 max-w-2xl">
-        <input [(ngModel)]="draft.hero_titulo"
-               class="hero-ie-input"
-               placeholder="Título del hero (parte 1)..." />
-        <input [(ngModel)]="draft.hero_nombre"
-               class="hero-ie-input text-[#fbbf24]"
-               placeholder="Título del hero (parte dorada)..." />
-      </div>
-
-      <!-- Subtítulo / descripción -->
-      <p *ngIf="!editMode" class="text-lg text-slate-200 font-light leading-relaxed max-w-2xl">
-        {{ info?.hero_subtitulo || info?.descripcion || 'Investigación innovadora desde la Facultad de Ingeniería en Sistemas, Electrónica e Industrial orientada a un futuro industrial verde y sostenible.' }}
-      </p>
-      <textarea *ngIf="editMode" [(ngModel)]="draft.hero_subtitulo" rows="3"
-                class="w-full bg-white/10 border-2 border-dashed border-white/40 rounded-2xl text-white placeholder-white/40 text-base font-light leading-relaxed p-4 outline-none resize-none max-w-2xl"
-                placeholder="Subtítulo del hero..."></textarea>
-      <div class="flex flex-wrap gap-4 mt-4">
-        <a routerLink="/equipo" class="px-8 py-3.5 bg-reasons-green hover:bg-[#327e2a] text-white font-semibold rounded-full shadow-lg hover-premium transition-all">
-          Conocer el Equipo
-        </a>
-        <a routerLink="/contacto" class="px-8 py-3.5 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-full border border-white/20 shadow-md backdrop-blur-md hover-premium transition-all">
-          Contáctanos
-        </a>
-      </div>
-    </div>
-
-    <!-- Logo Card -->
-    <div class="lg:col-span-5 flex justify-center">
-      <div class="glass-dark-card p-8 rounded-3xl flex flex-col items-center gap-6 max-w-md w-full text-center hover-premium glowing-card animate-float">
-        <div class="w-32 h-32 rounded-full bg-white p-4 flex items-center justify-center shadow-xl">
-          <img [src]="info?.logo_url || '/logo.svg'" alt="REASONS Group Logo" class="h-24 w-auto object-contain" (error)="$any($event.target).src='/logo.svg'" />
-        </div>
-        <div class="flex flex-col gap-2 items-center w-full">
-          <h2 *ngIf="!editMode" class="text-2xl font-bold text-white tracking-wide">
-            {{ info?.hero_card_nombre || 'REASONS' }}
-          </h2>
-          <input *ngIf="editMode" [(ngModel)]="draft.hero_card_nombre"
-                 class="hero-card-input text-center text-xl font-bold text-white tracking-wide"
-                 placeholder="Nombre (ej: REASONS)" />
-
-          <span *ngIf="!editMode" class="text-xs text-[#7dd87a] font-semibold uppercase tracking-widest">
-            {{ info?.hero_card_grupo || 'Grupo de Investigación UTA' }}
-          </span>
-          <input *ngIf="editMode" [(ngModel)]="draft.hero_card_grupo"
-                 class="hero-card-input text-center text-[10px] font-bold uppercase tracking-widest text-[#7dd87a]"
-                 placeholder="Subtítulo del card (ej: Grupo de Investigación UTA)" />
-        </div>
-        <div class="w-full border-t border-white/10 my-2"></div>
-        <p *ngIf="!editMode" class="text-slate-300 text-sm font-light leading-relaxed">
-          "{{ info?.hero_cita || 'Investigación innovadora desde la Facultad de Ingeniería en Sistemas, Electrónica e Industrial orientada a un futuro industrial verde y sostenible.' }}"
-        </p>
-        <textarea *ngIf="editMode" [(ngModel)]="draft.hero_cita" rows="3"
-                  class="w-full bg-white/10 border-2 border-dashed border-white/30 rounded-xl text-slate-300 placeholder-white/30 text-sm font-light leading-relaxed p-3 outline-none resize-none"
-                  placeholder="Cita del card (sin comillas)..."></textarea>
-      </div>
-    </div>
+  <!-- Counter -->
+  <div *ngIf="slides.length > 1" class="carousel-counter">
+    {{ currentSlideIndex + 1 }}&thinsp;/&thinsp;{{ slides.length }}
   </div>
-</section>
+
+</section><!-- /carousel-section -->
 
 <!-- Misión y Objetivos Section -->
 <section class="py-24 bg-white bg-grid-pattern relative">
@@ -102,36 +196,36 @@
         <button (click)="selectTab('especificos')" [class]="activeTab==='especificos' ? 'tab-btn active-tab' : 'tab-btn'">Objetivos Específicos</button>
       </div>
 
-      <div class="glass-card p-8 md:p-12 rounded-3xl min-h-[220px] shadow-lg animate-fade-in glowing-card">
+      <div class="glass-card p-8 md:p-12 rounded-3xl min-h-[220px] shadow-lg glowing-card">
 
         <!-- Misión -->
-        <div *ngIf="activeTab==='mision'" class="flex flex-col gap-4 animate-fade-in">
+        <div [hidden]="activeTab !== 'mision'" class="tab-panel flex flex-col gap-4">
           <h3 class="text-xl font-bold text-reasons-navy flex items-center gap-3">
             <svg class="h-6 w-6 text-reasons-green flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
             Comprometidos con el Desarrollo Multidisciplinario
           </h3>
           <app-block-renderer *ngIf="!editMode" [blocksJson]="info?.mision_json" [fallback]="info?.mision || DEFAULT_MISION"></app-block-renderer>
-          <textarea *ngIf="editMode" [(ngModel)]="draft.mision" rows="5" class="ie-textarea-light" placeholder="Misión del grupo...">{{ draft.mision }}</textarea>
+          <textarea *ngIf="editMode" [(ngModel)]="draft.mision" rows="5" class="ie-textarea-light" placeholder="Misión del grupo..."></textarea>
         </div>
 
         <!-- Objetivo General -->
-        <div *ngIf="activeTab==='general'" class="flex flex-col gap-4 animate-fade-in">
+        <div [hidden]="activeTab !== 'general'" class="tab-panel flex flex-col gap-4">
           <h3 class="text-xl font-bold text-reasons-navy flex items-center gap-3">
             <svg class="h-6 w-6 text-reasons-green flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             Liderazgo Científico y Tecnológico
           </h3>
           <app-block-renderer *ngIf="!editMode" [blocksJson]="info?.objetivo_general_json" [fallback]="info?.objetivo_general || DEFAULT_OBJETIVO"></app-block-renderer>
-          <textarea *ngIf="editMode" [(ngModel)]="draft.objetivo_general" rows="5" class="ie-textarea-light" placeholder="Objetivo general...">{{ draft.objetivo_general }}</textarea>
+          <textarea *ngIf="editMode" [(ngModel)]="draft.objetivo_general" rows="5" class="ie-textarea-light" placeholder="Objetivo general..."></textarea>
         </div>
 
         <!-- Objetivos Específicos -->
-        <div *ngIf="activeTab==='especificos'" class="flex flex-col gap-4 animate-fade-in">
+        <div [hidden]="activeTab !== 'especificos'" class="tab-panel flex flex-col gap-4">
           <h3 class="text-xl font-bold text-reasons-navy flex items-center gap-3">
             <svg class="h-6 w-6 text-reasons-green flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
             Acciones Estratégicas del Grupo
           </h3>
           <app-block-renderer *ngIf="!editMode" [blocksJson]="info?.objetivos_especificos_json" [fallback]="info?.objetivos_especificos || DEFAULT_OBJETIVOS_ESP"></app-block-renderer>
-          <textarea *ngIf="editMode" [(ngModel)]="draft.objetivos_especificos" rows="6" class="ie-textarea-light" placeholder="Objetivos específicos...">{{ draft.objetivos_especificos }}</textarea>
+          <textarea *ngIf="editMode" [(ngModel)]="draft.objetivos_especificos" rows="6" class="ie-textarea-light" placeholder="Objetivos específicos..."></textarea>
         </div>
 
       </div>
@@ -210,140 +304,159 @@
   </div>
 </section>
 
-<!-- Noticias Section -->
-<section *ngIf="noticias.length > 0" class="py-20 bg-slate-50/50 relative overflow-hidden border-t border-slate-100">
-  <div class="absolute -left-40 top-20 w-96 h-96 bg-reasons-green/5 rounded-full filter blur-3xl"></div>
-  <div class="absolute -right-40 bottom-20 w-96 h-96 bg-reasons-blue/5 rounded-full filter blur-3xl"></div>
+<!-- Stats Counter Section -->
+<section id="home-stats-section" class="py-24 bg-reasons-bg bg-grid-pattern relative overflow-hidden">
+  <div class="absolute -left-32 -top-16 w-96 h-96 rounded-full bg-reasons-green/6 filter blur-3xl pointer-events-none"></div>
+  <div class="absolute -right-32 -bottom-16 w-96 h-96 rounded-full bg-reasons-blue/6 filter blur-3xl pointer-events-none"></div>
 
-  <div class="max-w-7xl mx-auto px-6">
-    <div class="text-center max-w-3xl mx-auto flex flex-col gap-4 mb-16">
-      <span class="text-xs font-bold text-reasons-green tracking-widest uppercase">Actualidad</span>
-      <h2 class="text-3xl md:text-4xl font-extrabold text-reasons-navy">Noticias y Novedades</h2>
-      <div class="w-16 h-1 bg-reasons-green mx-auto rounded-full"></div>
+  <div class="relative max-w-7xl mx-auto px-6">
+    <!-- Header -->
+    <div class="text-center mb-14">
+      <span class="text-xs font-bold text-reasons-green tracking-widest uppercase">Impacto en Números</span>
+      <h2 class="text-3xl md:text-4xl font-extrabold text-reasons-navy mt-2">REASONS en Cifras</h2>
+      <div class="w-16 h-1 bg-reasons-green mx-auto rounded-full mt-4"></div>
     </div>
 
-    <div class="relative max-w-4xl mx-auto">
-      <!-- Card container -->
-      <div class="group/card news-premium-card relative min-h-[380px] rounded-3xl">
-        <!-- Sliding Item -->
-        <div *ngFor="let noticia of noticias; let idx = index"
-             [class]="idx === currentNewsIndex ? 'flex flex-col md:flex-row opacity-100 scale-100 translate-x-0 relative z-10 slide-active' : 'absolute inset-0 flex flex-col md:flex-row opacity-0 scale-95 pointer-events-none z-0 translate-x-4'"
-             class="transition-all duration-750 cubic-bezier(0.16, 1, 0.3, 1) h-full min-h-[380px] text-left bg-white w-full">
-          
-          <!-- Image side -->
-          <div class="md:w-1/2 relative bg-gradient-to-br from-[#00283c] to-[#043d1a] overflow-hidden min-h-[220px] md:min-h-0 flex-shrink-0 flex items-center justify-center">
-            <img *ngIf="noticia.imagen_url" [src]="resolveUrl(noticia.imagen_url)" 
-                 class="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-out group-hover/card:scale-110 group-hover/card:brightness-110 group-hover/card:saturate-110" 
-                 [class]="idx === currentNewsIndex ? 'scale-100 opacity-100' : 'scale-110 opacity-0'" alt="News Image" />
-            <div *ngIf="!noticia.imagen_url" class="absolute inset-0 flex flex-col items-center justify-center text-white/20 p-8 transition-all duration-700"
-                 [class]="idx === currentNewsIndex ? 'opacity-100 scale-100' : 'opacity-0 scale-95'">
-              <svg class="w-16 h-16 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15M9 11l3 3m0 0l3-3m-3 3V8"/></svg>
-              <span class="text-[10px] uppercase tracking-widest font-bold mt-2 text-white/40">REASONS News</span>
-            </div>
-            <span class="absolute top-4 left-4 inline-flex px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-white bg-reasons-green/80 backdrop-blur-md border border-white/20 shadow-md transition-all duration-700 delay-300 transform"
-                  [class]="idx === currentNewsIndex ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0'">
-              {{ noticia.categoria }}
-            </span>
-          </div>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
 
-          <!-- Content side -->
-          <div class="md:w-1/2 p-8 md:p-12 flex flex-col justify-between bg-white text-left gap-6">
-            <div class="flex flex-col gap-4">
-              <span class="text-xs font-bold text-slate-400 uppercase tracking-wide flex items-center gap-1.5 transition-all duration-700 delay-75 transform"
-                    [class]="idx === currentNewsIndex ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'">
-                <svg class="w-4 h-4 text-reasons-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                {{ noticia.fecha | date:'longDate' }}
-              </span>
-              <h3 class="text-xl md:text-2xl font-black text-reasons-navy leading-tight hover:text-reasons-green transition-all duration-700 delay-150 transform cursor-pointer" 
-                  [class]="idx === currentNewsIndex ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'"
-                  (click)="verNoticia(noticia)">
-                {{ noticia.titulo }}
-              </h3>
-              <p class="text-sm text-slate-500 font-light leading-relaxed transition-all duration-700 delay-300 transform"
-                 [class]="idx === currentNewsIndex ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'">
-                {{ noticia.resumen }}
-              </p>
-            </div>
-            <button (click)="verNoticia(noticia)" 
-                    class="group w-fit px-6 py-2.5 bg-reasons-navy hover:bg-reasons-green text-white text-xs font-bold rounded-full shadow hover-premium transition-all duration-700 delay-500 transform cursor-pointer flex items-center gap-1.5"
-                    [class]="idx === currentNewsIndex ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'">
-              Leer más
-              <svg class="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-            </button>
-          </div>
-
+      <!-- Visitantes -->
+      <div class="glowing-card glass-card rounded-3xl p-8 flex flex-col items-center gap-5 text-center hover-premium">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-reasons-green/20 to-reasons-green/5 border border-reasons-green/15 flex items-center justify-center">
+          <svg class="w-8 h-8 text-reasons-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+          </svg>
+        </div>
+        <div class="flex flex-col items-center gap-2">
+          <span class="text-5xl font-extrabold text-reasons-navy font-mono tabular-nums leading-none">{{ statsDisplay.visitas | number }}</span>
+          <span class="w-10 h-0.5 bg-reasons-green rounded-full"></span>
+          <span class="text-sm font-bold text-reasons-navy uppercase tracking-wider">Visitantes</span>
+          <span class="text-xs text-slate-400 font-light">del sitio web</span>
         </div>
       </div>
 
-      <!-- Controls -->
-      <button (click)="prevNews()" class="premium-control-btn absolute left-[-20px] md:left-[-28px] top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full shadow-lg flex items-center justify-center cursor-pointer z-10">
-        <svg class="w-5 h-5 md:w-6 md:h-6 transition-transform duration-300 group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
-      </button>
-      <button (click)="nextNews()" class="premium-control-btn absolute right-[-20px] md:right-[-28px] top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full shadow-lg flex items-center justify-center cursor-pointer z-10">
-        <svg class="w-5 h-5 md:w-6 md:h-6 transition-transform duration-300 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-      </button>
-
-      <!-- Dots -->
-      <div class="flex justify-center gap-2 mt-8">
-        <button *ngFor="let noticia of noticias; let idx = index"
-                (click)="selectNews(idx)"
-                [class.carousel-dot-active]="idx === currentNewsIndex"
-                class="h-2 w-2 bg-slate-350 rounded-full cursor-pointer carousel-dot"></button>
+      <!-- Investigadores -->
+      <div class="glowing-card glass-card rounded-3xl p-8 flex flex-col items-center gap-5 text-center hover-premium">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-reasons-blue/20 to-reasons-blue/5 border border-reasons-blue/15 flex items-center justify-center">
+          <svg class="w-8 h-8 text-reasons-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 14l9-5-9-5-9 5 9 5z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+          </svg>
+        </div>
+        <div class="flex flex-col items-center gap-2">
+          <span class="text-5xl font-extrabold text-reasons-navy font-mono tabular-nums leading-none">{{ statsDisplay.investigadores | number }}</span>
+          <span class="w-10 h-0.5 bg-reasons-blue rounded-full"></span>
+          <span class="text-sm font-bold text-reasons-navy uppercase tracking-wider">Investigadores</span>
+          <span class="text-xs text-slate-400 font-light">del grupo</span>
+        </div>
       </div>
+
+      <!-- Proyectos -->
+      <div class="glowing-card glass-card rounded-3xl p-8 flex flex-col items-center gap-5 text-center hover-premium">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-reasons-green/20 to-reasons-green/5 border border-reasons-green/15 flex items-center justify-center">
+          <svg class="w-8 h-8 text-reasons-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+          </svg>
+        </div>
+        <div class="flex flex-col items-center gap-2">
+          <span class="text-5xl font-extrabold text-reasons-navy font-mono tabular-nums leading-none">{{ statsDisplay.proyectos | number }}</span>
+          <span class="w-10 h-0.5 bg-reasons-green rounded-full"></span>
+          <span class="text-sm font-bold text-reasons-navy uppercase tracking-wider">Proyectos</span>
+          <span class="text-xs text-slate-400 font-light">de investigación</span>
+        </div>
+      </div>
+
+      <!-- Publicaciones -->
+      <div class="glowing-card glass-card rounded-3xl p-8 flex flex-col items-center gap-5 text-center hover-premium">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-reasons-blue/20 to-reasons-blue/5 border border-reasons-blue/15 flex items-center justify-center">
+          <svg class="w-8 h-8 text-reasons-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+        </div>
+        <div class="flex flex-col items-center gap-2">
+          <span class="text-5xl font-extrabold text-reasons-navy font-mono tabular-nums leading-none">{{ statsDisplay.publicaciones | number }}</span>
+          <span class="w-10 h-0.5 bg-reasons-blue rounded-full"></span>
+          <span class="text-sm font-bold text-reasons-navy uppercase tracking-wider">Publicaciones</span>
+          <span class="text-xs text-slate-400 font-light">científicas indexadas</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Noticias Section -->
+<section *ngIf="latestNoticias.length > 0" class="py-20 bg-slate-50 relative overflow-hidden border-t border-slate-100">
+  <div class="absolute -left-40 top-20 w-96 h-96 bg-reasons-green/5 rounded-full filter blur-3xl pointer-events-none"></div>
+  <div class="absolute -right-40 bottom-20 w-96 h-96 bg-reasons-blue/5 rounded-full filter blur-3xl pointer-events-none"></div>
+
+  <div class="max-w-7xl mx-auto px-6">
+    <!-- Header + Ver todas -->
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-14">
+      <div class="flex flex-col gap-2">
+        <span class="text-xs font-bold text-reasons-green tracking-widest uppercase">Actualidad</span>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-reasons-navy">Noticias y Novedades</h2>
+        <div class="w-14 h-1 bg-reasons-green rounded-full"></div>
+      </div>
+      <a routerLink="/noticias"
+         class="inline-flex items-center gap-2 px-6 py-2.5 bg-reasons-navy hover:bg-reasons-green text-white text-sm font-semibold rounded-full shadow-md transition-all self-start sm:self-auto">
+        Ver todas
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+        </svg>
+      </a>
+    </div>
+
+    <!-- Grid de 3 cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <a *ngFor="let noticia of latestNoticias"
+         routerLink="/noticias"
+         [queryParams]="{ id: noticia.id }"
+         class="group news-premium-card rounded-3xl flex flex-col overflow-hidden no-underline">
+
+        <!-- Imagen -->
+        <div class="relative bg-gradient-to-br from-reasons-navy to-[#043d1a] h-52 overflow-hidden flex-shrink-0">
+          <img *ngIf="noticia.imagen_url"
+               [src]="resolveUrl(noticia.imagen_url)"
+               [alt]="noticia.titulo || ''"
+               class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+          <div *ngIf="!noticia.imagen_url"
+               class="absolute inset-0 flex flex-col items-center justify-center text-white/25">
+            <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2"
+                    d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15"/>
+            </svg>
+          </div>
+          <div class="absolute inset-0 bg-gradient-to-t from-[#001a2a]/60 via-transparent to-transparent"></div>
+          <span *ngIf="noticia.categoria"
+                class="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-white bg-reasons-green/85 backdrop-blur-sm border border-white/20">
+            {{ noticia.categoria }}
+          </span>
+        </div>
+
+        <!-- Contenido -->
+        <div class="flex flex-col gap-3 p-6 flex-1 bg-white">
+          <span class="text-xs text-slate-400 font-semibold uppercase tracking-wide flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-reasons-green flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            {{ noticia.fecha | date:'dd MMM yyyy' }}
+          </span>
+          <h3 class="text-lg font-bold text-reasons-navy leading-snug group-hover:text-reasons-green transition-colors line-clamp-2">
+            {{ noticia.titulo }}
+          </h3>
+          <p class="text-sm text-slate-500 font-light leading-relaxed line-clamp-3 flex-1">
+            {{ noticia.resumen }}
+          </p>
+          <span class="inline-flex items-center gap-1 text-reasons-green text-xs font-bold mt-1 group-hover:gap-2 transition-all">
+            Leer más
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+            </svg>
+          </span>
+        </div>
+      </a>
     </div>
 
   </div>
 </section>
-
-<!-- News Details Backdrop Modal -->
-<div *ngIf="selectedNoticia" 
-     (click)="cerrarNoticia()"
-     class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 animate-backdrop">
-  <div (click)="$event.stopPropagation()"
-       class="bg-white rounded-3xl max-w-3xl w-full max-h-[85vh] overflow-y-auto shadow-2xl border border-slate-100 flex flex-col text-left animate-modal-spring">
-    
-    <!-- Modal Cover -->
-    <div class="relative bg-gradient-to-br from-[#00283c] to-[#043d1a] min-h-[220px] sm:min-h-[280px] flex items-center justify-center text-center overflow-hidden flex-shrink-0">
-      <img *ngIf="selectedNoticia.imagen_url" [src]="resolveUrl(selectedNoticia.imagen_url)" class="w-full h-full object-cover" />
-      <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
-      <button (click)="cerrarNoticia()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-all hover:rotate-90 duration-300 cursor-pointer">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-      </button>
-      
-      <div class="absolute bottom-6 left-6 right-6 flex flex-col gap-2.5">
-        <span class="inline-flex px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-[#7dd87a] bg-white/10 border border-white/20 w-fit backdrop-blur-md">
-          {{ selectedNoticia.categoria }}
-        </span>
-        <h3 class="text-xl sm:text-2xl md:text-3xl font-black text-white leading-tight">
-          {{ selectedNoticia.titulo }}
-        </h3>
-      </div>
-    </div>
-
-    <!-- Content -->
-    <div class="p-6 sm:p-8 flex flex-col gap-6">
-      <div class="flex items-center gap-1.5 text-xs text-slate-400 font-bold uppercase tracking-wide border-b border-slate-100 pb-3">
-        <svg class="w-4 h-4 text-reasons-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-        Publicado el {{ selectedNoticia.fecha | date:'longDate' }}
-      </div>
-
-      <div class="p-4 bg-slate-50 border-l-4 border-reasons-green rounded-r-2xl font-light text-slate-650 leading-relaxed text-sm italic">
-        {{ selectedNoticia.resumen }}
-      </div>
-
-      <div class="text-sm text-slate-700 font-light leading-relaxed prose max-w-none">
-        <app-block-renderer
-          [blocksJson]="selectedNoticia.contenido_json"
-          [fallback]="selectedNoticia.contenido">
-        </app-block-renderer>
-      </div>
-    </div>
-
-    <!-- Footer -->
-    <div class="p-5 border-t border-slate-100 bg-slate-50/50 flex justify-end">
-      <button (click)="cerrarNoticia()" class="px-6 py-2 bg-reasons-navy hover:bg-reasons-green text-white text-xs font-bold rounded-full transition-colors cursor-pointer shadow-sm">
-        Cerrar
-      </button>
-    </div>
-  </div>
-</div>

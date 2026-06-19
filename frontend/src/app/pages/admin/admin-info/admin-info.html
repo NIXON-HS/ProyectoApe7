@@ -9,7 +9,7 @@
   <ng-container *ngIf="infoLoaded">
 
     <!-- FORMULARIO 1: INFORMACIÓN GENERAL DEL GRUPO -->
-    <div class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-6 bg-white">
+    <div *ngIf="section === 'all' || section === 'inicio'" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-6 bg-white">
       <!-- Header -->
       <div class="flex items-center justify-between flex-wrap gap-3 pb-4 border-b border-slate-100">
         <h3 class="text-lg font-bold text-reasons-navy flex items-center gap-2 mb-0">
@@ -66,7 +66,7 @@
         </div>
         <div class="flex flex-col gap-1.5">
           <label class="form-label">Dominio oficial del grupo</label>
-          <textarea [(ngModel)]="infoGrupo.dominio" rows="2" class="form-input" placeholder="Optimización de los Sistemas Productivos..."></textarea>
+          <textarea [(ngModel)]="infoGrupo.dominio" rows="4" class="form-input w-full resize-y" placeholder="Optimización de los Sistemas Productivos..."></textarea>
         </div>
       </div>
 
@@ -123,8 +123,76 @@
       </div>
     </div>
 
-    <!-- FORMULARIO 2: PÁGINA PROYECTOS -->
-    <div class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-4 bg-white">
+    <!-- FORMULARIO 2: TARJETA DEL GRUPO EN EL HERO -->
+    <div *ngIf="section === 'all' || section === 'inicio'" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-4 bg-white">
+      <div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-100">
+        <h3 class="text-lg font-bold text-reasons-navy flex items-center gap-2 mb-0">
+          <div class="w-7 h-7 rounded-lg bg-reasons-navy/10 text-reasons-navy flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2"/></svg>
+          </div>
+          Tarjeta de Identidad del Grupo (en el Hero)
+        </h3>
+        <button type="button" (click)="guardarInfoHero()" class="save-btn">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+          Guardar
+        </button>
+      </div>
+
+      <!-- Info note -->
+      <div class="flex items-start gap-3 px-4 py-3 bg-reasons-blue/5 border border-reasons-blue/15 rounded-2xl text-xs text-reasons-blue">
+        <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span>El <strong>título, descripción y botones</strong> del hero se configuran en el <strong>Carrusel de Portada</strong> (slide de tipo Brand) que aparece abajo. Aquí solo se gestiona la tarjeta flotante de identidad del grupo.</span>
+      </div>
+
+      <!-- Card fields -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="flex flex-col gap-1.5">
+          <label class="form-label">Nombre en la tarjeta</label>
+          <input type="text" [(ngModel)]="infoGrupo.hero_card_nombre" class="form-input" placeholder="REASONS" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="form-label">Subtítulo de la tarjeta</label>
+          <input type="text" [(ngModel)]="infoGrupo.hero_card_grupo" class="form-input" placeholder="Grupo de Investigación UTA" />
+        </div>
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">Cita en la tarjeta (sin comillas)</label>
+        <textarea [(ngModel)]="infoGrupo.hero_cita" rows="3" class="form-input" placeholder="Investigación innovadora desde la Facultad..."></textarea>
+      </div>
+    </div>
+
+    <!-- FORMULARIO 3: PÁGINA NOTICIAS -->
+    <div *ngIf="section === 'all' || section === 'noticias'" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-4 bg-white">
+      <div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-100">
+        <h3 class="text-lg font-bold text-reasons-navy flex items-center gap-2 mb-0">
+          <div class="w-7 h-7 rounded-lg bg-reasons-green/10 text-reasons-green flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15"/></svg>
+          </div>
+          Página — Noticias y Novedades
+        </h3>
+        <button type="button" (click)="guardarInfoNoticias()" class="save-btn">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+          Guardar
+        </button>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="flex flex-col gap-1.5">
+          <label class="form-label">Etiqueta (badge)</label>
+          <input type="text" [(ngModel)]="infoGrupo.noticias_badge" class="form-input" placeholder="Actualidad" />
+        </div>
+        <div class="flex flex-col gap-1.5 sm:col-span-2">
+          <label class="form-label">Título de la página</label>
+          <input type="text" [(ngModel)]="infoGrupo.noticias_titulo" class="form-input" placeholder="Noticias y Novedades" />
+        </div>
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="form-label">Descripción / subtítulo</label>
+        <textarea [(ngModel)]="infoGrupo.noticias_descripcion" rows="2" class="form-input" placeholder="Mantente al tanto de las últimas noticias..."></textarea>
+      </div>
+    </div>
+
+    <!-- FORMULARIO 4: PÁGINA PROYECTOS -->
+    <div *ngIf="section === 'all' || section === 'proyectos'" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-4 bg-white">
       <div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-100">
         <h3 class="text-lg font-bold text-reasons-navy flex items-center gap-2 mb-0">
           <div class="w-7 h-7 rounded-lg bg-reasons-green/10 text-reasons-green flex items-center justify-center">
@@ -153,8 +221,8 @@
       </div>
     </div>
 
-    <!-- FORMULARIO 3: PÁGINA PUBLICACIONES -->
-    <div class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-4 bg-white">
+    <!-- FORMULARIO 5: PÁGINA PUBLICACIONES -->
+    <div *ngIf="section === 'all' || section === 'publicaciones'" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-4 bg-white">
       <div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-100">
         <h3 class="text-lg font-bold text-reasons-navy flex items-center gap-2 mb-0">
           <div class="w-7 h-7 rounded-lg bg-reasons-blue/10 text-reasons-blue flex items-center justify-center">
@@ -183,8 +251,8 @@
       </div>
     </div>
 
-    <!-- FORMULARIO 4: PÁGINA CONTACTO -->
-    <div class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-4 bg-white">
+    <!-- FORMULARIO 6: PÁGINA CONTACTO -->
+    <div *ngIf="section === 'all' || section === 'contacto'" class="glass-card p-6 md:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col gap-4 bg-white">
       <div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-100">
         <h3 class="text-lg font-bold text-reasons-navy flex items-center gap-2 mb-0">
           <div class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-650 flex items-center justify-center">

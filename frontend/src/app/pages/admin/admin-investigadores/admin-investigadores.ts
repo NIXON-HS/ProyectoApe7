@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { PaginationComponent } from '../../../shared/pagination/pagination';
 import { InvestigadorService } from '../../../core/services/investigador.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { ConfirmService } from '../../../core/services/confirm.service';
@@ -9,7 +10,7 @@ import { Investigador } from '../../../core/models/investigador.model';
 @Component({
   selector: 'app-admin-investigadores',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, PaginationComponent],
   templateUrl: './admin-investigadores.html',
   styleUrls: ['./admin-investigadores.css']
 })
@@ -17,6 +18,12 @@ export class AdminInvestigadoresComponent implements OnInit {
   @Input() searchQuery = '';
 
   investigadores: Investigador[] = [];
+
+  // Filtros y paginación
+  filterPosicion = '';
+  currentPage = 1;
+  readonly pageSize = 10;
+
   showForm = false;
   editMode = false;
   activeRecordId: number | null = null;
@@ -184,13 +191,22 @@ export class AdminInvestigadoresComponent implements OnInit {
     return url;
   }
 
+  onFilterChange() { this.currentPage = 1; }
+  onPageChange(page: number) { this.currentPage = page; }
+
   filtrarLista(items: any[]): any[] {
-    if (!this.searchQuery) return items;
-    const q = this.searchQuery.toLowerCase();
-    
-    return items.filter(item => {
-      if (item.nombres) return item.nombres.toLowerCase().includes(q) || item.correo_institucional.toLowerCase().includes(q);
-      return false;
-    });
+    let result = items;
+    if (this.filterPosicion) result = result.filter(i => i.posicion === this.filterPosicion);
+    if (this.searchQuery) {
+      const q = this.searchQuery.toLowerCase();
+      result = result.filter(i => i.nombres?.toLowerCase().includes(q) || i.correo_institucional?.toLowerCase().includes(q));
+    }
+    return result;
+  }
+
+  pagedList(items: any[]): any[] {
+    const filtered = this.filtrarLista(items);
+    const start = (this.currentPage - 1) * this.pageSize;
+    return filtered.slice(start, start + this.pageSize);
   }
 }

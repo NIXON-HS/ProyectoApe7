@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InfoGrupoService } from '../../../core/services/info-grupo.service';
@@ -15,6 +15,9 @@ import { InfoGrupo } from '../../../core/models/info-grupo.model';
   styleUrls: ['./admin-info.css']
 })
 export class AdminInfoComponent implements OnInit {
+  /** Which section to show. 'all' = legacy full view. */
+  @Input() section: 'all' | 'inicio' | 'proyectos' | 'publicaciones' | 'contacto' | 'noticias' = 'all';
+
   infoGrupo: InfoGrupo = {};
   infoLoaded = false;
   isUploading = false;
@@ -31,6 +34,13 @@ export class AdminInfoComponent implements OnInit {
 
   private readonly DEFAULTS = {
     logo_url: '/logo.svg',
+    hero_badge:       'Universidad Técnica de Ambato',
+    hero_titulo:      'Research in Engineering and Advanced Sustainable Operations,',
+    hero_nombre:      'Nature, and Society',
+    hero_subtitulo:   'Investigación innovadora desde la Facultad de Ingeniería en Sistemas, Electrónica e Industrial orientada a un futuro industrial verde y sostenible.',
+    hero_cita:        'Investigación innovadora desde la Facultad de Ingeniería en Sistemas, Electrónica e Industrial orientada a un futuro industrial verde y sostenible.',
+    hero_card_nombre: 'REASONS',
+    hero_card_grupo:  'Grupo de Investigación UTA',
     descripcion: 'Impulsamos la excelencia en investigación multidisciplinaria uniendo la optimización de procesos industriales, el desarrollo tecnológico computacional, la armonía con la naturaleza y el beneficio de la sociedad.',
     mision: 'Generar, promover y difundir conocimiento científico y tecnológico de vanguardia e impacto multidisciplinario, articulando la ingeniería avanzada con procesos de sostenibilidad industrial y ambiental, para aportar con soluciones innovadoras a las problemáticas actuales de la naturaleza y el beneficio de la sociedad andina y global.',
     objetivo_general: 'Consolidarse como un grupo de investigación multidisciplinario líder y de referencia nacional e internacional en la optimización de sistemas productivos, desarrollo tecnológico sustentable y ciencia de datos, aportando soluciones eficientes y amigables con el medio ambiente aplicables a las dinámicas del sector industrial y social del país.',
@@ -51,6 +61,9 @@ export class AdminInfoComponent implements OnInit {
     equipo_badge: 'Talento Humano',
     equipo_titulo: 'Nuestro Equipo de Investigación',
     equipo_descripcion: 'Conoce a los científicos, ingenieros y expertos multidisciplinares que lideran el desarrollo sostenible y la innovación tecnológica avanzada en REASONS.',
+    noticias_badge: 'Actualidad',
+    noticias_titulo: 'Noticias y Novedades',
+    noticias_descripcion: 'Mantente al tanto de las últimas noticias, eventos y logros del grupo de investigación REASONS.',
   };
 
   constructor(
@@ -70,7 +83,14 @@ export class AdminInfoComponent implements OnInit {
       next: (data) => {
         const d = this.DEFAULTS;
         this.infoGrupo = {
-          logo_url: data.logo_url || d.logo_url,
+          logo_url:         data.logo_url         || d.logo_url,
+          hero_badge:       data.hero_badge        || d.hero_badge,
+          hero_titulo:      data.hero_titulo       || d.hero_titulo,
+          hero_nombre:      data.hero_nombre       || d.hero_nombre,
+          hero_subtitulo:   data.hero_subtitulo    || d.hero_subtitulo,
+          hero_cita:        data.hero_cita         || d.hero_cita,
+          hero_card_nombre: data.hero_card_nombre  || d.hero_card_nombre,
+          hero_card_grupo:  data.hero_card_grupo   || d.hero_card_grupo,
           descripcion: data.descripcion || d.descripcion,
           descripcion_json: data.descripcion_json ?? null,
           mision: data.mision || d.mision,
@@ -95,6 +115,9 @@ export class AdminInfoComponent implements OnInit {
           equipo_badge: data.equipo_badge || d.equipo_badge,
           equipo_titulo: data.equipo_titulo || d.equipo_titulo,
           equipo_descripcion: data.equipo_descripcion || d.equipo_descripcion,
+          noticias_badge: data.noticias_badge || d.noticias_badge,
+          noticias_titulo: data.noticias_titulo || d.noticias_titulo,
+          noticias_descripcion: data.noticias_descripcion || d.noticias_descripcion,
         };
 
         this.infoDescModo = !!(data.descripcion_json);
@@ -247,5 +270,21 @@ export class AdminInfoComponent implements OnInit {
       equipo_titulo: this.infoGrupo.equipo_titulo,
       equipo_descripcion: this.infoGrupo.equipo_descripcion,
     }, 'Página Equipo');
+  }
+
+  guardarInfoHero() {
+    this.saveInfo({
+      hero_cita:        this.infoGrupo.hero_cita,
+      hero_card_nombre: this.infoGrupo.hero_card_nombre,
+      hero_card_grupo:  this.infoGrupo.hero_card_grupo,
+    }, 'Tarjeta del Hero');
+  }
+
+  guardarInfoNoticias() {
+    this.saveInfo({
+      noticias_badge:       this.infoGrupo.noticias_badge,
+      noticias_titulo:      this.infoGrupo.noticias_titulo,
+      noticias_descripcion: this.infoGrupo.noticias_descripcion,
+    }, 'Página Noticias');
   }
 }
