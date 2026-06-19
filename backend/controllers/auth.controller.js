@@ -126,6 +126,30 @@ exports.login = async (req, res, next) => {
   }
 };
 
+exports.changePassword = async (req, res, next) => {
+  try {
+    const { passwordActual, passwordNuevo } = req.body;
+    const usuarioId = req.usuario.id;
+
+    const usuario = await Usuario.findByPk(usuarioId);
+    if (!usuario) {
+      return res.status(404).json({ success: false, message: 'Usuario no encontrado.' });
+    }
+
+    const esValido = await bcrypt.compare(passwordActual, usuario.password);
+    if (!esValido) {
+      return res.status(401).json({ success: false, message: 'La contraseña actual es incorrecta.' });
+    }
+
+    const hash = await bcrypt.hash(passwordNuevo, 10);
+    await usuario.update({ password: hash });
+
+    return res.status(200).json({ success: true, message: 'Contraseña actualizada exitosamente.' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Verifica un JWT token existente sin bcrypt (para reloads instantáneos)
 exports.verify = (req, res) => {
   try {

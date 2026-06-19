@@ -3,6 +3,7 @@ const { body } = require('express-validator');
 const rateLimit = require('express-rate-limit');
 const controller = require('../controllers/auth.controller');
 const validate = require('../middlewares/validate.middleware');
+const authMiddleware = require('../middlewares/auth.middleware');
 
 const router = express.Router();
 
@@ -33,6 +34,14 @@ const loginValidador = [
     .notEmpty().withMessage('La contraseña es requerida')
 ];
 
+const changePasswordValidador = [
+  body('passwordActual').notEmpty().withMessage('La contraseña actual es requerida'),
+  body('passwordNuevo')
+    .notEmpty().withMessage('La nueva contraseña es requerida')
+    .isLength({ min: 6 }).withMessage('La nueva contraseña debe tener al menos 6 caracteres')
+];
+
+
 const forgotPasswordValidador = [
   body('correo')
     .notEmpty().withMessage('El correo electrónico es requerido')
@@ -58,7 +67,10 @@ const validateResetTokenValidador = [
     .notEmpty().withMessage('El token de recuperación es requerido')
 ];
 
+
+
 router.post('/login', loginValidador, validate, controller.login);
+router.put('/change-password', authMiddleware, changePasswordValidador, validate, controller.changePassword);
 router.post('/forgot-password', forgotPasswordValidador, validate, forgotPasswordLimiter, controller.forgotPassword);
 router.post('/validate-reset-token', validateResetTokenValidador, validate, controller.validateResetToken);
 router.post('/reset-password', resetPasswordValidador, validate, controller.resetPassword);
