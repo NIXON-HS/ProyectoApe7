@@ -10,7 +10,9 @@
 <section *ngIf="slides.length > 0"
          class="carousel-section relative w-full overflow-hidden"
          (mouseenter)="stopSlideRotation()"
-         (mouseleave)="startSlideRotation()">
+         (mouseleave)="startSlideRotation()"
+         (touchstart)="onTouchStart($event)"
+         (touchend)="onTouchEnd($event)">
 
   <!-- Slides (crossfade) -->
   <div *ngFor="let slide of slides; let i = index"
@@ -43,37 +45,37 @@
       <div class="absolute inset-0 bg-gradient-to-t from-[#00141f]/60 via-transparent to-transparent"></div>
 
       <!-- Contenido: dos columnas -->
-      <div class="absolute inset-0 flex items-center z-10">
+      <div class="absolute inset-0 flex items-center z-10 pt-16 md:pt-20">
         <div class="max-w-7xl mx-auto px-6 lg:px-16 w-full">
           <div class="carousel-text" style="max-width:none;width:100%"
                [class.content-active]="i === currentSlideIndex">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
 
               <!-- Izquierda: texto -->
-              <div class="lg:col-span-7 flex flex-col gap-5">
+              <div class="lg:col-span-7 flex flex-col gap-3 md:gap-5">
                 <span class="inline-flex px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold uppercase tracking-wider text-[#7dd87a] w-fit">
                   {{ slide.subtitulo || 'Universidad Técnica de Ambato' }}
                 </span>
-                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
+                <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
                   {{ slide.titulo }}
                 </h1>
-                <p class="text-lg text-slate-200 font-light leading-relaxed max-w-2xl">
+                <p class="text-sm sm:text-base lg:text-lg text-slate-200 font-light leading-relaxed max-w-2xl line-clamp-3 md:line-clamp-none">
                   {{ slide.descripcion }}
                 </p>
-                <div class="flex flex-wrap gap-4 mt-2">
+                <div class="flex flex-wrap gap-3 lg:gap-4 mt-1 lg:mt-2">
                   <a *ngIf="slide.enlace" [href]="slide.enlace"
-                     class="px-7 py-3.5 bg-reasons-green hover:bg-[#327e2a] text-white font-semibold rounded-full shadow-lg transition-all">
+                     class="px-5 py-3 md:px-7 md:py-3.5 text-sm md:text-base bg-reasons-green hover:bg-[#327e2a] text-white font-semibold rounded-full shadow-lg transition-all">
                     {{ slide.boton1_texto || 'Ver más' }}
                   </a>
                   <a *ngIf="slide.boton2_url && slide.boton2_texto" [href]="slide.boton2_url"
-                     class="px-7 py-3.5 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-full border border-white/20 shadow-md backdrop-blur-md transition-all">
+                     class="px-5 py-3 md:px-7 md:py-3.5 text-sm md:text-base bg-white/10 hover:bg-white/20 text-white font-semibold rounded-full border border-white/20 shadow-md backdrop-blur-md transition-all">
                     {{ slide.boton2_texto }}
                   </a>
                 </div>
               </div>
 
-              <!-- Derecha: Logo Card -->
-              <div class="lg:col-span-5 flex justify-center">
+              <!-- Derecha: Logo Card (solo visible en desktop) -->
+              <div class="hidden lg:flex lg:col-span-5 justify-center">
                 <div class="glass-dark-card p-8 rounded-3xl flex flex-col items-center gap-6 max-w-sm w-full text-center hover-premium glowing-card animate-float">
                   <div class="w-28 h-28 rounded-full bg-white p-3 flex items-center justify-center shadow-xl">
                     <img [src]="info?.logo_url || '/logo.svg'" alt="REASONS Logo"
@@ -115,8 +117,8 @@
       </div>
       <div class="absolute inset-0 bg-gradient-to-t from-[#00141f]/50 via-transparent to-transparent"></div>
 
-      <div class="absolute inset-0 flex items-center z-10">
-        <div class="w-full max-w-7xl mx-auto px-8 lg:px-16">
+      <div class="absolute inset-0 flex items-center z-10 pt-16 md:pt-20">
+        <div class="w-full max-w-7xl mx-auto px-6 lg:px-16">
           <div class="carousel-text"
                [class.content-active]="i === currentSlideIndex"
                [class.text-center]="slide.alineacion === 'center'"
@@ -148,7 +150,7 @@
 
   </div><!-- /carousel-slide -->
 
-  <!-- Prev / Next -->
+  <!-- Prev / Next — solo visibles en desktop, en mobile se usa swipe -->
   <button *ngIf="slides.length > 1" (click)="prevSlide()"
           class="carousel-arrow left-4 md:left-8" aria-label="Anterior">
     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -317,66 +319,69 @@
       <div class="w-16 h-1 bg-reasons-green mx-auto rounded-full mt-4"></div>
     </div>
 
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
 
       <!-- Visitantes -->
-      <div class="glowing-card glass-card rounded-3xl p-8 flex flex-col items-center gap-5 text-center hover-premium">
-        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-reasons-green/20 to-reasons-green/5 border border-reasons-green/15 flex items-center justify-center">
-          <svg class="w-8 h-8 text-reasons-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+      <div class="glowing-card glass-card rounded-3xl p-5 md:p-8 flex flex-col items-center gap-4 md:gap-5 text-center hover-premium">
+        <div class="w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center shadow-sm"
+             style="background: linear-gradient(135deg, rgba(60,150,50,0.18) 0%, rgba(60,150,50,0.06) 100%); box-shadow: 0 6px 20px -4px rgba(60,150,50,0.22), inset 0 1px 0 rgba(255,255,255,0.7)">
+          <svg class="w-7 h-7 md:w-8 md:h-8 text-reasons-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/>
           </svg>
         </div>
         <div class="flex flex-col items-center gap-2">
-          <span class="text-5xl font-extrabold text-reasons-navy font-mono tabular-nums leading-none">{{ statsDisplay.visitas | number }}</span>
-          <span class="w-10 h-0.5 bg-reasons-green rounded-full"></span>
-          <span class="text-sm font-bold text-reasons-navy uppercase tracking-wider">Visitantes</span>
-          <span class="text-xs text-slate-400 font-light">del sitio web</span>
+          <span class="text-3xl md:text-5xl font-extrabold text-reasons-navy font-mono tabular-nums leading-none">{{ statsDisplay.visitas | number }}</span>
+          <span class="w-8 md:w-10 h-0.5 bg-reasons-green rounded-full"></span>
+          <span class="text-xs md:text-sm font-bold text-reasons-navy uppercase tracking-wider">Visitantes</span>
+          <span class="hidden sm:block text-xs text-slate-400 font-light">del sitio web</span>
         </div>
       </div>
 
       <!-- Investigadores -->
-      <div class="glowing-card glass-card rounded-3xl p-8 flex flex-col items-center gap-5 text-center hover-premium">
-        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-reasons-blue/20 to-reasons-blue/5 border border-reasons-blue/15 flex items-center justify-center">
-          <svg class="w-8 h-8 text-reasons-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 14l9-5-9-5-9 5 9 5z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+      <div class="glowing-card glass-card rounded-3xl p-5 md:p-8 flex flex-col items-center gap-4 md:gap-5 text-center hover-premium">
+        <div class="w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center"
+             style="background: linear-gradient(135deg, rgba(10,50,70,0.18) 0%, rgba(10,50,70,0.06) 100%); box-shadow: 0 6px 20px -4px rgba(10,50,70,0.18), inset 0 1px 0 rgba(255,255,255,0.7)">
+          <svg class="w-7 h-7 md:w-8 md:h-8 text-reasons-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5"/>
           </svg>
         </div>
         <div class="flex flex-col items-center gap-2">
-          <span class="text-5xl font-extrabold text-reasons-navy font-mono tabular-nums leading-none">{{ statsDisplay.investigadores | number }}</span>
-          <span class="w-10 h-0.5 bg-reasons-blue rounded-full"></span>
-          <span class="text-sm font-bold text-reasons-navy uppercase tracking-wider">Investigadores</span>
-          <span class="text-xs text-slate-400 font-light">del grupo</span>
+          <span class="text-3xl md:text-5xl font-extrabold text-reasons-navy font-mono tabular-nums leading-none">{{ statsDisplay.investigadores | number }}</span>
+          <span class="w-8 md:w-10 h-0.5 bg-reasons-blue rounded-full"></span>
+          <span class="text-xs md:text-sm font-bold text-reasons-navy uppercase tracking-wider">Investigadores</span>
+          <span class="hidden sm:block text-xs text-slate-400 font-light">del grupo</span>
         </div>
       </div>
 
       <!-- Proyectos -->
-      <div class="glowing-card glass-card rounded-3xl p-8 flex flex-col items-center gap-5 text-center hover-premium">
-        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-reasons-green/20 to-reasons-green/5 border border-reasons-green/15 flex items-center justify-center">
-          <svg class="w-8 h-8 text-reasons-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+      <div class="glowing-card glass-card rounded-3xl p-5 md:p-8 flex flex-col items-center gap-4 md:gap-5 text-center hover-premium">
+        <div class="w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center"
+             style="background: linear-gradient(135deg, rgba(60,150,50,0.18) 0%, rgba(60,150,50,0.06) 100%); box-shadow: 0 6px 20px -4px rgba(60,150,50,0.22), inset 0 1px 0 rgba(255,255,255,0.7)">
+          <svg class="w-7 h-7 md:w-8 md:h-8 text-reasons-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/>
           </svg>
         </div>
         <div class="flex flex-col items-center gap-2">
-          <span class="text-5xl font-extrabold text-reasons-navy font-mono tabular-nums leading-none">{{ statsDisplay.proyectos | number }}</span>
-          <span class="w-10 h-0.5 bg-reasons-green rounded-full"></span>
-          <span class="text-sm font-bold text-reasons-navy uppercase tracking-wider">Proyectos</span>
-          <span class="text-xs text-slate-400 font-light">de investigación</span>
+          <span class="text-3xl md:text-5xl font-extrabold text-reasons-navy font-mono tabular-nums leading-none">{{ statsDisplay.proyectos | number }}</span>
+          <span class="w-8 md:w-10 h-0.5 bg-reasons-green rounded-full"></span>
+          <span class="text-xs md:text-sm font-bold text-reasons-navy uppercase tracking-wider">Proyectos</span>
+          <span class="hidden sm:block text-xs text-slate-400 font-light">de investigación</span>
         </div>
       </div>
 
       <!-- Publicaciones -->
-      <div class="glowing-card glass-card rounded-3xl p-8 flex flex-col items-center gap-5 text-center hover-premium">
-        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-reasons-blue/20 to-reasons-blue/5 border border-reasons-blue/15 flex items-center justify-center">
-          <svg class="w-8 h-8 text-reasons-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+      <div class="glowing-card glass-card rounded-3xl p-5 md:p-8 flex flex-col items-center gap-4 md:gap-5 text-center hover-premium">
+        <div class="w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center"
+             style="background: linear-gradient(135deg, rgba(10,50,70,0.18) 0%, rgba(10,50,70,0.06) 100%); box-shadow: 0 6px 20px -4px rgba(10,50,70,0.18), inset 0 1px 0 rgba(255,255,255,0.7)">
+          <svg class="w-7 h-7 md:w-8 md:h-8 text-reasons-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/>
           </svg>
         </div>
         <div class="flex flex-col items-center gap-2">
-          <span class="text-5xl font-extrabold text-reasons-navy font-mono tabular-nums leading-none">{{ statsDisplay.publicaciones | number }}</span>
-          <span class="w-10 h-0.5 bg-reasons-blue rounded-full"></span>
-          <span class="text-sm font-bold text-reasons-navy uppercase tracking-wider">Publicaciones</span>
-          <span class="text-xs text-slate-400 font-light">científicas indexadas</span>
+          <span class="text-3xl md:text-5xl font-extrabold text-reasons-navy font-mono tabular-nums leading-none">{{ statsDisplay.publicaciones | number }}</span>
+          <span class="w-8 md:w-10 h-0.5 bg-reasons-blue rounded-full"></span>
+          <span class="text-xs md:text-sm font-bold text-reasons-navy uppercase tracking-wider">Publicaciones</span>
+          <span class="hidden sm:block text-xs text-slate-400 font-light">científicas indexadas</span>
         </div>
       </div>
 
