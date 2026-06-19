@@ -1,18 +1,20 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { VisitaService, AnalyticsData, SiteStats } from '../../../core/services/visita.service';
+import { VisitaService, AnalyticsData, SiteStats, AnalyticsAvanzado } from '../../../core/services/visita.service';
+import { VisitorsMapComponent } from '../../../shared/visitors-map/visitors-map';
 
 @Component({
   selector: 'app-admin-analytics',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, VisitorsMapComponent],
   templateUrl: './admin-analytics.html',
   styleUrls: ['./admin-analytics.css']
 })
 export class AdminAnalyticsComponent implements OnInit {
   data: AnalyticsData | null = null;
   stats: SiteStats | null = null;
+  avanzado: AnalyticsAvanzado | null = null;
   isLoading = true;
   chartMax = 0;
   chartPeriod: '7d' | '30d' | 'semanas' = '30d';
@@ -44,6 +46,10 @@ export class AdminAnalyticsComponent implements OnInit {
     });
     this.visitaService.obtenerStats().subscribe({
       next: (s) => { this.stats = s; this.cdr.detectChanges(); },
+      error: () => {}
+    });
+    this.visitaService.obtenerAnalyticsAvanzado().subscribe({
+      next: (a) => { this.avanzado = a; this.cdr.detectChanges(); },
       error: () => {}
     });
   }
@@ -242,6 +248,94 @@ export class AdminAnalyticsComponent implements OnInit {
   getTrend(): number {
     if (!this.data?.visitasAyer) return 0;
     return Math.round(((this.data.visitasHoy - this.data.visitasAyer) / (this.data.visitasAyer || 1)) * 100);
+  }
+
+  // ── Period comparison helpers ────────────────────────────────────
+
+  getSemanaCrecimiento(): number {
+    return this.avanzado?.comparacionPeriodos?.semanaCrecimiento || 0;
+  }
+
+  getMesCrecimiento(): number {
+    return this.avanzado?.comparacionPeriodos?.mesCrecimiento || 0;
+  }
+
+  getSemanaActual(): number {
+    return this.avanzado?.comparacionPeriodos?.semanaActual || 0;
+  }
+
+  getSemanaAnterior(): number {
+    return this.avanzado?.comparacionPeriodos?.semanaAnterior || 0;
+  }
+
+  getMesActual(): number {
+    return this.avanzado?.comparacionPeriodos?.mesActual || 0;
+  }
+
+  getMesAnterior(): number {
+    return this.avanzado?.comparacionPeriodos?.mesAnterior || 0;
+  }
+
+  // ── Calendar heatmap helpers ─────────────────────────────────────
+
+  getCalendarioMeses(): { mes: string; dias: { fecha: string; total: number; nivel: number }[] }[] {
+    if (!this.avanzado?.calendario?.length) return [];
+    const meses: Record<string, { fecha: string; total: number; nivel: number }[]> = {};
+    const maxVisitas = Math.max(...this.avanzado.calendario.map(d => parseInt(d.total) || 0), 1);
+
+    for (const dia of this.avanzado.calendario) {
+      const total = parseInt(dia.total) || 0;
+      const nivel = total === 0 ? 0 : total <= maxVisitas * 0.25 ? 1 : total <= maxVisitas * 0.5 ? 2 : total <= maxVisitas * 0.75 ? 3 : 4;
+      const fecha = new Date(dia.fecha);
+      const clave = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}`;
+      if (!meses[clave]) meses[clave] = [];
+      meses[clave].push({ fecha: dia.fecha, total, nivel });
+    }
+
+    return Object.entries(meses).sort((a, b) => a[0].localeCompare(b[0])).map(([clave, dias]) => ({
+      mes: this.MESES[parseInt(clave.split('-')[1]) - 1],
+      dias
+    }));
+  }
+
+  // ── Best/worst days helpers ──────────────────────────────────────
+
+  getMejoresDias(): { fecha: string; total: number; label: string }[] {
+    if (!this.avanzado?.mejoresDias?.length) return [];
+    return this.avanzado.mejoresDias.map(d => {
+      const fecha = new Date(d.fecha);
+      return {
+        fecha: d.fecha,
+        total: parseInt(d.total) || 0,
+        label: `${this.DIAS[fecha.getDay()]} ${fecha.getDate()} ${this.MESES[fecha.getMonth()]}`
+      };
+    });
+  }
+
+  getPeoresDias(): { fecha: string; total: number; label: string }[] {
+    if (!this.avanzado?.peoresDias?.length) return [];
+    return this.avanzado.peoresDias.map(d => {
+      const fecha = new Date(d.fecha);
+      return {
+        fecha: d.fecha,
+        total: parseInt(d.total) || 0,
+        label: `${this.DIAS[fecha.getDay()]} ${fecha.getDate()} ${this.MESES[fecha.getMonth()]}`
+      };
+    });
+  }
+
+  getCalendarioMax(): number {
+    if (!this.avanzado?.calendario?.length) return 1;
+    return Math.max(...this.avanzado.calendario.map(d => parseInt(d.total) || 0), 1);
+  }
+
+  getCalendarioColor(nivel: number): string {
+    const colores = ['#f1f5f9', '#bbf7d0', '#4ade80', '#16a34a', '#14532d'];
+    return colores[nivel] || colores[0];
+  }
+
+  getDiaDelMes(fecha: string): number {
+    return new Date(fecha).getDate();
   }
 
   getPageInfo(page: string): { icon: string; name: string; desc: string; color: string } {

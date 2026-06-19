@@ -1,4 +1,4 @@
-const { Visita, sequelize } = require('../models/index');
+const { Visita, GeolocationCache, sequelize } = require('../models/index');
 const { Op, fn, col, literal } = require('sequelize');
 
 const EC = "created_at AT TIME ZONE 'America/Guayaquil'";
@@ -55,28 +55,32 @@ exports.obtenerContador = async (req, res, next) => {
 
 exports.obtenerAnalytics = async (req, res, next) => {
   try {
-    const totalVisitas = await Visita.count();
+    const [totalRow] = await sequelize.query(`SELECT COUNT(*) as c FROM visitas`);
+    const totalVisitas = parseInt(totalRow[0].c);
 
-    const [vh] = await sequelize.query(`SELECT COUNT(*) as c FROM visitas WHERE ${EC_DATE} = ${EC_TODAY}`);
-    const [va] = await sequelize.query(`SELECT COUNT(*) as c FROM visitas WHERE ${EC_DATE} = ${EC_TODAY} - 1`);
-    const [vs] = await sequelize.query(`SELECT COUNT(*) as c FROM visitas WHERE ${EC_DATE} >= ${EC_TODAY} - 7`);
-    const [vm] = await sequelize.query(`SELECT COUNT(*) as c FROM visitas WHERE ${EC_DATE} >= ${EC_TODAY} - 30`);
+    const [hoyRow] = await sequelize.query(`SELECT COUNT(DISTINCT session_id) as c FROM visitas WHERE ${EC_DATE} = ${EC_TODAY} AND session_id IS NOT NULL`);
+    const visitasHoyCount = parseInt(hoyRow[0].c);
 
-    const visitasHoyCount = parseInt(vh[0].c);
-    const visitasAyerCount = parseInt(va[0].c);
-    const visitasSemanaCount = parseInt(vs[0].c);
-    const visitasMesCount = parseInt(vm[0].c);
+    const [ayerRow] = await sequelize.query(`SELECT COUNT(DISTINCT session_id) as c FROM visitas WHERE ${EC_DATE} = (${EC_TODAY} - 1) AND session_id IS NOT NULL`);
+    const visitasAyerCount = parseInt(ayerRow[0].c);
 
-    const [su] = await sequelize.query(`SELECT COUNT(DISTINCT session_id) as c FROM visitas WHERE ${EC_DATE} >= ${EC_TODAY} - 30`);
-    const sesionesUnicas = parseInt(su[0].c);
+    const [semanaRow] = await sequelize.query(`SELECT COUNT(DISTINCT session_id) as c FROM visitas WHERE ${EC_DATE} >= (${EC_TODAY} - 7) AND session_id IS NOT NULL`);
+    const visitasSemanaCount = parseInt(semanaRow[0].c);
+
+    const [mesRow] = await sequelize.query(`SELECT COUNT(DISTINCT session_id) as c FROM visitas WHERE ${EC_DATE} >= (${EC_TODAY} - 30) AND session_id IS NOT NULL`);
+    const visitasMesCount = parseInt(mesRow[0].c);
+
+    const [sesionesRow] = await sequelize.query(`SELECT COUNT(DISTINCT session_id) as c FROM visitas WHERE ${EC_DATE} >= (${EC_TODAY} - 30) AND session_id IS NOT NULL`);
+    const sesionesUnicas = parseInt(sesionesRow[0].c);
 
     const paginasRows = await sequelize.query(`
-      SELECT page, COUNT(id) as count FROM visitas
-      WHERE ${EC_DATE} >= ${EC_TODAY} - 30
+      SELECT page, COUNT(id) as count
+      FROM visitas
+      WHERE ${EC_DATE} >= (${EC_TODAY} - 30)
       GROUP BY page ORDER BY count DESC LIMIT 10
     `, { type: sequelize.QueryTypes.SELECT });
 
-    const [uu] = await sequelize.query(`SELECT COUNT(DISTINCT ip_address) as c FROM visitas WHERE ${EC_DATE} >= ${EC_TODAY} - 30`);
+    const [uu] = await sequelize.query(`SELECT COUNT(DISTINCT ip_address) as c FROM visitas WHERE ${EC_DATE} >= (${EC_TODAY} - 30)`);
     const usuariosUnicos = parseInt(uu[0].c);
 
     const [uuh] = await sequelize.query(`SELECT COUNT(DISTINCT ip_address) as c FROM visitas WHERE ${EC_DATE} = ${EC_TODAY}`);
@@ -85,7 +89,7 @@ exports.obtenerAnalytics = async (req, res, next) => {
     const visitasPorDia = await sequelize.query(`
       SELECT ${EC_DATE} as fecha, COUNT(DISTINCT session_id) as total
       FROM visitas
-      WHERE ${EC_DATE} >= ${EC_TODAY} - 30 AND session_id IS NOT NULL
+      WHERE ${EC_DATE} >= (${EC_TODAY} - 30) AND session_id IS NOT NULL
       GROUP BY ${EC_DATE}
       ORDER BY ${EC_DATE} ASC
     `, { type: sequelize.QueryTypes.SELECT });
@@ -107,7 +111,7 @@ exports.obtenerAnalytics = async (req, res, next) => {
         INNER JOIN visitas v2 ON v1.session_id = v2.session_id AND v2.created_at = (
           SELECT MIN(v3.created_at) FROM visitas v3 WHERE v3.session_id = v1.session_id AND v3.created_at > v1.created_at
         )
-        WHERE (v1.created_at AT TIME ZONE 'America/Guayaquil')::date >= ${EC_TODAY} - 7
+        WHERE (v1.created_at AT TIME ZONE 'America/Guayaquil')::date >= (${EC_TODAY} - 7)
           AND v1.session_id IS NOT NULL
       `, { type: sequelize.QueryTypes.SELECT });
       avgDuration = parseFloat(duracionResult[0]?.segundos) || 0;
@@ -129,7 +133,7 @@ exports.obtenerAnalytics = async (req, res, next) => {
           END as browser,
           COUNT(id) as count
         FROM visitas
-        WHERE ${EC_DATE} >= ${EC_TODAY} - 30
+        WHERE ${EC_DATE} >= (${EC_TODAY} - 30)
         GROUP BY browser
         ORDER BY count DESC
       `, { type: sequelize.QueryTypes.SELECT });
@@ -147,7 +151,7 @@ exports.obtenerAnalytics = async (req, res, next) => {
           END as tipo,
           COUNT(id) as count
         FROM visitas
-        WHERE ${EC_DATE} >= ${EC_TODAY} - 30
+        WHERE ${EC_DATE} >= (${EC_TODAY} - 30)
         GROUP BY tipo
         ORDER BY count DESC
       `, { type: sequelize.QueryTypes.SELECT });
@@ -174,6 +178,190 @@ exports.obtenerAnalytics = async (req, res, next) => {
         ultimasVisitas,
         navegadores: browserRows,
         dispositivos: mobileRows,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.obtenerAnalyticsAvanzado = async (req, res, next) => {
+  try {
+    const periodos = {
+      semanaActual: await sequelize.query(`SELECT COUNT(DISTINCT session_id) as c FROM visitas WHERE ${EC_DATE} >= (${EC_TODAY} - 7) AND ${EC_DATE} < ${EC_TODAY} AND session_id IS NOT NULL`, { type: sequelize.QueryTypes.SELECT }),
+      semanaAnterior: await sequelize.query(`SELECT COUNT(DISTINCT session_id) as c FROM visitas WHERE ${EC_DATE} >= (${EC_TODAY} - 14) AND ${EC_DATE} < (${EC_TODAY} - 7) AND session_id IS NOT NULL`, { type: sequelize.QueryTypes.SELECT }),
+      mesActual: await sequelize.query(`SELECT COUNT(DISTINCT session_id) as c FROM visitas WHERE ${EC_DATE} >= (${EC_TODAY} - 30) AND session_id IS NOT NULL`, { type: sequelize.QueryTypes.SELECT }),
+      mesAnterior: await sequelize.query(`SELECT COUNT(DISTINCT session_id) as c FROM visitas WHERE ${EC_DATE} >= (${EC_TODAY} - 60) AND ${EC_DATE} < (${EC_TODAY} - 30) AND session_id IS NOT NULL`, { type: sequelize.QueryTypes.SELECT }),
+    };
+
+    const semanaActual = parseInt(periodos.semanaActual[0].c);
+    const semanaAnterior = parseInt(periodos.semanaAnterior[0].c);
+    const mesActual = parseInt(periodos.mesActual[0].c);
+    const mesAnterior = parseInt(periodos.mesAnterior[0].c);
+
+    const comparacionPeriodos = {
+      semanaActual,
+      semanaAnterior,
+      mesActual,
+      mesAnterior,
+      semanaCrecimiento: semanaAnterior > 0
+        ? Math.round(((semanaActual - semanaAnterior) / semanaAnterior) * 100)
+        : (semanaActual > 0 ? 100 : 0),
+      mesCrecimiento: mesAnterior > 0
+        ? Math.round(((mesActual - mesAnterior) / mesAnterior) * 100)
+        : (mesActual > 0 ? 100 : 0),
+    };
+
+    const calendario = await sequelize.query(`
+      SELECT ${EC_DATE} as fecha, COUNT(DISTINCT session_id) as total
+      FROM visitas
+      WHERE ${EC_DATE} >= (${EC_TODAY} - 90) AND session_id IS NOT NULL
+      GROUP BY ${EC_DATE}
+      ORDER BY ${EC_DATE} ASC
+    `, { type: sequelize.QueryTypes.SELECT });
+
+    const mejoresPeores = await sequelize.query(`
+      SELECT ${EC_DATE} as fecha, COUNT(DISTINCT session_id) as total
+      FROM visitas
+      WHERE ${EC_DATE} >= (${EC_TODAY} - 30) AND session_id IS NOT NULL
+      GROUP BY ${EC_DATE}
+      ORDER BY total DESC
+    `, { type: sequelize.QueryTypes.SELECT });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        comparacionPeriodos,
+        calendario,
+        mejoresDias: mejoresPeores.slice(0, 5),
+        peoresDias: mejoresPeores.slice(-5).reverse(),
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.obtenerMapaVisitas = async (req, res, next) => {
+  try {
+    const [rows] = await sequelize.query(`
+      SELECT DISTINCT ip_address FROM visitas
+      WHERE ip_address IS NOT NULL AND ip_address != ''
+        AND ip_address NOT LIKE '127.%'
+        AND ip_address NOT LIKE '::1'
+        AND ip_address NOT LIKE '::ffff:127.%'
+    `);
+
+    const ips = rows.map(r => r.ip_address).filter(ip => ip && ip.trim());
+
+    const cache = await GeolocationCache.findAll({ raw: true });
+    const cachedMap = {};
+    cache.forEach(c => { cachedMap[c.ip_address] = c; });
+
+    const uncached = ips.filter(ip => !cachedMap[ip]);
+    if (uncached.length > 0) {
+      const batchSize = 50;
+      for (let i = 0; i < uncached.length; i += batchSize) {
+        const batch = uncached.slice(i, i + batchSize);
+        try {
+          const ipApiUrl = `http://ip-api.com/batch?fields=status,country,countryCode,regionName,city,lat,lon,timezone,isp`;
+          const response = await fetch(ipApiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(batch.map(ip => ({ query: ip }))),
+          });
+          const results = await response.json();
+
+          for (let j = 0; j < results.length; j++) {
+            const r = results[j];
+            const ip = batch[j];
+            if (r.status === 'success') {
+              try {
+                await GeolocationCache.create({
+                  ip_address: ip,
+                  country: r.country || null,
+                  country_code: r.countryCode || null,
+                  region: r.regionName || null,
+                  city: r.city || null,
+                  lat: r.lat || null,
+                  lon: r.lon || null,
+                  timezone: r.timezone || null,
+                  isp: r.isp || null,
+                });
+                cachedMap[ip] = {
+                  ip_address: ip,
+                  country: r.country,
+                  country_code: r.countryCode,
+                  city: r.city,
+                  lat: r.lat,
+                  lon: r.lon,
+                };
+              } catch (e) {
+                // duplicate key, ignore
+              }
+            }
+          }
+        } catch (e) {
+          console.error('Error batch geolocating:', e.message);
+        }
+      }
+    }
+
+    const visitasPorIP = await sequelize.query(`
+      SELECT ip_address, COUNT(*) as total
+      FROM visitas
+      WHERE ip_address IS NOT NULL AND ip_address != ''
+        AND ip_address NOT LIKE '127.%'
+        AND ip_address NOT LIKE '::1'
+        AND ip_address NOT LIKE '::ffff:127.%'
+      GROUP BY ip_address
+    `, { type: sequelize.QueryTypes.SELECT });
+
+    const locations = [];
+    const aggregated = {};
+
+    for (const v of visitasPorIP) {
+      const geo = cachedMap[v.ip_address];
+      if (geo && geo.lat && geo.lon) {
+        const key = `${geo.lat},${geo.lon}`;
+        if (!aggregated[key]) {
+          aggregated[key] = {
+            lat: parseFloat(geo.lat),
+            lon: parseFloat(geo.lon),
+            city: geo.city || 'Desconocida',
+            country: geo.country || 'Desconocido',
+            country_code: geo.country_code || '',
+            total: 0,
+          };
+        }
+        aggregated[key].total += parseInt(v.total);
+      }
+    }
+
+    for (const key of Object.keys(aggregated)) {
+      locations.push(aggregated[key]);
+    }
+
+    locations.sort((a, b) => b.total - a.total);
+
+    const porPais = {};
+    for (const v of visitasPorIP) {
+      const geo = cachedMap[v.ip_address];
+      const pais = geo?.country || 'Desconocido';
+      porPais[pais] = (porPais[pais] || 0) + parseInt(v.total);
+    }
+
+    const paises = Object.entries(porPais)
+      .map(([nombre, total]) => ({ nombre, total }))
+      .sort((a, b) => b.total - a.total);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        locations,
+        paises,
+        totalConUbicacion: locations.reduce((s, l) => s + l.total, 0),
+        totalIPs: ips.length,
       },
     });
   } catch (error) {

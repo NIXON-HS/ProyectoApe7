@@ -121,3 +121,40 @@
   background-color: rgba(241, 245, 249, 0.8);
   transform: translateX(3px);
 }
+
+/* Calendar heatmap */
+.calendar-day {
+  opacity: 0;
+  transform: scale(0.8);
+  animation: calendarPop 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes calendarPop {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.calendar-month {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: monthFadeIn 0.4s ease forwards;
+}
+
+@keyframes monthFadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.calendar-month:nth-child(1) { animation-delay: 0.1s; }
+.calendar-month:nth-child(2) { animation-delay: 0.2s; }
+.calendar-month:nth-child(3) { animation-delay: 0.3s; }
+
+/* Map wrapper */
+.map-wrapper {
+  padding: 0;
+  overflow: visible;
+}
