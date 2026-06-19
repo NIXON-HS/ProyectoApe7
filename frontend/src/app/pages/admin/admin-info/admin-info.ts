@@ -16,7 +16,7 @@ import { InfoGrupo } from '../../../core/models/info-grupo.model';
 })
 export class AdminInfoComponent implements OnInit {
   /** Which section to show. 'all' = legacy full view. */
-  @Input() section: 'all' | 'inicio' | 'proyectos' | 'publicaciones' | 'contacto' = 'all';
+  @Input() section: 'all' | 'inicio' | 'proyectos' | 'publicaciones' | 'contacto' | 'noticias' = 'all';
 
   infoGrupo: InfoGrupo = {};
   infoLoaded = false;
@@ -61,6 +61,9 @@ export class AdminInfoComponent implements OnInit {
     equipo_badge: 'Talento Humano',
     equipo_titulo: 'Nuestro Equipo de Investigación',
     equipo_descripcion: 'Conoce a los científicos, ingenieros y expertos multidisciplinares que lideran el desarrollo sostenible y la innovación tecnológica avanzada en REASONS.',
+    noticias_badge: 'Actualidad',
+    noticias_titulo: 'Noticias y Novedades',
+    noticias_descripcion: 'Mantente al tanto de las últimas noticias, eventos y logros del grupo de investigación REASONS.',
   };
 
   constructor(
@@ -112,6 +115,9 @@ export class AdminInfoComponent implements OnInit {
           equipo_badge: data.equipo_badge || d.equipo_badge,
           equipo_titulo: data.equipo_titulo || d.equipo_titulo,
           equipo_descripcion: data.equipo_descripcion || d.equipo_descripcion,
+          noticias_badge: data.noticias_badge || d.noticias_badge,
+          noticias_titulo: data.noticias_titulo || d.noticias_titulo,
+          noticias_descripcion: data.noticias_descripcion || d.noticias_descripcion,
         };
 
         this.infoDescModo = !!(data.descripcion_json);
@@ -268,13 +274,17 @@ export class AdminInfoComponent implements OnInit {
 
   guardarInfoHero() {
     this.saveInfo({
-      hero_badge:       this.infoGrupo.hero_badge,
-      hero_titulo:      this.infoGrupo.hero_titulo,
-      hero_nombre:      this.infoGrupo.hero_nombre,
-      hero_subtitulo:   this.infoGrupo.hero_subtitulo,
       hero_cita:        this.infoGrupo.hero_cita,
       hero_card_nombre: this.infoGrupo.hero_card_nombre,
       hero_card_grupo:  this.infoGrupo.hero_card_grupo,
-    }, 'Página Inicio (Hero)');
+    }, 'Tarjeta del Hero');
+  }
+
+  guardarInfoNoticias() {
+    this.saveInfo({
+      noticias_badge:       this.infoGrupo.noticias_badge,
+      noticias_titulo:      this.infoGrupo.noticias_titulo,
+      noticias_descripcion: this.infoGrupo.noticias_descripcion,
+    }, 'Página Noticias');
   }
 }

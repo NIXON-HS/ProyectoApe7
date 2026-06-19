@@ -1,0 +1,241 @@
+<app-admin-bar editTab="noticias"
+  [editMode]="editMode"
+  (editStart)="startEdit()"
+  (editSave)="saveEdit()"
+  (editCancel)="cancelEdit()">
+</app-admin-bar>
+
+<div class="min-h-screen pt-32 pb-24 bg-reasons-bg bg-grid-pattern relative">
+  <div class="max-w-7xl mx-auto px-6">
+
+    <!-- Edit mode banner -->
+    <div *ngIf="editMode" class="mb-4 px-4 py-2 bg-reasons-green/10 border border-reasons-green/30 rounded-2xl text-xs text-reasons-green font-semibold text-center animate-fade-in">
+      ✏ Modo edición activo — modifica los textos directamente y presiona "Guardar cambios"
+    </div>
+
+    <!-- Header -->
+    <div class="text-center max-w-3xl mx-auto flex flex-col gap-4 mb-16 animate-fade-in">
+      <span *ngIf="!editMode" class="text-xs font-bold text-reasons-green tracking-widest uppercase">
+        {{ info?.noticias_badge || 'Actualidad' }}
+      </span>
+      <input *ngIf="editMode" [(ngModel)]="draft.noticias_badge" class="ie-badge ie-badge-green" placeholder="Etiqueta..."/>
+
+      <h1 *ngIf="!editMode" class="text-4xl font-extrabold text-reasons-navy">
+        {{ info?.noticias_titulo || 'Noticias y Novedades' }}
+      </h1>
+      <input *ngIf="editMode" [(ngModel)]="draft.noticias_titulo" class="ie-title" placeholder="Título..."/>
+
+      <div class="w-16 h-1 bg-reasons-green mx-auto rounded-full"></div>
+
+      <p *ngIf="!editMode" class="text-slate-500 font-light leading-relaxed">
+        {{ info?.noticias_descripcion || 'Mantente informado sobre las últimas actividades, publicaciones y logros del grupo REASONS.' }}
+      </p>
+      <textarea *ngIf="editMode" [(ngModel)]="draft.noticias_descripcion" rows="3"
+                class="ie-desc" placeholder="Descripción..."></textarea>
+    </div>
+
+    <!-- Buscador + Filtros -->
+    <div class="max-w-4xl mx-auto flex flex-col gap-4 mb-10 animate-fade-in">
+      <!-- Buscador -->
+      <div class="glass-card flex items-center gap-3 px-5 py-3 rounded-2xl border border-white/60 shadow-sm hover-premium focus-within:ring-4 focus-within:ring-reasons-blue/8 focus-within:border-reasons-blue/30 transition-all duration-300">
+        <svg class="w-5 h-5 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input type="text" [(ngModel)]="searchQuery"
+               class="flex-1 bg-transparent border-0 outline-none text-slate-700 text-sm placeholder-slate-400"
+               placeholder="Buscar por título, categoría o resumen..." />
+        <button *ngIf="searchQuery" (click)="searchQuery = ''"
+                class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-all">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Chips de categoría + contador -->
+      <div class="flex flex-wrap items-start gap-x-6 gap-y-3">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Categoría</span>
+          <button (click)="filterCategoria = ''"
+                  class="px-4 py-1.5 rounded-full text-xs font-bold border cursor-pointer transition-all"
+                  [ngClass]="filterCategoria === ''
+                    ? 'bg-reasons-navy text-white border-reasons-navy shadow-md'
+                    : 'glass-card text-slate-600 border-slate-200/80 hover:border-reasons-blue/40 hover:text-reasons-blue hover:bg-reasons-blue/5 shadow-sm'">
+            Todas
+          </button>
+          <button *ngFor="let cat of categorias"
+                  (click)="filterCategoria = filterCategoria === cat ? '' : cat"
+                  class="px-4 py-1.5 rounded-full text-xs font-bold border cursor-pointer transition-all"
+                  [ngClass]="filterCategoria === cat
+                    ? 'bg-reasons-navy text-white border-reasons-navy shadow-md'
+                    : 'glass-card text-slate-600 border-slate-200/80 hover:border-reasons-blue/40 hover:text-reasons-blue hover:bg-reasons-blue/5 shadow-sm'">
+            {{ cat }}
+          </button>
+        </div>
+        <!-- Count + limpiar -->
+        <div class="flex items-center gap-3 ml-auto self-center">
+          <span class="text-xs text-slate-400 font-medium whitespace-nowrap">
+            <strong class="text-slate-600">{{ filtradas.length }}</strong> de {{ noticias.length }} noticias
+          </span>
+          <button *ngIf="filterCategoria || searchQuery"
+                  (click)="filterCategoria = ''; searchQuery = ''"
+                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-rose-500 bg-rose-50 border border-rose-200/50 hover:bg-rose-100 cursor-pointer transition-all">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+            Limpiar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading skeleton -->
+    <div *ngIf="isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div *ngFor="let _ of [1,2,3,4,5,6]" class="rounded-3xl bg-white/60 overflow-hidden shadow-sm animate-pulse">
+        <div class="h-52 bg-slate-200/80 rounded-t-3xl"></div>
+        <div class="p-6 flex flex-col gap-3">
+          <div class="h-3 w-20 bg-slate-200 rounded"></div>
+          <div class="h-5 w-full bg-slate-200 rounded"></div>
+          <div class="h-5 w-3/4 bg-slate-200 rounded"></div>
+          <div class="h-4 w-full bg-slate-100 rounded"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="!isLoading && filtradas.length === 0"
+         class="flex flex-col items-center justify-center py-24 gap-5 text-center">
+      <div class="w-20 h-20 rounded-3xl bg-white/70 glass-card flex items-center justify-center shadow-sm">
+        <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-lg font-bold text-slate-500">No hay noticias</p>
+        <p class="text-sm text-slate-400 mt-1">Prueba con otros términos de búsqueda o filtra por otra categoría.</p>
+      </div>
+      <button (click)="searchQuery = ''; filterCategoria = ''"
+              class="px-5 py-2.5 bg-reasons-green text-white text-sm font-semibold rounded-full hover:bg-[#327a28] transition-colors shadow-sm">
+        Ver todas las noticias
+      </button>
+    </div>
+
+    <!-- Cards grid -->
+    <div *ngIf="!isLoading && filtradas.length > 0"
+         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in">
+
+      <div *ngFor="let noticia of filtradas"
+           (click)="abrirNoticia(noticia)"
+           class="glowing-card glass-card rounded-3xl flex flex-col overflow-hidden cursor-pointer group">
+
+        <!-- Imagen -->
+        <div class="relative bg-gradient-to-br from-reasons-navy to-[#043d1a] h-52 overflow-hidden flex-shrink-0">
+          <img *ngIf="noticia.imagen_url"
+               [src]="resolveUrl(noticia.imagen_url)"
+               [alt]="noticia.titulo"
+               class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+          <div *ngIf="!noticia.imagen_url"
+               class="absolute inset-0 flex items-center justify-center text-white/20">
+            <svg class="w-14 h-14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2"
+                    d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15"/>
+            </svg>
+          </div>
+          <div class="absolute inset-0 bg-gradient-to-t from-[#001a2a]/60 via-transparent to-transparent"></div>
+          <span *ngIf="noticia.categoria"
+                class="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-white bg-reasons-green/85 backdrop-blur-sm border border-white/20">
+            {{ noticia.categoria }}
+          </span>
+        </div>
+
+        <!-- Contenido -->
+        <div class="flex flex-col gap-3 p-6 flex-1">
+          <span class="text-xs text-slate-400 font-semibold uppercase tracking-wide flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-reasons-green flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            {{ noticia.fecha | date:'dd MMM yyyy' }}
+          </span>
+          <h3 class="text-base font-bold text-reasons-navy leading-snug group-hover:text-reasons-green transition-colors line-clamp-2">
+            {{ noticia.titulo }}
+          </h3>
+          <p class="text-sm text-slate-500 font-light leading-relaxed line-clamp-3 flex-1">
+            {{ noticia.resumen }}
+          </p>
+          <span class="inline-flex items-center gap-1 text-reasons-green text-xs font-bold mt-auto pt-2 border-t border-slate-100 group-hover:gap-2 transition-all">
+            Leer más
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+            </svg>
+          </span>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal detalle noticia -->
+<div *ngIf="selectedNoticia"
+     (click)="cerrarNoticia()"
+     class="fixed inset-0 z-[200] bg-slate-900/65 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 noticia-backdrop">
+  <div (click)="$event.stopPropagation()"
+       class="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-100 flex flex-col noticia-modal">
+
+    <!-- Cover -->
+    <div class="relative bg-gradient-to-br from-reasons-navy to-[#043d1a] min-h-[220px] sm:min-h-[280px] overflow-hidden flex-shrink-0">
+      <img *ngIf="selectedNoticia.imagen_url"
+           [src]="resolveUrl(selectedNoticia.imagen_url)"
+           [alt]="selectedNoticia.titulo"
+           class="absolute inset-0 w-full h-full object-cover" />
+      <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/30 to-transparent"></div>
+      <button (click)="cerrarNoticia()"
+              class="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/40 hover:bg-black/65 text-white flex items-center justify-center transition-all hover:rotate-90 duration-300 cursor-pointer">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+      <div class="absolute bottom-6 left-6 right-6 flex flex-col gap-2.5">
+        <span class="inline-flex px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-[#7dd87a] bg-white/10 border border-white/20 w-fit backdrop-blur-md">
+          {{ selectedNoticia.categoria }}
+        </span>
+        <h2 class="text-xl sm:text-2xl md:text-3xl font-black text-white leading-tight">
+          {{ selectedNoticia.titulo }}
+        </h2>
+      </div>
+    </div>
+
+    <!-- Contenido -->
+    <div class="p-6 sm:p-8 flex flex-col gap-6">
+      <div class="flex items-center gap-1.5 text-xs text-slate-400 font-bold uppercase tracking-wide border-b border-slate-100 pb-3">
+        <svg class="w-4 h-4 text-reasons-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+        Publicado el {{ selectedNoticia.fecha | date:'longDate' }}
+      </div>
+
+      <div class="p-4 bg-slate-50 border-l-4 border-reasons-green rounded-r-2xl text-sm text-slate-600 font-light leading-relaxed italic">
+        {{ selectedNoticia.resumen }}
+      </div>
+
+      <div class="text-sm text-slate-700 font-light leading-relaxed prose max-w-none">
+        <app-block-renderer
+          [blocksJson]="selectedNoticia.contenido_json"
+          [fallback]="selectedNoticia.contenido">
+        </app-block-renderer>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="p-5 border-t border-slate-100 bg-slate-50/50 flex justify-end">
+      <button (click)="cerrarNoticia()"
+              class="px-6 py-2 bg-reasons-navy hover:bg-reasons-green text-white text-xs font-bold rounded-full transition-colors cursor-pointer shadow-sm">
+        Cerrar
+      </button>
+    </div>
+  </div>
+</div>

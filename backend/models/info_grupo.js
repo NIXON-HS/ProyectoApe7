@@ -43,6 +43,10 @@ const InfoGrupo = sequelize.define('info_grupo', {
   contacto_telefono:    { type: DataTypes.TEXT, allowNull: true },
   contacto_direccion:   { type: DataTypes.TEXT, allowNull: true },
 
+  noticias_badge:       { type: DataTypes.TEXT, allowNull: true },
+  noticias_titulo:      { type: DataTypes.TEXT, allowNull: true },
+  noticias_descripcion: { type: DataTypes.TEXT, allowNull: true },
+
   equipo_badge:        { type: DataTypes.TEXT, allowNull: true },
   equipo_titulo:       { type: DataTypes.TEXT, allowNull: true },
   equipo_descripcion:  { type: DataTypes.TEXT, allowNull: true },
