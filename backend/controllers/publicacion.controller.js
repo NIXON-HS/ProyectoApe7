@@ -1,4 +1,4 @@
-const { Publicacion, Investigador, LineaInvestigacion } = require('../models/index');
+const { Publicacion, Investigador, LineaInvestigacion, Solicitud } = require('../models/index');
 
 exports.getPublicaciones = async (req, res, next) => {
   try {
@@ -50,6 +50,23 @@ exports.getPublicacionById = async (req, res, next) => {
 exports.crearPublicacion = async (req, res, next) => {
   try {
     const { titulo, resumen, resumen_json, cita, revista_portada_url, doi_url, linea_id, investigadores } = req.body;
+    
+    if (req.usuario && req.usuario.rol === 'investigador') {
+      const solicitud = await Solicitud.create({
+        usuario_id: req.usuario.id,
+        tipo: 'publicacion',
+        accion: 'crear',
+        datos_nuevos: JSON.stringify(req.body),
+        estado: 'pendiente'
+      });
+      return res.status(202).json({
+        success: true,
+        message: 'Tu solicitud de creación de publicación ha sido enviada al administrador para su aprobación.',
+        data: solicitud,
+        isPendingApproval: true
+      });
+    }
+
     const newItem = await Publicacion.create({ titulo, resumen, resumen_json, cita, revista_portada_url, doi_url, linea_id });
     
     if (investigadores && Array.isArray(investigadores)) {
@@ -66,6 +83,23 @@ exports.actualizarPublicacion = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { titulo, resumen, resumen_json, cita, revista_portada_url, doi_url, linea_id, investigadores } = req.body;
+
+    if (req.usuario && req.usuario.rol === 'investigador') {
+      const solicitud = await Solicitud.create({
+        usuario_id: req.usuario.id,
+        tipo: 'publicacion',
+        accion: 'editar',
+        registro_id: id,
+        datos_nuevos: JSON.stringify(req.body),
+        estado: 'pendiente'
+      });
+      return res.status(202).json({
+        success: true,
+        message: 'Tu solicitud de modificación de publicación ha sido enviada al administrador para su aprobación.',
+        data: solicitud,
+        isPendingApproval: true
+      });
+    }
 
     const [updated] = await Publicacion.update(
       { titulo, resumen, resumen_json, cita, revista_portada_url, doi_url, linea_id },

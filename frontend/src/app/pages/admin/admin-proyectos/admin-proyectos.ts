@@ -11,6 +11,7 @@ import { BlockRendererComponent } from '../../../shared/block-renderer/block-ren
 import { PaginationComponent } from '../../../shared/pagination/pagination';
 import { Proyecto } from '../../../core/models/proyecto.model';
 import { Investigador } from '../../../core/models/investigador.model';
+import { SolicitudService } from '../../../core/services/solicitud.service';
 
 @Component({
   selector: 'app-admin-proyectos',
@@ -71,7 +72,8 @@ export class AdminProyectosComponent implements OnInit {
     private toastService: ToastService,
     private confirmService: ConfirmService,
     private cdr: ChangeDetectorRef,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private solicitudService: SolicitudService
   ) {}
 
   ngOnInit() {
@@ -229,6 +231,7 @@ export class AdminProyectosComponent implements OnInit {
           this.toastService.show('Proyecto actualizado exitosamente.', 'success');
           this.cargarTodo();
           this.cancelForm();
+          this.solicitudService.triggerRefreshCount();
         },
         error: () => {
           this.isSubmitting = false;
@@ -242,6 +245,7 @@ export class AdminProyectosComponent implements OnInit {
           this.toastService.show('Proyecto registrado exitosamente.', 'success');
           this.cargarTodo();
           this.cancelForm();
+          this.solicitudService.triggerRefreshCount();
         },
         error: () => {
           this.isSubmitting = false;

@@ -68,6 +68,18 @@ Publicacion.belongsToMany(Investigador, {
   as: 'investigadores'
 });
 
+// 5. Relación 1:N entre Usuario y Solicitudes
+Usuario.hasMany(Solicitud, {
+  foreignKey: 'usuario_id',
+  as: 'solicitudes',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+Solicitud.belongsTo(Usuario, {
+  foreignKey: 'usuario_id',
+  as: 'usuario'
+});
+
 module.exports = {
   sequelize,
   Investigador,
@@ -83,3 +95,4 @@ module.exports = {
   CarouselSlide,
   GeolocationCache
 };
+
